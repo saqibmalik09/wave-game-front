@@ -1,0 +1,880 @@
+# Teen Patti Game - Complete Requirements & Q&A Documentation
+
+## Project Overview
+Building a multi-tenant Teen Patti card game using Next.js, Redux, PixiJS, Bootstrap, and shadcn/ui components. Backend uses NestJS with Kafka for bet processing.
+
+---
+
+## Technology Stack
+- **Frontend**: Next.js 14+ (App Router)
+- **State Management**: Redux Toolkit
+- **UI Libraries**: Bootstrap, shadcn/ui
+- **Graphics/Animation**: PixiJS, GSAP
+- **API Communication**: Axios (HTTP), Socket.io (future implementation)
+- **Styling**: CSS Modules, Tailwind CSS (via shadcn)
+
+---
+
+## Directory Structure
+```
+src/
+├── app/
+│   ├── games/
+│   │   ├── layout.tsx
+│   │   └── page.tsx
+│   ├── teenpatti/
+│   │   ├── page.tsx
+│   │   ├── TeenPattiGame.tsx
+│   │   └── game/
+│   │       ├── TeenPattiEngine.ts
+│   │       ├── CardSprite.ts
+│   │       ├── ChipAnimation.ts
+│   │       └── SoundManager.ts
+│   ├── globals.css
+│   └── layout.tsx (ReduxProvider wrapped)
+├── lib/
+│   ├── redux/
+│   │   ├── store.ts
+│   │   ├── hooks.ts
+│   │   ├── provider.tsx
+│   │   └── slices/
+│   │       ├── userSlice.ts
+│   │       └── teenPattiSlice.ts
+│   └── api/
+│       └── api.tsx (Axios setup with interceptors)
+```
+
+---
+
+## Question 1: API & Backend Integration
+
+### Question:
+- What does your betting API endpoint look like?
+- What response format does your Kafka/backend return?
+- Do you have WebSocket/Socket.io for real-time updates?
+- What's the structure of game state updates?
+
+### Answer:
+
+#### Base URL
+```typescript
+process.env.BACKEND_API_URL = "http://127.0.0.1:4005/api"
+```
+
+#### Bet Placement Endpoint
+**Endpoint**: `POST /teenpatti/bet`
+
+**Request Payload**:
+```json
+{
+  "userId": "user_123",
+  "amount": 500,
+  "tableId": "table_456",
+  "betType": "player"
+}
+```
+
+**Response**:
+```json
+{
+  "success": true,
+  "message": "Bet accepted for processing",
+  "data": {
+    "betId": "abc-123-def",
+    "userId": "user_123",
+    "amount": 500,
+    "tableId": "table_456",
+    "game": "teenpatti",
+    "timestamp": 1704067200000,
+    "status": "pending"
+  }
+}
+```
+
+#### Game Result Endpoint
+**Endpoint**: `POST /teenpatti/game/result`
+
+**Response**:
+```json
+{
+  "success": true,
+  "message": "Winners announced successfully",
+  "data": {
+    "winners": [
+      {
+        "userId": "user_123",
+        "amountWon": 1500,
+        "gameId": 16,
+        "imageProfile": "https://randomuser.me/api/portraits/men/75.jpg"
+      }
+    ],
+    "winningPot": "pot1",
+    "winningPotRankText": "Pair",
+    "winningCards": [
+      "https://deckofcardsapi.com/static/img/AS.png",
+      "https://deckofcardsapi.com/static/img/2S.png",
+      "https://deckofcardsapi.com/static/img/3S.png"
+    ]
+  }
+}
+```
+
+#### Real-Time Communication
+- **Current**: HTTP polling (no WebSocket yet)
+- **Future**: Socket.io implementation planned
+- **Polling Interval**: 3-4 seconds for pot/user updates
+
+#### Game Timing Configuration
+- Round timing is **dynamic** from configuration API
+- All time values stored in variables at top of code (easily changeable)
+- Round phases: Betting → Calculation → Result Announce → Next Bet Wait
+
+---
+
+## Question 2: Redux State Management
+
+### Question:
+- Do you already have slices defined?
+- What's in your userslice.ts?
+- Should I create new slices for game state?
+
+### Answer:
+
+#### Current Setup
+- Axios instance configured in `app/lib/api/api.tsx`
+- Token interceptor automatically attaches auth token from localStorage
+- Response/Error interceptors for logging
+
+**Existing Axios Structure**:
+```typescript
+const api: AxiosInstance = axios.create({
+  baseURL: BASE_URL,
+  timeout: 10000,
+  headers: {
+    "Content-Type": "application/json",
+    Accept: "application/json",
+  },
+});
+```
+
+#### User Data Endpoint
+**Endpoint**: `GET /teenpatti/user/data`
+
+**Response**:
+```json
+{
+  "success": true,
+  "message": "User data fetched successfully",
+  "data": {
+    "user": [
+      {
+        "userId": "user_123",
+        "balance": 1500,
+        "gameId": 16,
+        "imageProfile": "https://randomuser.me/api/portraits/men/75.jpg"
+      }
+    ]
+  }
+}
+```
+
+#### Required Slices
+1. **userSlice.ts**: Store user balance, profile, userId, imageProfile
+2. **teenPattiSlice.ts**: Store game state, pots, timer, phase, selectedChip
+
+#### TypeScript Types
+- Use existing `types.ts` file for data structures
+- No need to create new type files unless absolutely necessary
+- Keep types lightweight to maintain fast game performance
+
+---
+
+## Question 3: Game Rules & Variants
+
+### Question:
+- Which Teen Patti variant?
+- What are the 3 betting lanes?
+- What are exact multipliers?
+
+### Answer:
+
+#### Game Variant
+- **Classic 3-card Teen Patti**
+- 3 betting lanes (pots) displayed side-by-side
+- Each pot shows 3 cards (face-down during betting, revealed on result)
+- Any one pot will be the winner showing winning card combination
+
+#### Game Configuration Endpoint
+**Endpoint**: `POST /teenpatti/game/configuration`
+
+**Request Payload**:
+```json
+{
+  "gameId": 16
+}
+```
+
+**Response**:
+```json
+{
+  "success": true,
+  "message": "Game configuration fetched successfully",
+  "data": {
+    "gameId": 16,
+    "bettingCoins": [10, 50, 100, 500, 1000],
+    "returnWinngingPotPercentage": [1.9, 2, 2.5],
+    "winningCalculationTime": 3000,
+    "BettingTime": 30000,
+    "resultAnnounceTime": 30000,
+    "nextBetWait": 5000,
+    "colors": ["red", "green", "blue", "yellow"],
+    "cardImages": [
+      ["https://deckofcardsapi.com/static/img/AS.png", "https://deckofcardsapi.com/static/img/2S.png", "https://deckofcardsapi.com/static/img/3S.png"],
+      ["https://deckofcardsapi.com/static/img/4S.png", "https://deckofcardsapi.com/static/img/5S.png", "https://deckofcardsapi.com/static/img/6S.png"],
+      ["https://deckofcardsapi.com/static/img/7S.png", "https://deckofcardsapi.com/static/img/8S.png", "https://deckofcardsapi.com/static/img/9S.png"]
+    ],
+    "cardBackImages": [
+      ["https://deckofcardsapi.com/static/img/back.png", "https://deckofcardsapi.com/static/img/back.png", "https://deckofcardsapi.com/static/img/back.png"],
+      ["https://deckofcardsapi.com/static/img/back.png", "https://deckofcardsapi.com/static/img/back.png", "https://deckofcardsapi.com/static/img/back.png"],
+      ["https://deckofcardsapi.com/static/img/back.png", "https://deckofcardsapi.com/static/img/back.png", "https://deckofcardsapi.com/static/img/back.png"]
+    ],
+    "tableBackgroundImage": "https://example.com/table-bg.jpg",
+    "dealerAvatar": "https://example.com/dealer.png",
+    "cardsShuffleSound": "https://example.com/shuffle.mp3",
+    "betButtonAndCardClickSound": "https://example.com/click.mp3",
+    "timerUpSound": "https://example.com/timeup.mp3"
+  }
+}
+```
+
+#### Pot Display
+- Each pot shows **"Pot [total bet amount]"** at the top
+- Total bet = sum of ALL users' bets on that specific pot
+- Pot totals update dynamically via polling every 3-4 seconds
+
+#### Multipliers
+- Frontend displays multipliers from API (`returnWinngingPotPercentage`)
+- Backend calculates actual winnings (no frontend calculation needed)
+- Display multiplier below each pot (e.g., "x1.9", "x2", "x2.5")
+
+---
+
+## Question 4: Coin Denominations & Balance
+
+### Question:
+- Coin denominations to display?
+- Starting balance?
+- Min/Max bet limits?
+- Can chips be stacked on same lane?
+
+### Answer:
+
+#### Coin Selection Behavior
+- **Default Selection**: First coin (lowest denomination) auto-selected on game load
+- **Selection Visual**: Selected coin lifts slightly upward (minor pixels, e.g., 5-10px translateY)
+- **Single Selection**: Only ONE coin can be selected at a time
+- **Beautiful Selection**: Add subtle glow, border, or scale effect
+
+#### Bet Placement Animation
+1. User selects a coin (e.g., 100)
+2. User clicks on any pot
+3. Coin animates FROM **top center of that pot** (not from coin tray)
+4. Coin displays the selected amount (e.g., "100" text on coin sprite)
+5. Coin lands in a **random free area** inside the pot
+6. Coins can **overlap each other** (no collision detection needed)
+7. User can select different coin and repeat
+
+#### Balance Management
+- **Starting Balance**: Fetched from `/teenpatti/user/data` API
+- **Balance Deduction**: Happens via `/teenpatti/bet` API call
+- **No Min/Max Limits**: User can bet any coin denomination until balance runs out
+- **Real-time Update**: Balance updates from API response
+
+#### Coin Stacking
+- **Unlimited Bets**: User can place multiple bets on same pot
+- **Multiple Pots**: User can bet on all 3 pots in one round
+- **No Cancellation**: Once bet is placed, cannot undo (until round ends)
+- **Coins Persist**: Placed coins remain visible until result announcement
+- **Coins Removed**: After result announced, all coins cleared for next round
+
+---
+
+## Question 5: Timer & Round Flow
+
+### Question:
+- Betting phase duration?
+- Calculation/reveal phase duration?
+- Auto-start next round?
+
+### Answer:
+
+#### Timer Configuration
+All timing values come from `/teenpatti/game/configuration` API:
+
+1. **Betting Phase**: `BettingTime` (e.g., 30000ms = 30 seconds)
+   - Timer countdown displayed (30 → 0)
+   - Users can place bets during this phase
+   - Circular progress ring visual
+
+2. **Calculation Phase**: `winningCalculationTime` (e.g., 3000ms = 3 seconds)
+   - No betting allowed
+   - Card flip animation occurs
+   - Processing/shuffling visual effect
+
+3. **Result Announce Phase**: `resultAnnounceTime` (e.g., 30000ms = 30 seconds)
+   - Winners modal displayed
+   - Winning pot glows green for 2 seconds
+   - Winning cards revealed
+   - Hand rank text shown (e.g., "Pair", "Trio", "High Card")
+
+4. **Next Bet Wait**: `nextBetWait` (e.g., 5000ms = 5 seconds)
+   - Brief pause before next round
+   - Smooth transition period
+
+#### Auto-Loop Behavior
+```
+[Betting Phase 30s] → [Calculation 3s] → [Result 30s] → [Wait 5s] → [Repeat]
+```
+
+- **Auto-Start**: Yes, automatically start next round after wait period
+- **API Re-fetch**: Call `/teenpatti/game/configuration` on each new round
+- **Smooth Updates**: Ensure no UI jank during transitions
+- **Timer Sync**: All users see same timer (server-controlled)
+
+#### Timer Visual Behavior
+- **Normal State**: Green/blue gradient progress ring
+- **Last 5 Seconds**: Ring color shifts to red, pulsing animation
+- **Timer Sound**: Play `timerUpSound` when timer reaches 0
+- **Numeric Display**: Bold white text in center of ring (e.g., "23")
+
+---
+
+## Question 6: Assets & Resources
+
+### Question:
+- Do you have asset URLs or need placeholders?
+- Sound files provided?
+
+### Answer:
+
+#### All Assets from Configuration API
+Everything comes from `POST /teenpatti/game/configuration`:
+
+**Visual Assets**:
+- `tableBackgroundImage`: Full-screen background
+- `dealerAvatar`: Static dealer image (no animation frames needed)
+- `cardImages`: 3 pots × 3 cards = 9 front-facing card URLs
+- `cardBackImages`: 3 pots × 3 cards = 9 back-facing card URLs
+- `colors`: Array for coin colors (e.g., ["red", "green", "blue", "yellow"])
+
+**Audio Assets**:
+- `cardsShuffleSound`: Played during card flip animation
+- `betButtonAndCardClickSound`: Played on coin selection & bet placement
+- `timerUpSound`: Played when any timer phase ends (0 seconds)
+
+#### Asset Implementation Notes
+- **No Placeholders**: All real URLs provided by API
+- **Preload Assets**: Load all textures/sounds before game starts
+- **Fallback**: Show loading screen until assets ready
+- **CDN URLs**: All assets hosted externally (deck of cards API, custom CDN)
+
+---
+
+## Question 7: Multi-Tenant Architecture
+
+### Question:
+- How does game selection work?
+- Different themes per tenant?
+- Tenant config from API or hardcoded?
+
+### Answer:
+**SKIPPED FOR NOW** - Will implement in future phase. Current focus is single-game implementation.
+
+---
+
+## Question 8: Mobile Responsiveness
+
+### Question:
+- Full responsive design or desktop-first?
+- Touch vs click interactions?
+
+### Answer:
+
+#### Responsive Strategy
+- **Primary Focus**: Desktop-first implementation
+- **Bootstrap Grid**: Use for layout responsiveness
+- **PixiJS Canvas**: Handle resize events, maintain aspect ratio
+- **Future Enhancement**: Mobile-specific layout (stacked pots, swipe controls)
+
+#### Interaction Design
+- **Click & Touch**: Both handled automatically by PixiJS
+- **No Special Handling**: Standard event listeners work for both
+- **Coin Animation**: Same animation path for click/touch
+
+---
+
+## Question 9: File Structure & TypeScript
+
+### Question:
+- Confirm file structure preference?
+- Should PixiJS logic be split or in single engine file?
+- Separate types.ts file?
+
+### Answer:
+
+#### Confirmed File Structure
+```
+teenpatti/
+├── page.tsx (Next.js route page)
+├── TeenPattiGame.tsx (Main React component)
+└── game/
+    ├── TeenPattiEngine.ts (PixiJS initialization & game loop)
+    ├── CardSprite.ts (Card rendering & flip animation)
+    ├── ChipAnimation.ts (Coin toss & stacking logic)
+    └── SoundManager.ts (Audio playback & mute toggle)
+```
+
+#### TypeScript Types
+- **Use Existing**: `types.ts` file already present
+- **Add Only When Needed**: Don't create unnecessary type files
+- **Keep Lightweight**: Prioritize fast game performance over extensive typing
+
+#### Sound Implementation Functions
+All sound triggers from configuration API keys:
+- `betButtonAndCardClickSound`: Coin click, card click
+- `timerUpSound`: When timer reaches 0 (betting/calculation/result phases)
+- `cardsShuffleSound`: During card flip animation
+
+---
+
+## Question 10: Additional Features - Users & Pot Data
+
+### Question:
+- Players list data source?
+- Chat/tooltip functional?
+- Result modal content?
+- Sound toggle preference storage?
+
+### Answer:
+
+#### Combined Pot & Users API
+**Endpoint**: `POST /teenpatti/game/potbetandusers/list`
+
+**Request Payload**:
+```json
+{
+  "gameId": 16
+}
+```
+
+**Response**:
+```json
+{
+  "success": true,
+  "message": "Game bets fetched successfully",
+  "data": {
+    "pots": [
+      {
+        "potName": "pot1",
+        "betCoins": [50, 100, 100, 200, 500, 100, 50, 200],
+        "totalBetAmount": 1300
+      },
+      {
+        "potName": "pot2",
+        "betCoins": [100, 100, 200, 50, 500, 100],
+        "totalBetAmount": 1050
+      },
+      {
+        "potName": "pot3",
+        "betCoins": [50, 100, 100, 500, 200],
+        "totalBetAmount": 950
+      }
+    ],
+    "users": [
+      {
+        "userId": "user_101",
+        "name": "Alice",
+        "imageProfile": "https://randomuser.me/api/portraits/women/65.jpg"
+      },
+      {
+        "userId": "user_102",
+        "name": "Bob",
+        "imageProfile": "https://randomuser.me/api/portraits/men/66.jpg"
+      },
+      {
+        "userId": "user_103",
+        "name": "Charlie",
+        "imageProfile": "https://randomuser.me/api/portraits/men/67.jpg"
+      }
+    ]
+  }
+}
+```
+
+#### Real-Time Synchronization
+- **Polling Interval**: Call API every 3-4 seconds
+- **All Users See Same Data**: Timer, pots, bets synchronized across clients
+- **Join Anytime**: New users see current game state immediately
+- **Bet Coins Display**: Convert `betCoins` array into individual coin sprites in pot
+
+#### Users List Display (Left Sidebar)
+- **Show All Active Players**: From `users` array in API response
+- **Avatar Display**: Circular profile images
+- **Overflow Handling**: If more than 4 users, show "10+" indicator
+- **Dynamic Updates**: List refreshes every 3-4 seconds
+- **No Winner Indicator**: Just display names and avatars (no crown/rank badges)
+
+#### Sound Toggle
+- **Default State**: Sound ON by default
+- **Toggle Button**: Icon in top bar (speaker icon)
+- **No Persistence**: Session-based only (no localStorage/Redux storage needed)
+- **Keep Lightweight**: Avoid heavy game size, prioritize performance
+
+#### Dealer Avatar
+- **Static Image Only**: No frame-based animation needed
+- **Single Sprite**: Load from `dealerAvatar` URL in config API
+- **Placement**: Center-top above pots
+
+---
+
+## Detailed Q&A Clarifications (Round 2)
+
+### Q1: Bet Placement Flow (DETAILED)
+
+#### Coin Selection Mechanism
+1. **Default Selection**: First coin in `bettingCoins` array auto-selected on load
+2. **Visual Feedback**: Selected coin elevated by 5-10px (CSS translateY)
+3. **Selection Change**: Click different coin → previous coin returns to normal, new coin elevates
+4. **No Flip Animation**: Coins don't flip, just selection indicator changes
+
+#### Bet Animation Flow
+```
+User clicks coin (100) → Coin UI shows selected state
+↓
+User clicks pot2 → Check balance
+↓
+If balance >= 100:
+  - Create coin sprite at top-center of pot2
+  - Animate coin downward with random X offset
+  - Display "100" text on coin
+  - Coin lands and stays visible
+  - Call /teenpatti/bet API
+  - Deduct from balance
+↓
+If balance < 100:
+  - Show toast: "Insufficient balance"
+  - No animation, no API call
+```
+
+#### Coin Positioning
+- **Start Position**: Top-center of clicked pot (fixed X, Y at pot top)
+- **End Position**: Random X/Y within pot boundaries
+- **Overlap Allowed**: Coins can stack/overlap freely
+- **No Physics**: Simple tween animation, no collision detection
+
+#### Multi-Bet Behavior
+- User can bet on **same pot multiple times** (coins stack)
+- User can bet on **all 3 pots** in one round
+- Each bet creates new coin sprite with selected amount
+- Changing coin selection affects **next bet only** (existing bets unchanged)
+
+---
+
+### Q2: Pot Total Display
+
+#### Data Source
+- **API**: `POST /teenpatti/game/potbetandusers/list`
+- **Polling**: Call every 3-4 seconds
+- **Display**: "Pot 1300" text above each pot
+
+#### Coin Rendering
+```javascript
+// Example: pot1 has betCoins: [50, 100, 100, 200, 500]
+// Render 5 coin sprites in pot1, each showing its denomination
+```
+
+#### Real-Time Updates
+- All users see identical pot totals
+- When any user places bet, next polling cycle updates everyone's view
+- No WebSocket yet, so small 3-4 second delay is acceptable
+
+---
+
+### Q3: Result Announcement (DETAILED)
+
+#### Result API Response Structure
+```json
+{
+  "winners": [
+    { "userId": "user_123", "amountWon": 1500, "imageProfile": "..." },
+    { "userId": "user_456", "amountWon": 900, "imageProfile": "..." }
+  ],
+  "winningPot": "pot1",
+  "winningPotRankText": "Pair",
+  "winningCards": [
+    "https://deckofcardsapi.com/static/img/AS.png",
+    "https://deckofcardsapi.com/static/img/AS.png",
+    "https://deckofcardsapi.com/static/img/3S.png"
+  ]
+}
+```
+
+#### Result Phase Animation Sequence
+```
+1. Betting timer ends (0s)
+   ↓
+2. Calculation phase starts (3s)
+   - All 3 pots: flip cards from back to front
+   - Play cardsShuffleSound
+   ↓
+3. Cards fully revealed
+   - Identify winningPot (e.g., "pot1")
+   - Apply green glow border/background to pot1 for 2 seconds
+   ↓
+4. Display hand rank text below pot1 cards: "Pair"
+   ↓
+5. Show winners modal (30s duration)
+   - Display all winners with avatars, amounts
+   - Current user highlighted if in winners array
+   ↓
+6. Modal auto-closes after 30s
+   ↓
+7. Next round wait (5s)
+   - Clear all coin sprites
+   - Reset pots to card backs
+   - Re-fetch configuration API
+   ↓
+8. New betting phase starts
+```
+
+#### Winning Pot Visual Effects
+- **Border Glow**: Green color, 2 second duration
+- **Background Glow**: Semi-transparent green overlay
+- **Hand Rank Text**: Display below cards (e.g., "Pair", "Trio", "High Card")
+- **Data Source**: `winningPotRankText` from API (no frontend calculation)
+
+#### Winners Modal Content
+- **Show All Winners**: Display entire `winners` array
+- **Avatar + Amount**: Circular profile image with amount won below
+- **Current User Highlight**: If logged-in user is in winners, show border/badge
+- **Auto-Close**: Modal disappears after `resultAnnounceTime` (30s)
+
+#### Losing Bets
+- **No Animation**: Losing coins simply disappear when modal shows
+- **No Sweep Effect**: Just fade out or instant removal (your choice)
+
+---
+
+### Q4: Card Reveal Logic
+
+#### Card States
+1. **Betting Phase**: All pots show `cardBackImages` (face-down)
+2. **Calculation Phase**: All pots flip to `cardImages` (face-up)
+3. **Result Phase**: Winning pot highlighted, losing pots stay normal
+
+#### Card Flip Animation
+- **Technique**: PixiJS sprite scale animation (scaleX: 1 → 0 → 1)
+- **Texture Swap**: At scaleX = 0, change texture from back to front
+- **Duration**: 400-600ms per card
+- **Sequential**: Flip 3 cards in pot with 100ms stagger
+- **Sound**: Play `cardsShuffleSound` once per pot during flip
+
+#### Winning Pot Highlight
+- **When**: After all cards revealed
+- **Duration**: 2 seconds green glow
+- **Effect**: CSS box-shadow + border, or PixiJS sprite overlay
+- **Hand Rank**: Display text below cards (from `winningPotRankText`)
+
+#### Hand Rank Text Display
+- **Position**: Below 3 cards in winning pot
+- **Font**: Bold, 16-18px, yellow/gold color
+- **Examples**: "Pair", "Trio", "High Card", "Straight", "Flush"
+- **Data Source**: API response (no frontend logic)
+
+---
+
+### Q5: Sound Manager
+
+#### Default Behavior
+- **Sound ON**: Game starts with audio enabled
+- **User Control**: Top bar speaker icon toggles on/off
+- **No Persistence**: Setting resets on page reload (no localStorage)
+
+#### Sound Triggers
+| Event | Sound File | Source |
+|-------|-----------|--------|
+| Coin click | `betButtonAndCardClickSound` | Config API |
+| Bet placement | `betButtonAndCardClickSound` | Config API |
+| Card flip | `cardsShuffleSound` | Config API |
+| Timer ends | `timerUpSound` | Config API |
+
+#### Implementation
+- Preload all sound files on game start
+- Check mute state before playing any sound
+- Use Web Audio API or HTML5 Audio (your choice)
+
+---
+
+### Q6: Player List (Left Sidebar)
+
+#### Display Rules
+- **Show All Users**: From `/teenpatti/game/potbetandusers/list` API
+- **Update Frequency**: Polling every 3-4 seconds
+- **Max Visible**: Show 4 avatars, if more → display "10+" indicator
+- **No Ranking**: Just display profile pictures (no gold/silver/bronze crowns)
+
+#### Visual Design
+- **Circular Avatars**: 48px diameter
+- **Vertical Stack**: Aligned left side of game area
+- **Semi-Transparent Background**: Dark panel with blur effect
+- **Dynamic List**: Users can join/leave, list updates automatically
+
+---
+
+### Q7: Dealer Avatar
+
+#### Implementation
+- **Static Image Only**: No animation frames needed
+- **Single PNG**: Load from `dealerAvatar` URL in config
+- **Placement**: Center-top of game area, above 3 pots
+- **Size**: ~200x250px (adjust to fit design)
+
+---
+
+### Q8: Error Handling
+
+#### Insufficient Balance Toast
+- **Trigger**: User clicks pot but balance < selected coin amount
+- **Display**: Small toast notification (shadcn/ui Toast component)
+- **Duration**: 2 seconds, auto-dismiss
+- **Message**: "Insufficient balance"
+- **Repetition**: Each click shows new toast (can show multiple)
+- **No UI Blocking**: User can still click, select coins, just no bet placed
+
+#### No Button Blocking
+- **Always Enabled**: Coin selection & pot clicks always work
+- **Balance Check**: Only validate on API call attempt
+- **Visual Feedback**: Toast is only indication of failure
+
+---
+
+### Q9: tableId in Bet Payload
+
+#### Source
+- **Redux State**: Store `tableId` in `teenPattiSlice`
+- **Initial Load**: Fetch from config API or URL param
+- **Example**: `tableId: "table_456"` (can be dynamic)
+
+#### Usage
+```typescript
+// When placing bet:
+{
+  userId: currentUser.userId,
+  amount: selectedCoin,
+  tableId: gameState.tableId,
+  betType: "player"
+}
+```
+
+---
+
+### Q10: Winning Pot Percentage
+
+#### Display
+- **Show on Pot**: Display multiplier text below pot cards (e.g., "x1.9")
+- **Data Source**: `returnWinngingPotPercentage` from config API
+- **Mapping**: pot1 → [0] = 1.9, pot2 → [1] = 2.0, pot3 → [2] = 2.5
+
+#### Calculation
+- **Backend Only**: Frontend just displays, no calculation
+- **Winning Amount**: API returns `amountWon` directly in result response
+
+---
+
+### Q11: Betting Phase Restrictions
+
+#### Multiple Bets
+- ✅ **Same Pot**: User can place unlimited bets on one pot
+- ✅ **Multiple Pots**: User can bet on all 3 pots in one round
+- ✅ **Different Amounts**: Change coin selection between bets
+
+#### No Cancellation
+- ❌ **No Undo**: Once bet placed, cannot cancel
+- ❌ **No Refund**: Bet locked until round ends
+- ✅ **Add More**: Can add more bets until timer ends
+
+#### Balance Check
+- **Before Each Bet**: Validate balance >= selected coin
+- **Deduct Immediately**: API call deducts balance server-side
+- **Client Update**: Reflect new balance from API response
+
+---
+
+### Q12: Next Round Auto-Start
+
+#### Sequence
+```
+Result modal shows (30s)
+  ↓
+Modal auto-closes
+  ↓
+Wait period (5s) with "Next round starting..." text
+  ↓
+Call /teenpatti/game/configuration API
+  ↓
+Load new card images (if changed)
+  ↓
+Reset game state:
+  - Clear all coin sprites
+  - Reset pots to card backs
+  - Reset timer to betting phase
+  ↓
+Start new betting phase (30s)
+```
+
+#### Configuration Update
+- **Re-fetch Every Round**: Call config API each time
+- **Smooth Transition**: Preload assets during wait period
+- **Handle Changes**: If `cardImages` or timings change, update dynamically
+
+#### State Reset
+- **Coins Removed**: All placed coins cleared
+- **Pots Reset**: Back to face-down cards, no glow
+- **Balance Updated**: Fetch fresh balance from user API
+- **Timer Restart**: New countdown starts
+
+---
+
+## Implementation Priorities
+
+### Phase 1: Core Layout & State (Week 1)
+1. Redux slices (`userSlice`, `teenPattiSlice`)
+2. API service methods in `api.tsx`
+3. Bootstrap layout (top bar, 3 pots, coin tray)
+4. Static pot display with card images
+
+### Phase 2: PixiJS Integration (Week 1-2)
+1. Initialize PixiJS canvas, load textures
+2. Render 3 pots with cards (PixiJS sprites)
+3. Coin selection UI (Bootstrap buttons)
+4. Static coin sprites in tray
+
+### Phase 3: Betting & Animation (Week 2)
+1. Bet placement API integration
+2. Coin toss animation (top-to-pot)
+3. Balance deduction & update
+4. Polling for pot totals every 3-4s
+
+### Phase 4: Game Loop & Timer (Week 2-3)
+1. Timer countdown with progress ring
+2. Phase transitions (betting → calculation → result)
+3. Card flip animation
+4. Result API integration
+
+### Phase 5: Result & Winners (Week 3)
+1. Winning pot glow effect
+2. Hand rank text display
+3. Winners modal with avatars
+4. Auto-close and next round start
+
+### Phase 6: Polish
