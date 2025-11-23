@@ -1,4 +1,4 @@
-//potCard.tsx
+//PotCard.tsx
 'use client';
 import React, { useState, useEffect, useRef } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
@@ -6,6 +6,7 @@ import { RootState } from '@/lib/redux/store';
 import { placeBet } from '@/lib/redux/slices/teenpatti/teenPattiBettingSlice';
 import { SoundManager } from '../game/SoundManager';
 import { useToast } from './Toast';
+import { clearPendingCoin } from '@/lib/redux/slices/teenpatti/coinDropAnimation';
 
 interface PotCardProps {
   potIndex: number;
@@ -46,10 +47,13 @@ export default function PotCard({
   const selectedCoin = useSelector((s: RootState) => s.selectedCoin.coin);
   const currentPhase = useSelector((s: RootState) => s.teenpattiTimer.phase);
   const gameConfig = useSelector((s: RootState) => s.gameConfiguration.data);
+  const pendingCoin = useSelector((state: RootState) => state.coinAnimation.pendingCoin);
   const { ToastContainer, showToast } = useToast();
+  const coinsContainerRef = useRef<HTMLDivElement>(null);
 
   const bettingCoins: number[] = gameConfig?.bettingCoins || [];
   const colors: string[] = gameConfig?.colors || [];
+  const tableBackgroundImage = gameConfig?.tableBackgroundImage;
 
   const coinColorMap: Record<number, string> = {};
   bettingCoins.forEach((value, index) => {
@@ -60,11 +64,9 @@ export default function PotCard({
   const [coinIdCounter, setCoinIdCounter] = useState(0);
   const apiCoinsAnimated = useRef(false);
   const previousPhase = useRef(currentPhase);
-
-  // Cards state
   const [displayCards, setDisplayCards] = useState<string[]>(cardBackImages);
 
-  // Clear coins when phase is not bettingTimer
+  // ✅ Clear coins when phase changes
   useEffect(() => {
     if (currentPhase !== 'bettingTimer') {
       setCoins([]);
@@ -72,7 +74,7 @@ export default function PotCard({
     }
   }, [currentPhase]);
 
-  // Animate API coins once per bettingTimer
+  // ✅ Initial coin drop animation (API coins)
   useEffect(() => {
     const phaseJustStarted =
       previousPhase.current !== 'bettingTimer' && currentPhase === 'bettingTimer';
@@ -80,7 +82,6 @@ export default function PotCard({
 
     if (phaseJustStarted && !apiCoinsAnimated.current && betCoins.length > 0) {
       apiCoinsAnimated.current = true;
-
       const totalDuration = 4000;
       const bunchSize = Math.ceil(betCoins.length / 3);
 
@@ -90,11 +91,15 @@ export default function PotCard({
         const bunchDelay = bunchIndex * (totalDuration / 3);
 
         setTimeout(() => {
+          if (!coinsContainerRef.current) return;
+          const containerWidth = coinsContainerRef.current.offsetWidth;
+          const containerHeight = coinsContainerRef.current.offsetHeight;
+          
           const newCoin: CoinData = {
             id: coinIdCounter + idx,
             value: coinValue,
-            x: Math.random() * 160,
-            y: Math.random() * 40,
+            x: Math.random() * (containerWidth * 0.75),
+            y: Math.random() * (containerHeight * 0.5),
             isAnimating: true,
           };
 
@@ -114,22 +119,58 @@ export default function PotCard({
     }
   }, [currentPhase, betCoins]);
 
-  // Handle card flip during resultAnnounceTimer
+  // ✅ Listen for server response and animate user coin
+  useEffect(() => {
+    if (pendingCoin && pendingCoin.potIndex === potIndex) {
+      SoundManager.getInstance().play('betButtonAndCardClickSound');
+
+      if (!coinsContainerRef.current) {
+        dispatch(clearPendingCoin());
+        return;
+      }
+
+      const containerWidth = coinsContainerRef.current.offsetWidth;
+      const containerHeight = coinsContainerRef.current.offsetHeight;
+
+      const newCoinId = coinIdCounter;
+      setCoinIdCounter(prev => prev + 1);
+
+      const newUserCoin: CoinData = {
+        id: newCoinId,
+        value: pendingCoin.value,
+        x: Math.random() * (containerWidth * 0.75),
+        y: Math.random() * (containerHeight * 0.5),
+        isAnimating: true,
+      };
+
+      setCoins(prev => [...prev, newUserCoin]);
+
+      setTimeout(() => {
+        setCoins(prev =>
+          prev.map(c =>
+            c.id === newCoinId ? { ...c, isAnimating: false } : c
+          )
+        );
+      }, 500);
+
+      dispatch(clearPendingCoin());
+    }
+  }, [pendingCoin, potIndex, coinIdCounter, dispatch]);
+
+  // ✅ Card flip animation
   useEffect(() => {
     if (currentPhase === 'resultAnnounceTimer') {
-      // Wait 2s before flip
-      setDisplayCards(cardBackImages); // start with back
+      setDisplayCards(cardBackImages);
       const timer = setTimeout(() => {
-        setDisplayCards(cardImages); // flip to front
+        setDisplayCards(cardImages);
       }, 2000);
-
       return () => clearTimeout(timer);
     } else {
-      // Non-result phases → show back
       setDisplayCards(cardBackImages);
     }
   }, [currentPhase, cardBackImages, cardImages]);
 
+  // ✅ Handle pot click - ONLY dispatch bet, NO animation here
   const handlePotClick = () => {
     if (!selectedCoin) {
       showToast(`Please select a coin to bet!`);
@@ -141,72 +182,70 @@ export default function PotCard({
       return;
     }
 
-    SoundManager.getInstance().play('betButtonAndCardClickSound');
     const selectedCoinAmount = selectedCoin.amount;
 
-    const newCoinId = coinIdCounter;
-    setCoinIdCounter(prev => prev + 1);
-
-    const newUserCoin: CoinData = {
-      id: newCoinId,
-      value: selectedCoinAmount,
-      x: Math.random() * 160,
-      y: Math.random() * 40,
-      isAnimating: true,
-    };
-
-    setCoins(prev => [...prev, newUserCoin]);
-
-    setTimeout(() => {
-      setCoins(prev =>
-        prev.map(c =>
-          c.id === newCoinId ? { ...c, isAnimating: false } : c
-        )
-      );
-    }, 500);
-
+    // ✅ ONLY dispatch bet - coin animation will happen when server responds
     dispatch(
       placeBet({
         userId: '10007',
         amount: selectedCoinAmount,
         tableId: 10,
-        betType: 'player',
+        betType: 1,
+        potIndex
       })
     );
-
-    onPotClick();
   };
 
   return (
     <div
-      className="position-relative rounded-4 p-3"
+      className="position-relative"
       style={{
-        width: '280px',
-        height: '380px',
-        background: isWinner
+        width: 'clamp(180px, 5%, 200px)',
+        aspectRatio: '0.74',
+        padding: '3px',
+        background: isWinner && currentPhase === "resultAnnounceTimer"
           ? 'linear-gradient(180deg, #2d7a2d 0%, #1a4d1a 100%)'
           : 'linear-gradient(180deg, #6b1f2b 0%, #4a1520 100%)',
-        border: isWinner ? '3px solid #22c55e' : '2px solid rgba(255, 153, 102, 0.3)',
-        boxShadow: isWinner
+        border: isWinner && currentPhase === "resultAnnounceTimer"
+          ? '2px solid #22c55e' 
+          : '1px solid rgba(255, 153, 102, 0.3)',
+        boxShadow: isWinner && currentPhase === "resultAnnounceTimer"
           ? '0 0 30px rgba(34, 197, 94, 0.5), 0 12px 30px rgba(0, 0, 0, 0.5)'
           : '0 12px 30px rgba(0, 0, 0, 0.5)',
         cursor: currentPhase === 'bettingTimer' ? 'pointer' : 'not-allowed',
         transition: 'all 0.3s ease',
         opacity: currentPhase === 'bettingTimer' ? 1 : 0.8,
+        borderRadius: '16px',
+        display: 'flex',
+        flexDirection: 'column',
       }}
       onClick={handlePotClick}
     >
       {/* Header */}
-      <div className="text-center mb-3">
-        <div className="text-warning fw-bold" style={{ fontSize: '14px' }}>
+      <div 
+        className="text-center" 
+        style={{ 
+          marginBottom: '8px',
+          flex: '0 0 auto'
+        }}
+      >
+        <div 
+          className="text-warning fw-bold" 
+          style={{ 
+            fontSize: '10px',
+            lineHeight: '1.2'
+          }}
+        >
           {potName.toUpperCase()}
         </div>
         <div
-          className="badge mt-1 px-3 py-1"
+          className="badge mt-1"
           style={{
             background: 'rgba(0,0,0,0.5)',
-            fontSize: '13px',
+            fontSize: '12px',
             color: '#ffd78b',
+            padding: '4px 10px',
+            lineHeight: '1.2'
           }}
         >
           Pot: ₹{totalBet.toLocaleString()}
@@ -214,15 +253,23 @@ export default function PotCard({
       </div>
 
       {/* Cards */}
-      <div className="d-flex justify-content-center gap-2 mb-3">
+      <div 
+        className="d-flex justify-content-center" 
+        style={{ 
+          gap: '6px',
+          marginBottom: '0px',
+          flex: '0 0 auto'
+        }}
+      >
         {displayCards.map((cardUrl, idx) => (
           <div
             key={idx}
-            className={`rounded-3 overflow-hidden card-flip`}
+            className="overflow-hidden card-flip"
             style={{
-              width: '70px',
-              height: '100px',
+              width: 'clamp(50px, 10%, 50px)',
+              height: 'clamp(70px, 31%, 100px)',
               boxShadow: '0 4px 8px rgba(0,0,0,0.4)',
+              borderRadius: '6px',
             }}
           >
             <img
@@ -235,14 +282,20 @@ export default function PotCard({
         ))}
       </div>
 
-      {/* Coins */}
+      {/* Coins Container */}
       <div
-        className="position-relative mx-auto mb-3 rounded-3"
+        ref={coinsContainerRef}
+        className="position-relative mx-auto"
         style={{
-          width: '200px',
-          height: '80px',
+          width: '100%',
+          marginTop: "5px",
+          height: 'clamp(50px, 20%, 100px)',
           background: 'rgba(0,0,0,0.3)',
           overflow: 'hidden',
+          borderRadius: '8px',
+          flex: '1 1 auto',
+          minHeight: '50px',
+          maxHeight: '80%',
         }}
       >
         {coins.map(coin => {
@@ -252,13 +305,13 @@ export default function PotCard({
               key={coin.id}
               className="position-absolute rounded-circle d-flex align-items-center justify-content-center fw-bold text-white select-none"
               style={{
-                width: '40px',
-                height: '40px',
+                width: '23px',
+                height: '23px',
                 left: `${coin.x}px`,
                 top: `${coin.y}px`,
                 background: `radial-gradient(circle at 30% 30%, ${thisCoinColor}, ${thisCoinColor}dd)`,
                 border: '2px solid rgba(255,255,255,0.3)',
-                fontSize: '11px',
+                fontSize: '10px',
                 boxShadow: '0 2px 8px rgba(0,0,0,0.3)',
                 transform: coin.isAnimating ? 'translateY(-50px)' : 'translateY(0)',
                 opacity: coin.isAnimating ? 0 : 1,
@@ -277,7 +330,6 @@ export default function PotCard({
           100% { transform: translateY(0); opacity: 1; }
         }
 
-        /* Card flip + vibrate effect */
         .card-flip {
           transition: transform 0.6s ease;
         }

@@ -3,12 +3,11 @@ export class SoundManager {
   private static instance: SoundManager;
   private sounds: Map<string, HTMLAudioElement> = new Map();
   private enabled: boolean = true;
+  private unlocked: boolean = false; // for browser autoplay restriction
+  private isWeb: boolean = typeof window !== 'undefined';
 
   private constructor() {}
 
-  /**
-   * Singleton instance
-   */
   static getInstance(): SoundManager {
     if (!SoundManager.instance) {
       SoundManager.instance = new SoundManager();
@@ -17,8 +16,7 @@ export class SoundManager {
   }
 
   /**
-   * Load sounds from game configuration
-   * Example keys: timerUpSound, cardsShuffleSound, betButtonAndCardClickSound
+   * Load sounds from URLs
    */
   loadSounds(soundUrls: { [key: string]: string }): void {
     Object.entries(soundUrls).forEach(([key, url]) => {
@@ -28,31 +26,62 @@ export class SoundManager {
         audio.preload = 'auto';
         audio.volume = 0.5;
         this.sounds.set(key, audio);
-      } catch (error) {
-        console.error(`❌ [SoundManager] Failed to load sound: ${key}`, error);
+      } catch (err) {
+        console.error(`❌ [SoundManager] Failed to load sound: ${key}`, err);
       }
     });
-  }
 
-  /**
-   * Play a sound by key
-   */
-  play(key: string): void {
-    if (!this.enabled) return;
-    const sound = this.sounds.get(key);
-    if (sound) {
-      const clone = sound.cloneNode(true) as HTMLAudioElement;
-      clone.volume = 0.5;
-      clone.play().catch((err) => console.warn(`⚠️ [SoundManager] Failed to play ${key}`, err));
-    } else {
-      console.warn(`⚠️ [SoundManager] Sound not found: ${key}`);
+    if (this.isWeb) {
+      this.unlockAudioOnInteraction();
     }
   }
 
   /**
-   * Stop a specific sound
+   * Unlock audio in browser (play/pause once) after first user interaction
    */
-  stop(key: string): void {
+  private unlockAudioOnInteraction() {
+    if (this.unlocked) return;
+
+    const unlock = () => {
+      this.sounds.forEach((sound) => {
+        const clone = sound.cloneNode(true) as HTMLAudioElement;
+        clone.play().catch(() => {});
+        clone.pause();
+        clone.currentTime = 0;
+      });
+      this.unlocked = true;
+      window.removeEventListener('click', unlock);
+      window.removeEventListener('touchstart', unlock);
+      console.log('✅ [SoundManager] Audio unlocked');
+    };
+
+    window.addEventListener('click', unlock, { once: true });
+    window.addEventListener('touchstart', unlock, { once: true });
+  }
+
+  /**
+   * Play a sound
+   */
+  play(key: string, volume: number = 0.5) {
+    if (!this.enabled) return;
+
+    const sound = this.sounds.get(key);
+    if (!sound) return console.warn(`⚠️ [SoundManager] Sound not found: ${key}`);
+
+    try {
+      const clone = sound.cloneNode(true) as HTMLAudioElement;
+      clone.volume = volume;
+      clone.play().catch((err) => {
+        if (this.isWeb && !this.unlocked) {
+          console.warn(`⚠️ [SoundManager] Cannot autoplay ${key} before interaction`, err);
+        }
+      });
+    } catch (err) {
+      console.error(`❌ [SoundManager] Failed to play sound ${key}`, err);
+    }
+  }
+
+  stop(key: string) {
     const sound = this.sounds.get(key);
     if (sound) {
       sound.pause();
@@ -60,37 +89,25 @@ export class SoundManager {
     }
   }
 
-  /**
-   * Stop all sounds
-   */
-  stopAll(): void {
+  stopAll() {
     this.sounds.forEach((sound) => {
       sound.pause();
       sound.currentTime = 0;
     });
   }
 
-  /**
-   * Enable / disable all sounds
-   */
-  setEnabled(enabled: boolean): void {
+  setEnabled(enabled: boolean) {
     this.enabled = enabled;
     if (!enabled) this.stopAll();
   }
 
-  /**
-   * Check if sound is enabled
-   */
-  isEnabled(): boolean {
+  isEnabled() {
     return this.enabled;
   }
 
-  /**
-   * Cleanup all sounds
-   */
-  destroy(): void {
+  destroy() {
     this.stopAll();
-    this.sounds.forEach((sound) => (sound.src = ''));
+    this.sounds.forEach((s) => (s.src = ''));
     this.sounds.clear();
     console.log('🧹 [SoundManager] Destroyed');
   }

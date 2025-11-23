@@ -1,60 +1,17 @@
 'use client';
-import { useEffect } from 'react';
 import { initSocket } from './socketClient';
-import { useAppDispatch } from '../redux/hooks';
-import { userDataFailure, userDataRequest, userDataSuccess } from '../redux/slices/userSlice';
 import { setCache, getCache } from "../cache";
-
+const socket = initSocket();
 /**
  * Global Socket Event Handlers
  * Handles user data from socket responses across all games.
  */
-export function useGlobalSocketEvents(userId?: number) {
-  const dispatch = useAppDispatch();
-
-  useEffect(() => {
-    const socket = initSocket();
-
-    if (userId) {
-      // console.log('[SocketGlobal] 🔄 Requesting user data for userId:', userId);
-      dispatch(userDataRequest());
-      socket.emit('userIdData', { userId });
-    }
-
-    const handleUserDataResponse = (data: any) => {
-      // console.log('[SocketGlobal] 💰 User data received:', data);
-
-      if (data.success && data.data) {
-        const { userId, name, imageProfile, balance } = data.data;
-        dispatch(
-          userDataSuccess({
-            userId,
-            name,
-            imageProfile,
-            balance,
-          })
-        );
-      } else {
-        dispatch(userDataFailure(data.message || 'Failed to fetch user data'));
-      }
-    };
-
-    socket.on('userIdDataResponse', handleUserDataResponse);
-    // console.log('[SocketGlobal] Listening for "userIdDataResponse" events...');
-
-    return () => {
-      socket.off('userIdDataResponse', handleUserDataResponse);
-      // console.log('[SocketGlobal] ❌ Stopped listening for "userIdDataResponse"');
-    };
-  }, [userId, dispatch]);
-}
 
 
 export function gameConfiguration(
   gameId: number | string | { gameId: number | string },
   callback: (data: any) => void
 ) {
-  const socket = initSocket();
 
   // Normalize gameId to a number
   const id = typeof gameId === "object" ? Number(gameId.gameId) : Number(gameId);
@@ -87,5 +44,21 @@ export function gameConfiguration(
 
   socket.on("gameConfigurationResponse", handleResponse);
 }
+
+export function tanantDetailsByAppKey(
+  appKey: string | undefined,
+  callback: (data: any) => void
+): void {
+
+  socket.emit("tenantDetailsByAppKey", { appKey });
+
+  const handleResponse = (data: any) => {
+    socket.off("tenantDetailsResponse", handleResponse);
+    callback(data);
+  };
+
+  socket.on("tenantDetailsByAppKeyResponse", handleResponse);
+}
+
 
 

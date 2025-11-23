@@ -2,6 +2,9 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { getSocket } from '@/lib/socket/socketClient';
 import { useAppSelector } from '@/lib/redux/hooks';
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState } from '@/lib/redux/store';
+import { clearWinningPot, setWinningPotIndex } from '@/lib/redux/slices/teenpatti/winningPotSlice';
 
 interface Winner {
   userId: string;
@@ -20,7 +23,10 @@ export default function ResultModal() {
   const [show, setShow] = useState(false);
   const [result, setResult] = useState<ResultData | null>(null);
   const [manualClosed, setManualClosed] = useState(false);
-  const currentUserId = useAppSelector((state) => state.user.user?.userId);
+   const dispatch = useDispatch();
+  const userPlayerData = useSelector((state: RootState) => state.userPlayerData);
+  const currentUserId = userPlayerData.data?.id;
+
   const currentPhase = useAppSelector((state) => state.teenpattiTimer.phase);
 
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -37,20 +43,22 @@ export default function ResultModal() {
 
     const handleResult = (response: any) => {
       if (!response?.success || !response.data) return;
-      if (manualClosed) return; // don't show if manually closed
+      let winningPotIndex=response.data.winningPotIndex;
+      let winners=response.data.winners;
+      if (manualClosed) return; 
 
       setResult(response.data);
-
+      dispatch(setWinningPotIndex(winningPotIndex))
       // Clear previous timeout if any
       if (timeoutRef.current) clearTimeout(timeoutRef.current);
-
+       
       // Show modal after 3 seconds
       timeoutRef.current = setTimeout(() => {
         setShow(true);
-
-        // Auto-close after 5s
+        
         timeoutRef.current = setTimeout(() => {
           setShow(false);
+          dispatch(clearWinningPot());
         }, 5000);
       }, 3000);
     };

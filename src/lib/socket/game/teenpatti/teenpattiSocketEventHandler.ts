@@ -30,27 +30,94 @@ export function useTeenpattiTimerListener() {
   export function placeTeenpattiBet({
   userId,
   amount,
-  tableId,
   betType,
+  appKey,
+  token,
+  gameId,
+  potIndex,
+  socketId
 }: {
   userId: string;
   amount: number;
   tableId: number;
-  betType: string;
+  betType: number;
+  appKey: string;
+  token: string;
+  gameId: string;
+  potIndex:string;
+  socketId:string;
 }) {
   const socket = initSocket();
 
   const payload = {
     userId,
     amount,
-    tableId,
     betType,
+    appKey,
+    gameId,
+    token,
+    potIndex,
+    socketId
   };
-
-  console.log(" Emitting bet:", payload);
-
   socket.emit("placeTeenpattiBet", payload);
 }
+
+ export function teenpattiGameTableJoin({
+  userId,
+  name,
+  imageProfile,
+}: {
+  userId: string;
+  name: string;
+  imageProfile: string;
+}) {
+  const socket = initSocket();
+
+  const payload = {
+    userId,
+    name,
+    imageProfile  
+  };
+  socket.emit("teenpattiGameTableJoin", payload);
+}
+ export function mySocketIdEvent({
+  userId,
+  socketId,
+}: {
+  userId: string;
+  socketId: string;
+
+}) {
+  const socket = initSocket();
+
+  const payload = {
+    userId,
+    socketId
+  };
+  socket.emit("mySocketId", payload)
+}
+
+
+      
+export function teenpattiGameTableJoinListener(
+  onResponse: (data: any) => void
+) {
+  useEffect(() => {
+    const socket = initSocket();
+
+    const handleBetResponse = (data: any) => {
+      onResponse(data); 
+    };
+
+    socket.on("teenpattiGameTableUpdate", handleBetResponse);
+
+    return () => {
+      socket.off("teenpattiGameTableUpdate", handleBetResponse);
+    };
+  }, [onResponse]);
+
+}
+
 export function useTeenpattiBetResponseListener(
   onResponse: (data: any) => void
 ) {
@@ -58,10 +125,8 @@ export function useTeenpattiBetResponseListener(
     const socket = initSocket();
 
     const handleBetResponse = (data: any) => {
-      console.log("Bet Response:", data);
       onResponse(data); // send data back to component
     };
-
     socket.on("teenpattiBetResponse", handleBetResponse);
 
     return () => {
@@ -70,31 +135,31 @@ export function useTeenpattiBetResponseListener(
   }, [onResponse]);
 
 }
-// game users and pots
-export function teenpattiPotBetsAndUsers({ gameId }: { gameId: number }): Promise<any> {
-  const socket = initSocket();
 
-  return new Promise((resolve, reject) => {
-    const payload = { gameId };
-    // console.log('[TeenPatti] 🎯 Requesting pot and user data:', payload);
+// // game users and pots
+// export function teenpattiPotBetsAndUsers({ gameId }: { gameId: number }): Promise<any> {
+//   const socket = initSocket();
 
-    // Response handler
-    const handleResponse = (data: any) => {
-      socket.off('teenpattiPotBetsAndUsersResponse', handleResponse); // remove listener after response
+//   return new Promise((resolve, reject) => {
+//     const payload = { gameId };
 
-      if (!data) return reject(new Error('No data received from server'));
+//     // Response handler
+//     const handleResponse = (data: any) => {
+//       socket.off('teenpattiPotBetsAndUsersResponse', handleResponse); // remove listener after response
 
-      if (data.success === undefined || data.success === true) {
-        resolve(data); // Keep data format exactly as is
-      } else {
-        reject(new Error(data.message || 'Failed to fetch pot and users'));
-      }
-    };
-    socket.emit('teenpattiPotBetsAndUsers', payload);
-    socket.on('teenpattiPotBetsAndUsersResponse', handleResponse);
+//       if (!data) return reject(new Error('No data received from server'));
 
-  });
-}
+//       if (data.success === undefined || data.success === true) {
+//         resolve(data); // Keep data format exactly as is
+//       } else {
+//         reject(new Error(data.message || 'Failed to fetch pot and users'));
+//       }
+//     };
+//     socket.emit('teenpattiPotBetsAndUsers', payload);
+//     socket.on('teenpattiPotBetsAndUsersResponse', handleResponse);
+
+//   });
+// }
 
 
 
@@ -124,4 +189,20 @@ export function teenpattiAnnounceGameResult() {
 
 }
 
+export function myMessagesFromServer(
+  onResponse: (data: any) => void
+) {
+  useEffect(() => {
+    const socket = initSocket();
+    const handleBetResponse = (data: any) => {
+      onResponse(data); 
+    };
+    socket.on("toWinnerMessage", handleBetResponse);
+
+    return () => {
+      socket.off("toWinnerMessage", handleBetResponse);
+    };
+  }, [onResponse]);
+
+}
 

@@ -1,20 +1,27 @@
 import { configureStore } from "@reduxjs/toolkit";
-import userReducer from "./slices/userSlice";
+import userPlayerInfoReducer from "./slices/userSlice";
 import gameConfigReducer from "./slices/gameConfigSlice";
 import teenpattiTimerReducer from './slices/teenpatti/teenpattiTimerSlice';
 import teenPattiBettingReducer from "./slices/teenpatti/teenPattiBettingSlice";
 import selectedCoinReducer from "./slices/teenpatti/selectedCoinSlice";
 import gameConfigurationReducer from "./slices/teenpatti/gameConfiguration";
-
+import tenantDetailsReducer from "./slices/tenantDetails";
+import coinAnimationReducer from "./slices/teenpatti/coinDropAnimation"; 
+import applicationInfoReducer from "./slices/applicationInfoSlice";
+import winningPotReducer from "./slices/teenpatti/winningPotSlice";
 
 export const store = configureStore({
   reducer: {
-    user: userReducer,
+    userPlayerData: userPlayerInfoReducer,
     gameConfig: gameConfigReducer,
     teenpattiTimer: teenpattiTimerReducer,
     teenPattiBettingReducer:teenPattiBettingReducer,
     selectedCoin: selectedCoinReducer,
     gameConfiguration: gameConfigurationReducer,
+    tenantDetails:tenantDetailsReducer,
+    coinAnimation:coinAnimationReducer,
+    applicationInfo: applicationInfoReducer,
+    winningPot:winningPotReducer
 
 
   },

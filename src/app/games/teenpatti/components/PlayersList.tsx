@@ -1,4 +1,3 @@
-// src/app/teenpatti/components/PlayersList.tsx
 'use client';
 
 import React, { useEffect, useState } from 'react';
@@ -18,15 +17,15 @@ export default function PlayersList() {
     if (!socket) return;
 
     const handlePotDataResponse = (response: any) => {
-      if (response?.success && response?.data?.users) {
-        setPlayers(response.data.users);
+      if (response && response?.users) {
+        setPlayers(response.users);
       }
     };
 
-    socket.on('teenpattiPotBetsAndUsersResponse', handlePotDataResponse);
+    socket.on('teenpattiGameTableUpdate', handlePotDataResponse);
 
     return () => {
-      socket.off('teenpattiPotBetsAndUsersResponse', handlePotDataResponse);
+      socket.off('teenpattiGameTableUpdate', handlePotDataResponse);
     };
   }, []);
 
@@ -34,69 +33,74 @@ export default function PlayersList() {
   const remainingCount = players.length - 4;
 
   return (
-    <div 
-      className="position-fixed start-0 top-0 mt-5 ms-3 p-3 rounded-4"
+    <div
+      className="position-fixed start-0 top-0 d-flex flex-column align-items-center gap-2 p-2 rounded-3"
       style={{
         background: 'rgba(0, 0, 0, 0.5)',
-        backdropFilter: 'blur(10px)',
-        boxShadow: '0 8px 24px rgba(0, 0, 0, 0.4)',
+        backdropFilter: 'blur(8px)',
+        boxShadow: '0 6px 18px rgba(0, 0, 0, 0.35)',
         zIndex: 40,
-        marginTop: '120px',
+        marginTop: 'clamp(40px, 6vw, 80px)',
+        left: 'clamp(6px, 2vw, 12px)',
+        padding: 'clamp(4px, 1vw, 8px)',
       }}
     >
-      <div className="d-flex flex-column gap-3">
-        {visiblePlayers.map((player) => (
-          <div key={player.userId} className="position-relative" title={player.name}>
-            <img
-              src={player.imageProfile}
-              alt={player.name}
-              className="rounded-circle"
-              style={{
-                width: '56px',
-                height: '56px',
-                border: '3px solid rgba(255, 255, 255, 0.3)',
-                objectFit: 'cover',
-                cursor: 'pointer',
-                transition: 'all 0.3s ease',
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.borderColor = '#ffd700';
-                e.currentTarget.style.transform = 'scale(1.1)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.3)';
-                e.currentTarget.style.transform = 'scale(1)';
-              }}
-            />
-            {/* Online indicator */}
-            <div 
-              className="position-absolute bottom-0 end-0 rounded-circle"
-              style={{
-                width: '14px',
-                height: '14px',
-                background: '#22c55e',
-                border: '2px solid #000',
-              }}
-            />
-          </div>
-        ))}
-
-        {/* Remaining players badge */}
-        {remainingCount > 0 && (
-          <div 
-            className="rounded-circle d-flex align-items-center justify-content-center fw-bold text-white"
+      {visiblePlayers.map((player) => (
+        <div
+          key={player.userId}
+          className="position-relative"
+          title={player.name}
+        >
+          <img
+            src={player.imageProfile}
+            alt={player.name}
+            className="rounded-circle"
             style={{
-              width: '56px',
-              height: '56px',
-              background: 'linear-gradient(135deg, #8b5cf6, #6366f1)',
-              border: '3px solid rgba(255, 255, 255, 0.3)',
+              width: 'clamp(28px, 5vw, 48px)',
+              height: 'clamp(28px, 5vw, 48px)',
+              border: 'clamp(1px, 0.2vw, 2px) solid rgba(255, 255, 255, 0.3)',
+              objectFit: 'cover',
               cursor: 'pointer',
+              transition: 'all 0.3s ease',
             }}
-          >
-            +{remainingCount}
-          </div>
-        )}
-      </div>
+            onMouseEnter={(e) => {
+              e.currentTarget.style.borderColor = '#ffd700';
+              e.currentTarget.style.transform = 'scale(1.1)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.3)';
+              e.currentTarget.style.transform = 'scale(1)';
+            }}
+          />
+          {/* Online indicator */}
+          <div
+            className="position-absolute bottom-0 end-0 rounded-circle"
+            style={{
+              width: 'clamp(8px, 2vw, 12px)',
+              height: 'clamp(8px, 2vw, 12px)',
+              background: '#22c55e',
+              border: 'clamp(1px, 0.1vw, 1px) solid #000',
+            }}
+          />
+        </div>
+      ))}
+
+      {/* Remaining players badge */}
+      {remainingCount > 0 && (
+        <div
+          className="rounded-circle d-flex align-items-center justify-content-center fw-bold text-white"
+          style={{
+            width: 'clamp(28px, 5vw, 48px)',
+            height: 'clamp(28px, 5vw, 48px)',
+            background: 'linear-gradient(135deg, #8b5cf6, #6366f1)',
+            border: 'clamp(1px, 0.2vw, 2px) solid rgba(255, 255, 255, 0.3)',
+            cursor: 'pointer',
+            fontSize: 'clamp(10px, 2.5vw, 14px)',
+          }}
+        >
+          +{remainingCount}
+        </div>
+      )}
     </div>
   );
 }

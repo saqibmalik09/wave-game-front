@@ -6,7 +6,8 @@ export interface FastBet {
   userId: string;
   amount: number;      // coin (50,100,500...)
   tableId: number;    // which pot clicked
-  betType: string;    // e.g., '1' for normal bet, '2' for side bet etc.
+  betType: number;    // e.g., '1' for normal bet, '2' for side bet etc.
+  potIndex:number;
 }
 
 interface BetState {

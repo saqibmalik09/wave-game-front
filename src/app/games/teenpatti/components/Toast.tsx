@@ -59,10 +59,10 @@ function Toast({ message, type = 'error', duration = 2000, onClose }: ToastProps
         opacity: isVisible ? 1 : 0,
         transition: 'all 0.3s ease',
         background: bgColors[type],
-        boxShadow: '0 8px 24px rgba(0, 0, 0, 0.4)',
+        boxShadow: '0 2px 10px rgba(0, 0, 0, 0.2)',
         zIndex: 200,
-        minWidth: '280px',
-        maxWidth: '400px',
+        minWidth: '200px',
+        maxWidth: '300px',
       }}
     >
       {icons[type]}
@@ -103,9 +103,9 @@ export function useToast() {
 
   const ToastContainer = () => (
     <>
-      {toasts.map((toast) => (
+      {toasts.map((toast,index) => (
         <Toast
-          key={toast.id}
+          key={index}
           message={toast.message}
           type={toast.type}
           onClose={() => removeToast(toast.id)}

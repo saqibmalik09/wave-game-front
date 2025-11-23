@@ -23,10 +23,10 @@ const api: AxiosInstance = axios.create({
  */
 api.interceptors.request.use(
   (config) => {
-      const token = localStorage.getItem("auth_token");
-      if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
-      }
+    const token = localStorage.getItem("auth_token");
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
     return config;
   },
   (error) => Promise.reject(error)
@@ -48,18 +48,20 @@ api.interceptors.response.use(
 /**
  * Define a reusable, typed API helper
  */
-export interface ApiResponse<T> {
-  success: boolean;
-  message?: string;
-  data: T;
-}
+
 
 export const ApiService = {
-   teenpattiBetGame: async <T>(payload: { amount: number; roomId: string }): Promise<ApiResponse<T>> => {
-    const response = await api.post<T>("EndPoint Here", payload);
-    return { success: true, data: response.data };
+  gameUserInfo: async <T>(payload: { token: string; tenantDomainURL: string }): Promise<T> => {
+    const response = await axios.get<T>(
+      "http://127.0.0.1:4005/admin/game/userInfo",
+      {
+        headers: {
+          Authorization: `Bearer ${payload.token}`,
+        },
+      }
+    );
+    return response.data;
   },
-
 };
 
 export default ApiService;

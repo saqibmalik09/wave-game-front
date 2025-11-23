@@ -1,4 +1,3 @@
-//CoinTray.tsx
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
@@ -6,7 +5,9 @@ import { useAppSelector } from '@/lib/redux/hooks';
 import { useDispatch, useSelector } from 'react-redux';
 import { setCoin } from '@/lib/redux/slices/teenpatti/selectedCoinSlice';
 import { SoundManager } from '../game/SoundManager';
-import { useGlobalSocketEvents } from '@/lib/socket/socketEventHandlers';
+import { RootState } from '@/lib/redux/store';
+import { myMessagesFromServer } from '@/lib/socket/game/teenpatti/teenpattiSocketEventHandler';
+import { useToast } from './Toast';
 
 interface CoinButtonProps {
   amount: number;
@@ -24,19 +25,24 @@ function CoinButton({ amount, color, isSelected, onClick }: CoinButtonProps) {
       className="btn p-0 position-relative"
       style={{
         transition: 'all 0.2s ease',
-        transform: isSelected ? 'translateY(-12px) scale(1.1)' : 'none',
+        transform: isSelected ? 'translateY(-8%) scale(1.05)' : 'none',
+        flexShrink: 1,
       }}
     >
       <div
         className="rounded-circle d-flex align-items-center justify-content-center fw-bold text-white"
         style={{
-          width: '72px',
-          height: '72px',
+          width: 'clamp(23px, 8vw, 50px)',
+          height: 'clamp(23px, 8vw, 50px)',
+          fontSize: 'clamp(4px, 2.1vw, 16px)',
           background: `radial-gradient(circle at 30% 30%, ${color}, ${color}dd)`,
-          border: `4px solid rgba(255, 255, 255, 0.3)`,
-          boxShadow: isSelected
-            ? `0 10px 30px ${color}88, 0 0 20px ${color}66`
-            : `0 4px 12px rgba(0, 0, 0, 0.4)`,
+          // border: `clamp(1px, 0.3vw, 4px) solid rgba(255, 255, 255, 0.3)`,
+          // boxShadow: isSelected
+          //   ? `0 0.5rem 1.5rem ${color}88, 0 0 1rem ${color}66`
+          //   : `0 0.25rem 0.75rem rgba(0, 0, 0, 0.4)`,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
         }}
       >
         {displayAmount}
@@ -46,8 +52,8 @@ function CoinButton({ amount, color, isSelected, onClick }: CoinButtonProps) {
         <div
           className="position-absolute bottom-0 start-50 translate-middle-x rounded-circle"
           style={{
-            width: '8px',
-            height: '8px',
+            width: 'clamp(6px, 1.5vw, 8px)',
+            height: 'clamp(6px, 1.5vw, 8px)',
             background: '#ffd700',
             animation: 'pulse 1.5s infinite',
           }}
@@ -58,18 +64,17 @@ function CoinButton({ amount, color, isSelected, onClick }: CoinButtonProps) {
 }
 
 export default function CoinTray() {
-  useGlobalSocketEvents(101);
 
   const dispatch = useDispatch();
-  const user = useAppSelector((state) => state.user.user);
+  const userPlayerData = useSelector((state: RootState) => state.userPlayerData);
   const gameConfig = useSelector((state) => state.gameConfiguration.data);
+  const { ToastContainer, showToast } = useToast();
 
   const bettingCoins = gameConfig?.bettingCoins || [];
   const colors = gameConfig?.colors || [];
 
   const [selectedCoin, setSelectedCoinLocal] = useState<number | null>(null);
 
-  // Auto select only once
   const initialized = useRef(false);
   useEffect(() => {
     if (!initialized.current && bettingCoins.length > 0) {
@@ -82,7 +87,11 @@ export default function CoinTray() {
       dispatch(setCoin({ amount, color }));
     }
   }, [bettingCoins, colors, dispatch]);
-
+    myMessagesFromServer((message)=>{
+      setTimeout(()=>{
+      showToast(`You won ${message.winningAmount}`,'success')
+      },5000)      
+    })
   const onClickCoin = (amount: number, color: string) => {
     SoundManager.getInstance().play('betButtonAndCardClickSound');
 
@@ -91,41 +100,52 @@ export default function CoinTray() {
   };
 
   return (
-    <div className="position-fixed bottom-0 start-50 translate-middle-x mb-4" style={{ zIndex: 50 }}>
+    <div
+      className="position-fixed bottom-0 start-50 translate-middle-x mb-2"
+      style={{ zIndex: 50, width: '100%', maxWidth: '100%' }}
+    >
       <div
-        className="px-4 py-3 rounded-pill d-flex align-items-center gap-3"
+        className="rounded-pill d-flex align-items-center gap-1 justify-content-center flex-nowrap"
         style={{
-          background: 'rgba(0, 0, 0, 0.7)',
+          // background: 'rgba(0, 0, 0, 0.7)',
           backdropFilter: 'blur(10px)',
-          boxShadow: '0 8px 32px rgba(0, 0, 0, 0.5)',
+          // boxShadow: '0 0.5rem 2rem rgba(0, 0, 0, 0.5)',
+          overflow: 'hidden',
+          padding: '0.15rem clamp(0.20rem, 1.5vw, 0.5rem)',
+          margin: '0 0.5rem',
         }}
       >
         {/* Balance */}
         <div
-          className="d-flex align-items-center gap-2 px-3 py-2 rounded-pill me-2"
-          style={{ background: 'rgba(0, 0, 0, 0.5)' }}
+          className="d-flex align-items-center gap-1 px-2 py-1 rounded-pill flex-shrink-0 select-none"
+          style={{
+            background: 'rgba(0, 0, 0, 0.5)',
+            fontSize: 'clamp(6px, 2vw, 14px)',
+          }}
         >
           <div
             className="rounded-circle d-flex align-items-center justify-content-center"
             style={{
-              width: '36px',
-              height: '36px',
+              width: 'clamp(20px, 4vw, 36px)',
+              height: 'clamp(20px, 4vw, 36px)',
               background: 'linear-gradient(135deg, #ffd700, #ffed4e)',
+              fontSize: 'clamp(6px, 1.5vw, 14px)',
             }}
           >
-            <span className="fw-bold" style={{ color: '#000' }}>₹</span>
+            <span className="fw-bold" style={{ color: '#000' }}>G</span>
           </div>
-
-          <div className="d-flex flex-column">
-            <small className="text-secondary" style={{ fontSize: '10px' }}>Balance</small>
-            <span className="text-white fw-bold" style={{ fontSize: '14px' }}>
-              {user?.balance?.toLocaleString() || '0'}
+          <div className="d-flex flex-column ">
+            <small className="text-secondary" style={{ fontSize: 'clamp(5px, 1.2vw, 10px)' }}>
+              Balance
+            </small>
+            <span className="text-white fw-bold" style={{ fontSize: 'clamp(6px, 1.5vw, 14px)' }}>
+              {userPlayerData?.data?.balance?.toLocaleString() || '0'}
             </span>
           </div>
         </div>
 
-        {/* Dynamic Coins */}
-        {bettingCoins.map((amount:any, index:any) => (
+        {/* Coins */}
+        {bettingCoins.map((amount: any, index: any) => (
           <CoinButton
             key={amount}
             amount={amount}
@@ -135,11 +155,10 @@ export default function CoinTray() {
           />
         ))}
       </div>
-
+     <ToastContainer />
       <style jsx>{`
         @keyframes pulse {
-          0%,
-          100% { opacity: 1; }
+          0%, 100% { opacity: 1; }
           50% { opacity: 0.5; }
         }
       `}</style>
