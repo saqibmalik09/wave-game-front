@@ -6,25 +6,29 @@ import { useTeenpattiTimerListener } from '@/lib/socket/game/teenpatti/teenpatti
 import { useDispatch } from 'react-redux';
 import { updateTimer } from '@/lib/redux/slices/teenpatti/teenpattiTimerSlice';
 import { SoundManager } from '../game/SoundManager';
-
+interface TimerData {
+  phase: string;
+  remaining: number;
+  totalTime?: number; // optional
+  phaseDuration?: number; // optional
+}
 export default function Timer() {
   const dispatch = useDispatch();
-  const [timerData, setTimerData] = useState<any>(null);
+  const [timerData, setTimerData] = useState<TimerData>();
   useTeenpattiTimerListener();
 
   useEffect(() => {
     const socket = getSocket();
-    if (!socket) return;
+    if (!socket) return; // 
 
     let lastPhase: string | null = null;
 
     const handleTimer = (data: any) => {
       setTimerData(data);
-        if(data.remaining==3 &&data.phase=="bettingTimer"){
-            SoundManager.getInstance().play('timerUpSound'); 
-        }
+      if (data.remaining === 3 && data.phase === 'bettingTimer') {
+        SoundManager.getInstance().play('timerUpSound');
+      }
       if (data.phase && data.phase !== lastPhase) {
-        
         dispatch(
           updateTimer({
             phase: data.phase,
@@ -35,10 +39,15 @@ export default function Timer() {
         lastPhase = data.phase;
       }
     };
-          
+
     socket.on('teenpattiTimer', handleTimer);
-    return () => socket.off('teenpattiTimer', handleTimer);
-  }, []);
+
+    // ✅ Always return a cleanup function
+    return () => {
+      socket.off('teenpattiTimer', handleTimer);
+    };
+  }, [dispatch]); // include dispatch in dependencies
+
 
   if (!timerData) return null;
 
@@ -80,7 +89,7 @@ export default function Timer() {
       <div
         className="position-relative"
         style={{
-          width: 'clamp(55px, 12vw, 100px)',   // 🔥 Responsive circle size
+          width: 'clamp(55px, 12vw, 100px)',
           height: 'clamp(55px, 12vw, 100px)',
         }}
       >
@@ -114,7 +123,7 @@ export default function Timer() {
           <div
             className="fw-bold"
             style={{
-              fontSize: 'clamp(18px, 5vw, 32px)',   
+              fontSize: 'clamp(18px, 5vw, 32px)',
               color: isLowTime ? '#ff4646' : '#fff',
               lineHeight: 1,
             }}
@@ -125,7 +134,7 @@ export default function Timer() {
           <div
             className="text-secondary"
             style={{
-              fontSize: 'clamp(7px, 2.2vw, 12px)',  
+              fontSize: 'clamp(7px, 2.2vw, 12px)',
               marginTop: '2px',
             }}
           >

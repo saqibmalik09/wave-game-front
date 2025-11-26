@@ -2,18 +2,17 @@
 
 import { useEffect } from 'react';
 import { initSocket } from '@/lib/socket/socketClient';
+const socket = initSocket();
 
 /**
  * 🎯 Teen Patti Timer Listener
  */
-
-
 export function useTeenpattiTimerListener() {
   useEffect(() => {
-    const socket = initSocket();
     const handleTimer = (data: any) => {
       if (data.phase == 'winningCalculationTimer') {
-        teenpattiAnnounceGameResult();
+        console.log("calling  result")
+        // teenpattiAnnounceGameResult();
       }
     };
     socket.on('teenpattiTimer', handleTimer);
@@ -47,7 +46,6 @@ export function useTeenpattiTimerListener() {
   potIndex:string;
   socketId:string;
 }) {
-  const socket = initSocket();
 
   const payload = {
     userId,
@@ -66,36 +64,39 @@ export function useTeenpattiTimerListener() {
   userId,
   name,
   imageProfile,
+  appKey,
+  token,
 }: {
   userId: string;
   name: string;
   imageProfile: string;
+  appKey:string;
+  token:string
 }) {
-  const socket = initSocket();
 
   const payload = {
     userId,
     name,
-    imageProfile  
+    imageProfile,
+    appKey,
+    token
   };
   socket.emit("teenpattiGameTableJoin", payload);
 }
- export function mySocketIdEvent({
-  userId,
-  socketId,
-}: {
-  userId: string;
-  socketId: string;
+//  export function mySocketIdEvent({
+//   userId,
+//   socketId,
+// }: {
+//   userId: string;
+//   socketId: string;
+// }) {
 
-}) {
-  const socket = initSocket();
-
-  const payload = {
-    userId,
-    socketId
-  };
-  socket.emit("mySocketId", payload)
-}
+//   const payload = {
+//     userId,
+//     socketId
+//   };
+//   socket.emit("mySocketId", payload)
+// }
 
 
       
@@ -103,7 +104,6 @@ export function teenpattiGameTableJoinListener(
   onResponse: (data: any) => void
 ) {
   useEffect(() => {
-    const socket = initSocket();
 
     const handleBetResponse = (data: any) => {
       onResponse(data); 
@@ -118,12 +118,8 @@ export function teenpattiGameTableJoinListener(
 
 }
 
-export function useTeenpattiBetResponseListener(
-  onResponse: (data: any) => void
-) {
+export function useTeenpattiBetResponseListener( onResponse: (data: any) => void) {
   useEffect(() => {
-    const socket = initSocket();
-
     const handleBetResponse = (data: any) => {
       onResponse(data); // send data back to component
     };
@@ -165,24 +161,20 @@ export function useTeenpattiBetResponseListener(
 
 // game users and pots
 export function teenpattiAnnounceGameResult() {
-  const socket = initSocket();
 
   socket.emit('teenpattiAnnounceGameResult', {});
 
   const teenpattiAnnounceGameResultResponse = (data: any) => {
-    // console.log('[TeenPatti]  Raw teenpattiAnnounceGameResultResponse received:', data);
-
     if (!data) {
       console.error('[TeenPatti]  No data received from server');
       return;
-    }
-
-    // Some servers don’t send `success` flag — handle both cases
+    }  
+      // Some servers don’t send `success` flag — handle both cases
     if (data.success === undefined || data.success === true) {
       // console.log('[TeenPatti]  Game teenpattiAnnounceGameResultResponse Pot Bets And Users received successfully:');
       // console.table(data);
     } else {
-      console.error('[TeenPatti] ❌ Game teenpattiAnnounceGameResultResponse failed:', data.message || data);
+      // console.error('[TeenPatti] ❌ Game teenpattiAnnounceGameResultResponse failed:', data.message || data);
     }
   };
   socket.on('teenpattiAnnounceGameResultResponse', teenpattiAnnounceGameResultResponse);

@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
-import { useAppSelector } from '@/lib/redux/hooks';
 import { useDispatch, useSelector } from 'react-redux';
 import { setCoin } from '@/lib/redux/slices/teenpatti/selectedCoinSlice';
 import { SoundManager } from '../game/SoundManager';
@@ -67,11 +66,12 @@ export default function CoinTray() {
 
   const dispatch = useDispatch();
   const userPlayerData = useSelector((state: RootState) => state.userPlayerData);
-  const gameConfig = useSelector((state) => state.gameConfiguration.data);
+  const gameConfig = useSelector((state: RootState) => state.gameConfiguration.data);
   const { ToastContainer, showToast } = useToast();
 
-  const bettingCoins = gameConfig?.bettingCoins || [];
-  const colors = gameConfig?.colors || [];
+  const bettingCoins = React.useMemo(() => gameConfig?.bettingCoins || [], [gameConfig]);
+  const colors = React.useMemo(() => gameConfig?.colors || [], [gameConfig]);
+
 
   const [selectedCoin, setSelectedCoinLocal] = useState<number | null>(null);
 
@@ -88,9 +88,8 @@ export default function CoinTray() {
     }
   }, [bettingCoins, colors, dispatch]);
     myMessagesFromServer((message)=>{
-      setTimeout(()=>{
+      console.log("Message recieved from server...",message)
       showToast(`You won ${message.winningAmount}`,'success')
-      },5000)      
     })
   const onClickCoin = (amount: number, color: string) => {
     SoundManager.getInstance().play('betButtonAndCardClickSound');
@@ -145,7 +144,7 @@ export default function CoinTray() {
         </div>
 
         {/* Coins */}
-        {bettingCoins.map((amount: any, index: any) => (
+        {bettingCoins.map((amount: number, index: number) => (
           <CoinButton
             key={amount}
             amount={amount}

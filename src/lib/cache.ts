@@ -1,35 +1,54 @@
 const cacheStore = new Map<string, any>();
 
-// Get from RAM first, fallback to localStorage
+// Safe check for browser/localStorage
+function canUseLocalStorage(): boolean {
+  try {
+    return (
+      typeof window !== "undefined" &&
+      typeof localStorage !== "undefined"
+    );
+  } catch {
+    return false;
+  }
+}
+
+// GET
 export function getCache<T = any>(key: string): T | null {
+  // RAM first
   if (cacheStore.has(key)) return cacheStore.get(key);
 
-  try {
-    const ls = localStorage.getItem(key);
-    if (ls) {
-      const parsed = JSON.parse(ls) as T;
-      cacheStore.set(key, parsed); // populate RAM for future
+  // Browser localStorage
+  if (canUseLocalStorage()) {
+    try {
+      const item = localStorage.getItem(key);
+      if (!item) return null;
+
+      const parsed = JSON.parse(item);
+      cacheStore.set(key, parsed);
       return parsed;
+    } catch {
+      // Ignore error — return RAM only
+      return null;
     }
-  } catch (e) {
-    console.error('Failed to parse localStorage cache', e);
-    localStorage.removeItem(key);
   }
 
   return null;
 }
 
-// Set both RAM and localStorage
+// SET
 export function setCache<T = any>(key: string, value: T): void {
   cacheStore.set(key, value);
-  try {
-    localStorage.setItem(key, JSON.stringify(value));
-  } catch (e) {
-    console.error('Failed to write to localStorage', e);
+
+  if (canUseLocalStorage()) {
+    try {
+      localStorage.setItem(key, JSON.stringify(value));
+    } catch {
+      // Ignore storage errors (e.g. WebView restricted mode)
+    }
   }
 }
 
-// Check only RAM
+// CHECK
 export function hasCache(key: string): boolean {
-  return cacheStore.has(key);
+  return cacheStore.has(key) || (canUseLocalStorage() && localStorage.getItem(key) !== null);
 }

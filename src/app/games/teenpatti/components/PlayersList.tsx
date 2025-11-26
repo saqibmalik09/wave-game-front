@@ -1,12 +1,28 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import Image from 'next/image';
 import { getSocket } from '@/lib/socket/socketClient';
 
 interface Player {
+  id: number;
   userId: string;
   name: string;
-  imageProfile: string;
+  balance: number | null;
+  appKey: string;
+  token: string;
+  connectionUserId: string;
+  socketId: string;
+  profilePicture: string;
+  totalGamePlayed: number;
+  gameWon: number;
+  gameLost: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+interface PlayersUpdateResponse {
+  users: Player[];
 }
 
 export default function PlayersList() {
@@ -16,8 +32,8 @@ export default function PlayersList() {
     const socket = getSocket();
     if (!socket) return;
 
-    const handlePotDataResponse = (response: any) => {
-      if (response && response?.users) {
+    const handlePotDataResponse = (response: PlayersUpdateResponse) => {
+      if (response?.users) {
         setPlayers(response.users);
       }
     };
@@ -46,14 +62,12 @@ export default function PlayersList() {
       }}
     >
       {visiblePlayers.map((player) => (
-        <div
-          key={player.userId}
-          className="position-relative"
-          title={player.name}
-        >
-          <img
-            src={player.imageProfile}
+        <div key={player.userId} className="position-relative" title={player.name}>
+          <Image
+            src={player.profilePicture}
             alt={player.name}
+            width={48}     // required by next/image
+            height={48}    // required by next/image
             className="rounded-circle"
             style={{
               width: 'clamp(28px, 5vw, 48px)',
@@ -72,6 +86,7 @@ export default function PlayersList() {
               e.currentTarget.style.transform = 'scale(1)';
             }}
           />
+
           {/* Online indicator */}
           <div
             className="position-absolute bottom-0 end-0 rounded-circle"

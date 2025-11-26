@@ -1,46 +1,90 @@
 //TeenPattiGame.tsx
 'use client';
+import { TeenPattiEngine } from './game/TeenPattiEngine';
+import { SoundManager } from './game/SoundManager';
+import ApiService from '@/lib/api/api';
+import { getCache, setCache } from '@/lib/cache';
+import { useAppSelector } from '@/lib/redux/hooks';
 import React, { useEffect, useRef, useState } from 'react';
 import TopBar from './components/TopBar';
 import PlayersList from './components/PlayersList';
 import CoinTray from './components/CoinTray';
 import PotCard from './components/PotCard';
 import ResultModal from './components/ResultModal';
+import MessageModal from '@/app/components/messageModel';
 import Timer from './components/Timer';
 import { useToast } from './components/Toast';
-import { TeenPattiEngine } from './game/TeenPattiEngine';
 import { gameConfiguration as fetchGameConfiguration, tanantDetailsByAppKey } from '@/lib/socket/socketEventHandlers';
-import { useAppSelector } from '@/lib/redux/hooks';
-import { getCache, setCache } from '@/lib/cache';
-import { SoundManager } from './game/SoundManager';
-import { mySocketIdEvent, placeTeenpattiBet, teenpattiGameTableJoin, useTeenpattiBetResponseListener } from '@/lib/socket/game/teenpatti/teenpattiSocketEventHandler';
+import {  placeTeenpattiBet, teenpattiGameTableJoin, useTeenpattiBetResponseListener } from '@/lib/socket/game/teenpatti/teenpattiSocketEventHandler';
 import { useDispatch, useSelector } from "react-redux";
 import { setGameConfiguration } from '@/lib/redux/slices/teenpatti/gameConfiguration';
-import MessageModal from '@/app/components/messageModel';
 import { setTenantDetails } from '@/lib/redux/slices/tenantDetails';
-import ApiService from '@/lib/api/api';
-import { clearUserPlayerInfo, setUserPlayerInfo } from '@/lib/redux/slices/userSlice';
+import {  setUserPlayerInfo } from '@/lib/redux/slices/userSlice';
 import { setPendingCoin } from '@/lib/redux/slices/teenpatti/coinDropAnimation';
+import { v4 as uuidv4 } from 'uuid';
+import { RootState } from '@/lib/redux/store';
+interface TenantData {
+  success: boolean;
+  message: string;
+  data: {
+    activeGames: string;
+    tanantName: string;
+    tenantAppKey: string;
+    tenantProductionDomain: string;
+    tenantTestingDomain: string;
+    tenantPassword: string;
+  };
+}
+interface UserInfoType {
+  appKey: string;
+  token: string;
+  gameId: string;
+}
+
+interface UserData {
+  id: string;
+  name: string;
+  balance: number;
+  profilePicture: string;
+}
+interface GameUserInfoResponse {
+  success: boolean;
+  message: string;
+  data: UserData;
+}
+interface GameConfig {
+  colors: string[];
+  gameId: number;
+  cardImages: string[][];
+  BettingTime: number;
+  nextBetWait: number;
+  bettingCoins: number[];
+  dealerAvatar: string;
+  timerUpSound: string;
+  cardBackImages: string[][];
+  cardsShuffleSound: string;
+  tableBackgroundImage: string;
+  winningCalculationTime: number;
+  betButtonAndCardClickSound: string;
+  returnWinngingPotPercentage: number[];
+}
+
 export default function TeenPattiGame() {
   const dispatch = useDispatch();
   const { ToastContainer, showToast } = useToast();
   const canvasRef = useRef<HTMLDivElement>(null);
   const [engine, setEngine] = useState<TeenPattiEngine | null>(null);
   const [configLoaded, setConfigLoaded] = useState(false);
-  const [gameConfig, setGameConfig] = useState<any>(null);
-  const [userInfo, setUserInfo] = useState<any>(null);
-  const [potAndUsers, setPotAndUsers] = useState<any>(null);
+  const [gameConfig, setGameConfig] = useState<GameConfig>();
+  const [userInfo, setUserInfo] = useState<UserInfoType>();
   const latestBet = useAppSelector((s) => s.teenPattiBettingReducer.lastBet);
-  const winningPotIndex = useSelector((s: any) => s.winningPot.winningPotIndex);
-  const currentPhase = useSelector((s:any) => s.teenpattiTimer.phase);
+  const winningPotIndex = useSelector((s:RootState) => s.winningPot.winningPotIndex);
+  const currentPhase = useSelector((s:RootState) => s.teenpattiTimer.phase);
 
   const [showModal, setShowModal] = useState(false);
-  const [playerData, setPlayerData] = useState<any>(null);
-  const [tenantData, setTenantData] = useState<any>(null);
-  const [modalMessage, setModalMessage] = useState({
-    title: "",
-    message: "",
-  });
+  const [playerData, setPlayerData] = useState<UserData | null>(null);
+  const [tenantData, setTenantData] = useState<TenantData>();
+  const [modalMessage, setModalMessage] = useState({ title: "", message: ""});
 
   const gameId = React.useMemo(() => ({ gameId: 16 }), []);
   const idNumber = gameId.gameId;
@@ -50,17 +94,16 @@ export default function TeenPattiGame() {
 // ------------------------
 const fetchUserInfo = async () => {
   try {
+    if (!userInfo || !tenantData) return;
     const tenantDomainURL = tenantData.data.tenantProductionDomain;
-    let cachedApplicationInfo = getCache("applicationInfo");
-    let socketId=cachedApplicationInfo.socketId;
-    const response = await ApiService.gameUserInfo({
+    // let cachedApplicationInfo = getCache("applicationInfo");
+    let connectionUserId = getCache("userId");
+    const response: GameUserInfoResponse = await ApiService.gameUserInfo({
       token: userInfo.token,
       tenantDomainURL,
     });
-
     if (response.success) {
       setPlayerData(response.data);
-
       dispatch(setUserPlayerInfo({
         success: response.success,
         message: response.message,
@@ -68,20 +111,21 @@ const fetchUserInfo = async () => {
       }));
 
       const NewJoiner = {
-        userId: response.data.id,
+        userId: connectionUserId,
         name: response.data.name,
         imageProfile: response.data.profilePicture,
+        appKey:userInfo.appKey,
+        token:userInfo.token
       };
-      let socketDetails={
-        userId:response.data.id,
-        socketId:socketId
-      }
-    
+      // let socketDetails={
+      //   userId:connectionUserId,
+      //   socketId:socketId
+      // }    
+      console.log("newJoiner",NewJoiner)
       teenpattiGameTableJoin(NewJoiner);
-      mySocketIdEvent(socketDetails)
+      // mySocketIdEvent(socketDetails)
       return;
     }
-
     setModalMessage({
       title: "Missing information",
       message: "Invalid or missing userInfo",
@@ -94,9 +138,14 @@ const fetchUserInfo = async () => {
 };
 
   useEffect(() => {
+    const USERID_KEY = 'userId';
+    let userId=getCache(USERID_KEY)
+    if(!userId){
+    userId = uuidv4();
+    }
+    setCache(USERID_KEY, userId);
 
     const cached = getCache(cacheKey);
-
     if (cached) {
       setGameConfig(cached);
       dispatch(setGameConfiguration(cached));
@@ -127,6 +176,14 @@ const fetchUserInfo = async () => {
     const appKey = params.get("appKey");
     const token = params.get("token");
     const gameId = params.get("gameId");
+    if (!appKey || !token || !gameId) {
+      setModalMessage({
+        title: "Invalid Params",
+        message: "appKey, token, and gameId are required",
+      });
+      setShowModal(true);
+      return;
+    }
     const userInfo = {
       appKey,
       token,
@@ -176,46 +233,10 @@ const fetchUserInfo = async () => {
     if (!tenantData || !userInfo) return; // wait until both are ready
 
     if (tenantData.success) {
-      // const tenantDomainURL = tenantData.data.tenantProductionDomain;
-      // const fetchUserInfo = async () => {
-      //   try {
-      //     const response = await ApiService.gameUserInfo({
-      //       token: userInfo.token,
-      //       tenantDomainURL,
-      //     });
-      //     if (response.success === true) {
-              
-      //       setPlayerData(response.data);
-      //        dispatch(setUserPlayerInfo({
-      //           success: response.success,
-      //           message: response.message,
-      //           data: response.data,
-      //         }));
-      //         let NewJoiner={
-      //           userId:response.data.id,
-      //           name:response.data.name,
-      //           imageProfile:response.data.profilePicture,
-      //         }
-      //        teenpattiGameTableJoin(NewJoiner)
-      //       return;
-      //     }
-      //     setModalMessage({
-      //       title: "Missing information",
-      //       message: "Invalid or missing userInfo",
-      //     });
-      //     setShowModal(true);
-
-      //   } catch (error) {
-      //     dispatch(clearUserPlayerInfo());
-      //     console.error("Error fetching user info:", error);
-      //   }
-      // };
-      // fetchUserInfo();
       fetchUserInfo();
     } else {
       console.warn("Tenant data invalid or unsuccessful:", tenantData);
     }
-
   }, [tenantData, userInfo]);
 
  useEffect(() => {
@@ -226,6 +247,7 @@ const fetchUserInfo = async () => {
       fetchUserInfo(); // <-- call here
     }
   }, [currentPhase]);
+  
   useTeenpattiBetResponseListener((data) => {
     if (data.success) {
       // showToast(data.message ?? `Bet placed: ₹${data.amount}`, "success");
@@ -235,28 +257,33 @@ const fetchUserInfo = async () => {
       data: data.data,
       }));
       dispatch(setPendingCoin({ potIndex: data.data.potIndex, value:data.data.amount }));
-
-      
     } else {
       showToast(data.message ?? "Bet failed!", "error");
     }
   });
 
-  useEffect(() => {
-    if (!latestBet) return;
-    let cachedApplicationInfo = getCache("applicationInfo");
-    let socketId=cachedApplicationInfo.socketId;
-    let betData = {
-      userId: latestBet.userId,
-      amount: latestBet.amount,
-      tableId: latestBet.tableId,
-      betType: latestBet.betType,
-      potIndex: latestBet.potIndex,
-      socketId:socketId,
-      ...userInfo
-    }
-    placeTeenpattiBet(betData);
-  }, [latestBet]);
+ useEffect(() => {
+  if (!latestBet || !userInfo) return;
+
+  const cachedApplicationInfo = getCache("applicationInfo") || {};
+  const socketId = cachedApplicationInfo.socketId || "";
+  const connectionUserId = getCache("userId") || "";
+
+  const betData = {
+    userId: connectionUserId,
+    amount: latestBet.amount,
+    tableId: latestBet.tableId,
+    betType: latestBet.betType,
+    potIndex: String(latestBet.potIndex), // cast to string
+    socketId: String(socketId),
+    appKey: userInfo.appKey!, // non-null assertion
+    token: userInfo.token!,
+    gameId: userInfo.gameId!,
+  };
+
+  placeTeenpattiBet(betData);
+}, [latestBet, userInfo]);
+
 
   const onCardClick = () => SoundManager.getInstance().play('betButtonAndCardClickSound');
   const onShuffleCards = () => SoundManager.getInstance().play('cardsShuffleSound');
@@ -305,9 +332,9 @@ const fetchUserInfo = async () => {
       cardImages: cards,
       cardBackImages: gameConfig.cardBackImages[idx],
       isWinner: idx === winningPotIndex,
-      multiplier: gameConfig.returnWinngingPotPercentage[idx] || 1,
-      showFront: true,
-      onPotClick: () => { },
+      // multiplier: gameConfig.returnWinngingPotPercentage[idx] || 1,
+      // showFront: true,
+      // onPotClick: () => { },
     })) || [];
 
   if (!gameConfig) {
@@ -357,7 +384,7 @@ const fetchUserInfo = async () => {
         <TopBar />
         <PlayersList />
         <Timer />
-        <CoinTray key={gameConfig} />
+        <CoinTray key={gameConfig?.gameId ?? 'default'} />
 
         {/* GAME CANVAS */}
         <div

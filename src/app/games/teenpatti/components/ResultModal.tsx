@@ -6,17 +6,18 @@ import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '@/lib/redux/store';
 import { clearWinningPot, setWinningPotIndex } from '@/lib/redux/slices/teenpatti/winningPotSlice';
 
-interface Winner {
-  userId: string;
-  amountWon: number;
-  imageProfile: string;
-}
-
 interface ResultData {
-  winners: Winner[];
+  winners: any[]; // you can make a proper type if you know the structure
   winningPot: string;
+  winningPotIndex: number;
   winningCards: string[];
   winningPotRankText: string;
+}
+
+interface ResultResponse {
+  success: boolean;
+  message: string;
+  data?: ResultData;
 }
 
 export default function ResultModal() {
@@ -41,10 +42,10 @@ export default function ResultModal() {
     const socket = getSocket();
     if (!socket) return;
 
-    const handleResult = (response: any) => {
+    const handleResult = (response: ResultResponse) => {
       if (!response?.success || !response.data) return;
-      let winningPotIndex=response.data.winningPotIndex;
-      let winners=response.data.winners;
+      const winningPotIndex=response.data.winningPotIndex;
+      // const winners=response.data.winners;
       if (manualClosed) return; 
 
       setResult(response.data);
@@ -62,14 +63,13 @@ export default function ResultModal() {
         }, 5000);
       }, 3000);
     };
-
     socket.on('teenpattiAnnounceGameResultResponse', handleResult);
 
     return () => {
       socket.off('teenpattiAnnounceGameResultResponse', handleResult);
       if (timeoutRef.current) clearTimeout(timeoutRef.current);
     };
-  }, [manualClosed]);
+  }, [manualClosed,dispatch]);
 
   useEffect(() => {
     // Reset manualClosed when new game starts
@@ -166,6 +166,7 @@ export default function ResultModal() {
                     className="rounded-circle"
                     style={{ width: '40px', height: '40px', objectFit: 'cover', border: '2px solid #ffd700' }}
                   />
+
                   <div>
                     <p className="text-white mb-0 fw-semibold" style={{ fontSize: '14px' }}>
                       {winner.userId === String(currentUserId) ? 'You' : `User ${winner.userId.slice(-4)}`}

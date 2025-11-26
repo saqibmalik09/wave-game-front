@@ -16,10 +16,10 @@ interface PotCardProps {
   cardImages: string[];
   cardBackImages: string[];
   isWinner: boolean;
-  rankText?: string;
-  multiplier: number;
-  onPotClick: () => void;
-  showFront: boolean;
+  // rankText?: string;
+  // multiplier: number;
+  // onPotClick: () => void;
+  // showFront: boolean;
 }
 
 interface CoinData {
@@ -28,8 +28,12 @@ interface CoinData {
   x: number;
   y: number;
   isAnimating: boolean;
+  potIndex?: number;
 }
-
+interface PendingCoin {
+  value: number;
+  potIndex: number;
+}
 export default function PotCard({
   potIndex,
   potName,
@@ -38,16 +42,16 @@ export default function PotCard({
   cardImages,
   cardBackImages,
   isWinner,
-  rankText,
-  multiplier,
-  onPotClick,
-  showFront,
+  // rankText,
+  // multiplier,
+  // onPotClick,
+  // showFront,
 }: PotCardProps) {
   const dispatch = useDispatch();
   const selectedCoin = useSelector((s: RootState) => s.selectedCoin.coin);
   const currentPhase = useSelector((s: RootState) => s.teenpattiTimer.phase);
   const gameConfig = useSelector((s: RootState) => s.gameConfiguration.data);
-  const pendingCoin = useSelector((state: RootState) => state.coinAnimation.pendingCoin);
+const pendingCoin = useSelector<RootState, PendingCoin | null>( (state) => state.coinAnimation.pendingCoin);
   const { ToastContainer, showToast } = useToast();
   const coinsContainerRef = useRef<HTMLDivElement>(null);
 
