@@ -126,7 +126,7 @@ const pendingCoin = useSelector<RootState, PendingCoin | null>( (state) => state
   // ✅ Listen for server response and animate user coin
   useEffect(() => {
     if (pendingCoin && pendingCoin.potIndex === potIndex) {
-      SoundManager.getInstance().play('betButtonAndCardClickSound');
+      // SoundManager.getInstance().play('betButtonAndCardClickSound');
 
       if (!coinsContainerRef.current) {
         dispatch(clearPendingCoin());

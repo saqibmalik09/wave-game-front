@@ -92,7 +92,7 @@ export default function CoinTray() {
       showToast(`You won ${message.winningAmount}`,'success')
     })
   const onClickCoin = (amount: number, color: string) => {
-    SoundManager.getInstance().play('betButtonAndCardClickSound');
+    // SoundManager.getInstance().play('betButtonAndCardClickSound');
 
     setSelectedCoinLocal(amount);
     dispatch(setCoin({ amount, color }));
