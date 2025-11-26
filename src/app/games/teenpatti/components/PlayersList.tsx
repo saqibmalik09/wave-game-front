@@ -68,6 +68,7 @@ export default function PlayersList() {
             alt={player.name}
             width={48}     // required by next/image
             height={48}    // required by next/image
+             unoptimized
             className="rounded-circle"
             style={{
               width: 'clamp(28px, 5vw, 48px)',
