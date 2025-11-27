@@ -58,7 +58,7 @@ src/
 
 #### Base URL
 ```typescript
-process.env.BACKEND_API_URL = "http://3.108.229.85:5000/api"
+process.env.NEXT_PUBLIC_BACKEND_API_URL = "http://3.108.229.85:5000/api"
 ```
 
 #### Bet Placement Endpoint

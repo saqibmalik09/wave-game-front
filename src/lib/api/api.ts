@@ -4,7 +4,7 @@ import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from "axios";
  * Load environment variables
  */
 const APP_MODE = process.env.APP_MODE || "development";
-const BASE_URL = process.env.BACKEND_API_URL || "https://my.wavegames.online/api";
+const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_API_URL;
 
 /**
  * Create a single Axios instance
