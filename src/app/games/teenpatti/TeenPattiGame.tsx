@@ -331,9 +331,9 @@ const fetchUserInfo = async () => {
       cardImages: cards,
       cardBackImages: gameConfig.cardBackImages[idx],
       isWinner: idx === winningPotIndex,
-      multiplier: gameConfig.returnWinngingPotPercentage[idx] || 1,
-      showFront: true,
-      onPotClick: () => { },
+      // multiplier: gameConfig.returnWinngingPotPercentage[idx] || 1,
+      // showFront: true,
+      // onPotClick: () => { },
     })) || [];
 
   if (!gameConfig) {

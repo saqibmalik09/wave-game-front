@@ -42,10 +42,10 @@ export default function PotCard({
   cardImages,
   cardBackImages,
   isWinner,
-  rankText,
-  multiplier,
-  onPotClick,
-  showFront,
+  // rankText,
+  // multiplier,
+  // onPotClick,
+  // showFront,
 }: PotCardProps) {
   const dispatch = useDispatch();
   const selectedCoin = useSelector((s: RootState) => s.selectedCoin.coin);
