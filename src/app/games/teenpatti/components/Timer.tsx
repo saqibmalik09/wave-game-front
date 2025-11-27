@@ -26,7 +26,7 @@ export default function Timer() {
     const handleTimer = (data: any) => {
       setTimerData(data);
       if (data.remaining === 3 && data.phase === 'bettingTimer') {
-        SoundManager.getInstance().play('timerUpSound');
+        // SoundManager.getInstance().play('timerUpSound');
       }
       if (data.phase && data.phase !== lastPhase) {
         dispatch(

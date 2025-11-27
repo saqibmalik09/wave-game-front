@@ -32,52 +32,57 @@ export default function ResultModal() {
 
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  const handleClose = () => {
-    setShow(false);
-    setManualClosed(true);
+  useEffect(() => {
+  const socket = getSocket();
+  if (!socket) return;
+
+  const handleResult = (response: ResultResponse) => {
+    if (!response?.success || !response.data) return;
+
+    // If user manually closed, ignore showing again
+    if (manualClosed) return;
+
+    setResult(response.data);
+    dispatch(setWinningPotIndex(response.data.winningPotIndex));
+
+    // Clear previous timeout
     if (timeoutRef.current) clearTimeout(timeoutRef.current);
+
+    // Show modal after 3 seconds
+    timeoutRef.current = setTimeout(() => {
+      setShow(true);
+    }, 3000);
   };
 
-  useEffect(() => {
-    const socket = getSocket();
-    if (!socket) return;
+  socket.on('teenpattiAnnounceGameResultResponse', handleResult);
 
-    const handleResult = (response: ResultResponse) => {
-      if (!response?.success || !response.data) return;
-      const winningPotIndex=response.data.winningPotIndex;
-      // const winners=response.data.winners;
-      if (manualClosed) return; 
+  return () => {
+    socket.off('teenpattiAnnounceGameResultResponse', handleResult);
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
+  };
+}, [manualClosed, dispatch]);
 
-      setResult(response.data);
-      dispatch(setWinningPotIndex(winningPotIndex))
-      // Clear previous timeout if any
-      if (timeoutRef.current) clearTimeout(timeoutRef.current);
-       
-      // Show modal after 3 seconds
-      timeoutRef.current = setTimeout(() => {
-        setShow(true);
-        
-        timeoutRef.current = setTimeout(() => {
-          setShow(false);
-          dispatch(clearWinningPot());
-        }, 5000);
-      }, 3000);
-    };
-    socket.on('teenpattiAnnounceGameResultResponse', handleResult);
+// Close modal on phase change or manual close
+useEffect(() => {
+  if (!currentPhase) return;
 
-    return () => {
-      socket.off('teenpattiAnnounceGameResultResponse', handleResult);
-      if (timeoutRef.current) clearTimeout(timeoutRef.current);
-    };
-  }, [manualClosed,dispatch]);
+  // Close when new game starts or phase changes to any other
+  if (currentPhase !== 'resultAnnounceTimer') {
+    setShow(false);
+    setManualClosed(false); // reset manual close for next round
+    dispatch(clearWinningPot());
 
-  useEffect(() => {
-    // Reset manualClosed when new game starts
-    if (currentPhase === 'bettingTimer') {
-      setManualClosed(false);
-      if (timeoutRef.current) clearTimeout(timeoutRef.current);
-    }
-  }, [currentPhase]);
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
+  }
+}, [currentPhase, dispatch]);
+
+// Manual close
+const handleClose = () => {
+  setShow(false);
+  setManualClosed(true);
+  if (timeoutRef.current) clearTimeout(timeoutRef.current);
+};
+
 
   if (!show || !result) return null;
 

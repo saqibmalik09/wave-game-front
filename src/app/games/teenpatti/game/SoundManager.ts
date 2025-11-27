@@ -3,10 +3,14 @@ export class SoundManager {
   private static instance: SoundManager;
   private sounds: Map<string, HTMLAudioElement> = new Map();
   private enabled: boolean = true;
-  private unlocked: boolean = false; // for browser autoplay restriction
+  private unlocked: boolean = false;
   private isWeb: boolean = typeof window !== 'undefined';
 
-  private constructor() {}
+  private constructor() {
+    if (this.isWeb) {
+      this.setupAutoUnlock();
+    }
+  }
 
   static getInstance(): SoundManager {
     if (!SoundManager.instance) {
@@ -27,36 +31,41 @@ export class SoundManager {
         audio.volume = 0.5;
         this.sounds.set(key, audio);
       } catch (err) {
-        console.error(`❌ [SoundManager] Failed to load sound: ${key}`, err);
+        console.error(`[SoundManager] Failed to load sound: ${key}`, err);
       }
     });
-
-    if (this.isWeb) {
-      this.unlockAudioOnInteraction();
-    }
   }
 
   /**
-   * Unlock audio in browser (play/pause once) after first user interaction
+   * Setup auto unlock on any user interaction
    */
-  private unlockAudioOnInteraction() {
-    if (this.unlocked) return;
-
+  private setupAutoUnlock() {
     const unlock = () => {
+      if (this.unlocked) return;
+
+      // Play and immediately pause all sounds to unlock
       this.sounds.forEach((sound) => {
-        const clone = sound.cloneNode(true) as HTMLAudioElement;
-        clone.play().catch(() => {});
-        clone.pause();
-        clone.currentTime = 0;
+        sound.play()
+          .then(() => {
+            sound.pause();
+            sound.currentTime = 0;
+          })
+          .catch(() => {}); // Ignore errors during unlock
       });
+
       this.unlocked = true;
-      window.removeEventListener('click', unlock);
-      window.removeEventListener('touchstart', unlock);
-      console.log('✅ [SoundManager] Audio unlocked');
+      console.log('[SoundManager] Audio unlocked');
+      
+      // Remove listeners after first successful unlock
+      document.removeEventListener('click', unlock);
+      document.removeEventListener('touchstart', unlock);
+      document.removeEventListener('keydown', unlock);
     };
 
-    window.addEventListener('click', unlock, { once: true });
-    window.addEventListener('touchstart', unlock, { once: true });
+    // Listen to multiple interaction types
+    document.addEventListener('click', unlock);
+    document.addEventListener('touchstart', unlock);
+    document.addEventListener('keydown', unlock);
   }
 
   /**
@@ -66,21 +75,34 @@ export class SoundManager {
     if (!this.enabled) return;
 
     const sound = this.sounds.get(key);
-    if (!sound) return console.warn(`⚠️ [SoundManager] Sound not found: ${key}`);
+    if (!sound) {
+      console.warn(`[SoundManager] Sound not found: ${key}`);
+      return;
+    }
 
     try {
+      // Clone the sound to allow overlapping plays
       const clone = sound.cloneNode(true) as HTMLAudioElement;
       clone.volume = volume;
-      clone.play().catch((err) => {
-        if (this.isWeb && !this.unlocked) {
-          console.warn(`⚠️ [SoundManager] Cannot autoplay ${key} before interaction`, err);
-        }
-      });
+      
+      const playPromise = clone.play();
+      
+      if (playPromise !== undefined) {
+        playPromise.catch((err) => {
+          // Only warn if audio is still locked
+          if (!this.unlocked) {
+            console.warn(`[SoundManager] Audio not unlocked yet for ${key}`);
+          }
+        });
+      }
     } catch (err) {
-      console.error(`❌ [SoundManager] Failed to play sound ${key}`, err);
+      console.error(`[SoundManager] Failed to play sound ${key}`, err);
     }
   }
 
+  /**
+   * Stop a specific sound
+   */
   stop(key: string) {
     const sound = this.sounds.get(key);
     if (sound) {
@@ -89,6 +111,9 @@ export class SoundManager {
     }
   }
 
+  /**
+   * Stop all sounds
+   */
   stopAll() {
     this.sounds.forEach((sound) => {
       sound.pause();
@@ -96,19 +121,41 @@ export class SoundManager {
     });
   }
 
+  /**
+   * Enable/disable all sounds
+   */
   setEnabled(enabled: boolean) {
     this.enabled = enabled;
-    if (!enabled) this.stopAll();
+    if (!enabled) {
+      this.stopAll();
+    }
   }
 
-  isEnabled() {
+  /**
+   * Check if sounds are enabled
+   */
+  isEnabled(): boolean {
     return this.enabled;
   }
 
+  /**
+   * Toggle sound on/off
+   */
+  toggle(): boolean {
+    this.setEnabled(!this.enabled);
+    return this.enabled;
+  }
+
+  /**
+   * Cleanup
+   */
   destroy() {
     this.stopAll();
-    this.sounds.forEach((s) => (s.src = ''));
+    this.sounds.forEach((sound) => {
+      sound.src = '';
+    });
     this.sounds.clear();
-    console.log('🧹 [SoundManager] Destroyed');
+    this.unlocked = false;
+    console.log('[SoundManager] Destroyed');
   }
 }

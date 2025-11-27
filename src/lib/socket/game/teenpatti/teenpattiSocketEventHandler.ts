@@ -11,7 +11,6 @@ export function useTeenpattiTimerListener() {
   useEffect(() => {
     const handleTimer = (data: any) => {
       if (data.phase == 'winningCalculationTimer') {
-        console.log("calling  result")
         // teenpattiAnnounceGameResult();
       }
     };

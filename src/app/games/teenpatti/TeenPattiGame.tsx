@@ -121,7 +121,6 @@ const fetchUserInfo = async () => {
       //   userId:connectionUserId,
       //   socketId:socketId
       // }    
-      console.log("newJoiner",NewJoiner)
       teenpattiGameTableJoin(NewJoiner);
       // mySocketIdEvent(socketDetails)
       return;
@@ -150,9 +149,9 @@ const fetchUserInfo = async () => {
       setGameConfig(cached);
       dispatch(setGameConfiguration(cached));
       SoundManager.getInstance().loadSounds({
-        timerUpSound: cached.timerUpSound,
-        cardsShuffleSound: cached.cardsShuffleSound,
-        betButtonAndCardClickSound: cached.betButtonAndCardClickSound,
+        timerUpSound:`${process.env.NEXT_PUBLIC_BACKEND_ASSET_URL}/${cached.timerUpSound}` ,
+        cardsShuffleSound:`${process.env.NEXT_PUBLIC_BACKEND_ASSET_URL}/${cached.cardsShuffleSound}` ,
+        betButtonAndCardClickSound: `${process.env.NEXT_PUBLIC_BACKEND_ASSET_URL}/${cached.betButtonAndCardClickSound}`,
       });
       return;
     }
@@ -163,9 +162,9 @@ const fetchUserInfo = async () => {
         setCache(cacheKey, data);
         dispatch(setGameConfiguration(data));
         SoundManager.getInstance().loadSounds({
-          timerUpSound: data.timerUpSound,
-          cardsShuffleSound: data.cardsShuffleSound,
-          betButtonAndCardClickSound: data.betButtonAndCardClickSound,
+          timerUpSound:`${process.env.NEXT_PUBLIC_BACKEND_ASSET_URL}/${data.timerUpSound}` ,
+          cardsShuffleSound:`${process.env.NEXT_PUBLIC_BACKEND_ASSET_URL}/${data.cardsShuffleSound}` ,
+          betButtonAndCardClickSound:`${process.env.NEXT_PUBLIC_BACKEND_ASSET_URL}/${data.betButtonAndCardClickSound}` ,
         });
       }
     });
@@ -256,7 +255,7 @@ const fetchUserInfo = async () => {
       message: data.message,
       data: data.data,
       }));
-      dispatch(setPendingCoin({ potIndex: data.data.potIndex, value:data.data.amount }));
+      dispatch(setPendingCoin({ potIndex: Number(data.data.potIndex), value:data.data.amount }));
     } else {
       showToast(data.message ?? "Bet failed!", "error");
     }
@@ -332,9 +331,9 @@ const fetchUserInfo = async () => {
       cardImages: cards,
       cardBackImages: gameConfig.cardBackImages[idx],
       isWinner: idx === winningPotIndex,
-      // multiplier: gameConfig.returnWinngingPotPercentage[idx] || 1,
-      // showFront: true,
-      // onPotClick: () => { },
+      multiplier: gameConfig.returnWinngingPotPercentage[idx] || 1,
+      showFront: true,
+      onPotClick: () => { },
     })) || [];
 
   if (!gameConfig) {

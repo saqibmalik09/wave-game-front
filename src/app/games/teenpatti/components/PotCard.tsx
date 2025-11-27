@@ -42,10 +42,10 @@ export default function PotCard({
   cardImages,
   cardBackImages,
   isWinner,
-  // rankText,
-  // multiplier,
-  // onPotClick,
-  // showFront,
+  rankText,
+  multiplier,
+  onPotClick,
+  showFront,
 }: PotCardProps) {
   const dispatch = useDispatch();
   const selectedCoin = useSelector((s: RootState) => s.selectedCoin.coin);
@@ -123,10 +123,10 @@ const pendingCoin = useSelector<RootState, PendingCoin | null>( (state) => state
     }
   }, [currentPhase, betCoins]);
 
-  // ✅ Listen for server response and animate user coin
+  //  Listen for server response and animate user coin
   useEffect(() => {
     if (pendingCoin && pendingCoin.potIndex === potIndex) {
-      // SoundManager.getInstance().play('betButtonAndCardClickSound');
+      SoundManager.getInstance().play('betButtonAndCardClickSound');
 
       if (!coinsContainerRef.current) {
         dispatch(clearPendingCoin());
@@ -174,7 +174,6 @@ const pendingCoin = useSelector<RootState, PendingCoin | null>( (state) => state
     }
   }, [currentPhase, cardBackImages, cardImages]);
 
-  // ✅ Handle pot click - ONLY dispatch bet, NO animation here
   const handlePotClick = () => {
     if (!selectedCoin) {
       showToast(`Please select a coin to bet!`);
@@ -188,7 +187,6 @@ const pendingCoin = useSelector<RootState, PendingCoin | null>( (state) => state
 
     const selectedCoinAmount = selectedCoin.amount;
 
-    // ✅ ONLY dispatch bet - coin animation will happen when server responds
     dispatch(
       placeBet({
         userId: '10007',
@@ -277,11 +275,11 @@ const pendingCoin = useSelector<RootState, PendingCoin | null>( (state) => state
             }}
           >
             <img
-              src={cardUrl}
-              alt={`Card ${idx}`}
-              className="w-100 h-100"
-              style={{ objectFit: 'cover' }}
-            />
+            src={`${process.env.NEXT_PUBLIC_BACKEND_ASSET_URL}/${cardUrl}`}
+            alt={`Card ${idx}`}
+            className="w-100 h-100"
+            style={{ objectFit: 'cover' }}
+          />
           </div>
         ))}
       </div>

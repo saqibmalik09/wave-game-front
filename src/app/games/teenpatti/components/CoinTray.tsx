@@ -88,11 +88,10 @@ export default function CoinTray() {
     }
   }, [bettingCoins, colors, dispatch]);
     myMessagesFromServer((message)=>{
-      console.log("Message recieved from server...",message)
       showToast(`You won ${message.winningAmount}`,'success')
     })
-  const onClickCoin = (amount: number, color: string) => {
-    // SoundManager.getInstance().play('betButtonAndCardClickSound');
+     const onClickCoin = (amount: number, color: string) => {
+      SoundManager.getInstance().play('betButtonAndCardClickSound');
 
     setSelectedCoinLocal(amount);
     dispatch(setCoin({ amount, color }));

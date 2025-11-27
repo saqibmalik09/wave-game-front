@@ -2,12 +2,30 @@
 'use client';
 
 import { RootState } from '@/lib/redux/store';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
+import { SoundManager } from '../game/SoundManager';
 
 export default function TopBar() {
   const userPlayerData = useSelector((state: RootState) => state.userPlayerData);
   const [soundEnabled, setSoundEnabled] = useState(true);
+
+  // Initialize sound state from SoundManager
+  useEffect(() => {
+    const soundManager = SoundManager.getInstance();
+    setSoundEnabled(soundManager.isEnabled());
+  }, []);
+
+  const toggleSound = () => {
+    const soundManager = SoundManager.getInstance();
+    const newState = soundManager.toggle();
+    setSoundEnabled(newState);
+    
+    // Optional: Play a test sound when enabling
+    if (newState) {
+      soundManager.play('betButtonAndCardClickSound', 0.3);
+    }
+  };
 
   return (
     <div 
@@ -55,29 +73,6 @@ export default function TopBar() {
                 <path d="M19 12H5M12 19l-7-7 7-7"/>
               </svg>
             </button>
-            {/* <button 
-              className="btn btn-dark rounded-circle p-0 d-flex align-items-center justify-content-center d-none d-sm-flex"
-              style={{ 
-                width: 'clamp(32px, 5vw, 48px)', 
-                height: 'clamp(32px, 5vw, 48px)',
-                minWidth: '32px',
-              }}
-            >
-              <svg 
-                width="clamp(14px, 2vw, 20px)" 
-                height="clamp(14px, 2vw, 20px)" 
-                viewBox="0 0 24 24" 
-                fill="none" 
-                stroke="white" 
-                strokeWidth="2"
-                style={{
-                  width: 'clamp(14px, 2vw, 20px)',
-                  height: 'clamp(14px, 2vw, 20px)',
-                }}
-              >
-                <path d="M3 12h18M3 6h18M3 18h18"/>
-              </svg>
-            </button> */}
           </div>
 
           {/* Center: Maximum Bet */}
@@ -136,8 +131,10 @@ export default function TopBar() {
                 width: 'clamp(32px, 5vw, 48px)', 
                 height: 'clamp(32px, 5vw, 48px)',
                 minWidth: '32px',
+                transition: 'all 0.2s ease',
+                opacity: soundEnabled ? 1 : 0.6,
               }}
-              onClick={() => setSoundEnabled(!soundEnabled)}
+              onClick={toggleSound}
             >
               {soundEnabled ? (
                 <svg 
@@ -174,32 +171,6 @@ export default function TopBar() {
                 </svg>
               )}
             </button>
-
-            {/* Settings */}
-            {/* <button 
-              className="btn btn-dark rounded-circle p-0 d-flex align-items-center justify-content-center d-none d-sm-flex"
-              style={{ 
-                width: 'clamp(32px, 5vw, 48px)', 
-                height: 'clamp(32px, 5vw, 48px)',
-                minWidth: '32px',
-              }}
-            >
-              <svg 
-                width="clamp(14px, 2vw, 20px)" 
-                height="clamp(14px, 2vw, 20px)" 
-                viewBox="0 0 24 24" 
-                fill="none" 
-                stroke="white" 
-                strokeWidth="2"
-                style={{
-                  width: 'clamp(14px, 2vw, 20px)',
-                  height: 'clamp(14px, 2vw, 20px)',
-                }}
-              >
-                <circle cx="12" cy="12" r="3"/>
-                <path d="M12 1v6m0 6v6m8.66-15.66l-4.24 4.24m-4.24 4.24l-4.24 4.24M23 12h-6m-6 0H1m20.66 8.66l-4.24-4.24m-4.24-4.24l-4.24-4.24"/>
-              </svg>
-            </button> */}
           </div>
         </div>
       </div>
