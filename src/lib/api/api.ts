@@ -4,7 +4,7 @@ import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from "axios";
  * Load environment variables
  */
 const APP_MODE = process.env.APP_MODE || "development";
-const BASE_URL = process.env.BACKEND_API_URL || "http://3.108.229.85:5000/api";
+const BASE_URL = process.env.BACKEND_API_URL || "https://my.wavegames.online/api";
 
 /**
  * Create a single Axios instance
@@ -53,7 +53,7 @@ api.interceptors.response.use(
 export const ApiService = {
   gameUserInfo: async <T>(payload: { token: string; tenantDomainURL: string }): Promise<T> => {
     const response = await axios.get<T>(
-      "http://3.108.229.85:5000/admin/game/userInfo",
+      `${BASE_URL}/admin/game/userInfo`,
       {
         headers: {
           Authorization: `Bearer ${payload.token}`,

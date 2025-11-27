@@ -3,7 +3,7 @@
 import { io, Socket } from 'socket.io-client';
 import { setCache, getCache } from '@/lib/cache';
 import { v4 as uuidv4 } from 'uuid';
-const SOCKET_URL = process.env.NEXT_PUBLIC_BACKEND_SOCKET_URL || 'http://3.108.229.85:5000';
+const SOCKET_URL = process.env.NEXT_PUBLIC_BACKEND_SOCKET_URL;
 const APPLICATION_INFO_KEY = 'applicationInfo';
 const USERID_KEY = 'userId';
 let userId=getCache(USERID_KEY)
