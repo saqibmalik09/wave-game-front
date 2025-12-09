@@ -14,7 +14,7 @@ import ResultModal from './components/ResultModal';
 import MessageModal from '@/app/components/messageModel';
 import Timer from './components/Timer';
 import { useToast } from './components/Toast';
-import { gameConfiguration as fetchGameConfiguration, tanantDetailsByAppKey } from '@/lib/socket/socketEventHandlers';
+import { gameConfiguration as fetchGameConfiguration } from '@/lib/socket/socketEventHandlers';
 import {  placeTeenpattiBet, teenpattiGameTableJoin, useTeenpattiBetResponseListener } from '@/lib/socket/game/teenpatti/teenpattiSocketEventHandler';
 import { useDispatch, useSelector } from "react-redux";
 import { setGameConfiguration } from '@/lib/redux/slices/teenpatti/gameConfiguration';
@@ -23,6 +23,7 @@ import {  setUserPlayerInfo } from '@/lib/redux/slices/userSlice';
 import { setPendingCoin } from '@/lib/redux/slices/teenpatti/coinDropAnimation';
 import { v4 as uuidv4 } from 'uuid';
 import { RootState } from '@/lib/redux/store';
+
 interface TenantData {
   success: boolean;
   message: string;
@@ -85,7 +86,8 @@ export default function TeenPattiGame() {
   const [playerData, setPlayerData] = useState<UserData | null>(null);
   const [tenantData, setTenantData] = useState<TenantData>();
   const [modalMessage, setModalMessage] = useState({ title: "", message: ""});
-
+  const user = useSelector((state: RootState) => state.userPlayerData);
+  console.log("User from Redux:", user);
   const gameId = React.useMemo(() => ({ gameId: 16 }), []);
   const idNumber = gameId.gameId;
   const cacheKey = `game_config_${idNumber}`;
@@ -94,14 +96,34 @@ export default function TeenPattiGame() {
 // ------------------------
 const fetchUserInfo = async () => {
   try {
+    console.log("Fetching user info with tenantData and userInfo:", tenantData, userInfo);
     if (!userInfo || !tenantData) return;
     const tenantDomainURL = tenantData.data.tenantProductionDomain;
-    // let cachedApplicationInfo = getCache("applicationInfo");
-    let connectionUserId = getCache("userId");
+    // let connectionUserId = user.data? user.data.id:null;
+  //  connectionUserId playerData.id? connectionUserId=playerData.id:null;
+    //check if playerData has user id else get from user.data.id and pass to connectionUserId
+    let connectionUserId=null;
+    if(playerData){
+      console.log("getting form playerdata")
+      connectionUserId=playerData.id;
+    }else{
+    console.log("getting form connectionUserId2")
+      connectionUserId=user.data?.id;
+    }
+
+
+    if (!connectionUserId) {
+      console.warn("User ID not available yet.");
+    //reload window to restart
+      window.location.reload();
+      return;
+      }
     const response: GameUserInfoResponse = await ApiService.gameUserInfo({
       token: userInfo.token,
       tenantDomainURL,
     });
+    console.log("Fetched NewJoiner:", response);
+
     if (response.success) {
       setPlayerData(response.data);
       dispatch(setUserPlayerInfo({
@@ -117,11 +139,13 @@ const fetchUserInfo = async () => {
         appKey:userInfo.appKey,
         token:userInfo.token
       };
+      console.log("New Joiner Data:", NewJoiner);
+         teenpattiGameTableJoin(NewJoiner);
       // let socketDetails={
       //   userId:connectionUserId,
       //   socketId:socketId
       // }    
-      teenpattiGameTableJoin(NewJoiner);
+    
       // mySocketIdEvent(socketDetails)
       return;
     }
@@ -137,12 +161,13 @@ const fetchUserInfo = async () => {
 };
 
   useEffect(() => {
-    const USERID_KEY = 'userId';
-    let userId=getCache(USERID_KEY)
-    if(!userId){
-    userId = uuidv4();
-    }
-    setCache(USERID_KEY, userId);
+    // const USERID_KEY = 'userId';
+    // let userId=getCache(USERID_KEY)
+    // if(!userId){
+    // userId = uuidv4();
+    // }
+    // setCache(USERID_KEY, userId);
+    // const userId=user.data?.id;
 
     const cached = getCache(cacheKey);
     if (cached) {
@@ -212,19 +237,19 @@ const fetchUserInfo = async () => {
       setShowModal(true);
       return;
     }
-    tanantDetailsByAppKey(appKey, (data) => {
-      if (data.success) {
-        setTenantData(data)
-        dispatch(setTenantDetails(data))
-      } else {
-        setModalMessage({
-          title: "Wrong App Key provided",
-          message: "Invalid AppKey OR invalid data",
-        });
-        setShowModal(true);
-        return;
-      }
-    });
+    // tanantDetailsByAppKey(appKey, (data) => {
+    //   if (data.success) {
+    //     setTenantData(data)
+    //     dispatch(setTenantDetails(data))
+    //   } else {
+    //     setModalMessage({
+    //       title: "Wrong App Key provided",
+    //       message: "Invalid AppKey OR invalid data",
+    //     });
+    //     setShowModal(true);
+    //     return;
+    //   }
+    // });
     setUserInfo(userInfo);
   }, []);
 
@@ -249,6 +274,7 @@ const fetchUserInfo = async () => {
   
   useTeenpattiBetResponseListener((data) => {
     if (data.success) {
+      // console.log("Teenpatti Bet Response Data:", data);
       // showToast(data.message ?? `Bet placed: ₹${data.amount}`, "success");
       dispatch(setUserPlayerInfo({
       success: data.success,
@@ -263,11 +289,13 @@ const fetchUserInfo = async () => {
 
  useEffect(() => {
   if (!latestBet || !userInfo) return;
-
   const cachedApplicationInfo = getCache("applicationInfo") || {};
   const socketId = cachedApplicationInfo.socketId || "";
-  const connectionUserId = getCache("userId") || "";
-
+  const connectionUserId = playerData ? playerData.id : user.data?.id;
+  if (!connectionUserId) {
+   alert("User ID not available for placing bet.");
+    return;
+  }
   const betData = {
     userId: connectionUserId,
     amount: latestBet.amount,

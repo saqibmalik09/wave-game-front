@@ -5,7 +5,6 @@ import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from "axios";
  */
 const APP_MODE = process.env.APP_MODE || "development";
 const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_API_URL;
-
 /**
  * Create a single Axios instance
  */
@@ -48,20 +47,17 @@ api.interceptors.response.use(
 /**
  * Define a reusable, typed API helper
  */
-
-
 export const ApiService = {
   gameUserInfo: async <T>(payload: { token: string; tenantDomainURL: string }): Promise<T> => {
-    const response = await axios.get<T>(
-      `${BASE_URL}/admin/game/userInfo`,
-      {
-        headers: {
-          Authorization: `Bearer ${payload.token}`,
-        },
-      }
-    );
+    const url = `${payload.tenantDomainURL}/admin/game/userInfo`; 
+    
+    const response = await axios.get<T>(url, {
+      headers: {
+        Authorization: `Bearer ${payload.token}`,
+      },
+    });
+
     return response.data;
   },
 };
-
 export default ApiService;

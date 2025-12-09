@@ -1,13 +1,18 @@
 'use client';
 
 import { useEffect } from 'react';
-import { initSocket } from '@/lib/socket/socketClient';
-const socket = initSocket();
+import { getSocket } from '@/lib/socket/socketClient';
+
 
 /**
- * 🎯 Teen Patti Timer Listener
+ *  Teen Patti Timer Listener
  */
 export function useTeenpattiTimerListener() {
+  let socket = getSocket();
+  if(!socket) {
+   socket=getSocket()
+   return ;
+  }  
   useEffect(() => {
     const handleTimer = (data: any) => {
       if (data.phase == 'winningCalculationTimer') {
@@ -45,7 +50,12 @@ export function useTeenpattiTimerListener() {
   potIndex:string;
   socketId:string;
 }) {
+ const socket = getSocket();
 
+  if (!socket) {
+    console.log('Socket not initialized',socket);
+  return ;
+  }
   const payload = {
     userId,
     amount,
@@ -56,6 +66,7 @@ export function useTeenpattiTimerListener() {
     potIndex,
     socketId
   };
+  
   socket.emit("placeTeenpattiBet", payload);
 }
 
@@ -72,7 +83,12 @@ export function useTeenpattiTimerListener() {
   appKey:string;
   token:string
 }) {
+ const socket = getSocket();
 
+  if (!socket) {
+    console.log('Socket not initialized',socket);
+  return ;
+  }
   const payload = {
     userId,
     name,
@@ -80,6 +96,7 @@ export function useTeenpattiTimerListener() {
     appKey,
     token
   };
+  console.log("Emitting teenpattiGameTableJoin with payload:", payload);
   socket.emit("teenpattiGameTableJoin", payload);
 }
 //  export function mySocketIdEvent({
@@ -102,6 +119,12 @@ export function useTeenpattiTimerListener() {
 export function teenpattiGameTableJoinListener(
   onResponse: (data: any) => void
 ) {
+  const socket = getSocket();
+
+  if (!socket) {
+    console.log('Socket not initialized',socket);
+  return ;
+  }
   useEffect(() => {
 
     const handleBetResponse = (data: any) => {
@@ -118,6 +141,11 @@ export function teenpattiGameTableJoinListener(
 }
 
 export function useTeenpattiBetResponseListener( onResponse: (data: any) => void) {
+  const socket = getSocket();
+  if (!socket) {
+    console.log('Socket not initialized',socket);
+  return ;
+  }
   useEffect(() => {
     const handleBetResponse = (data: any) => {
       onResponse(data); // send data back to component
@@ -160,7 +188,12 @@ export function useTeenpattiBetResponseListener( onResponse: (data: any) => void
 
 // game users and pots
 export function teenpattiAnnounceGameResult() {
+ const socket = getSocket();
 
+  if (!socket) {
+    console.log('Socket not initialized',socket);
+  return ;
+  }
   socket.emit('teenpattiAnnounceGameResult', {});
 
   const teenpattiAnnounceGameResultResponse = (data: any) => {
@@ -183,8 +216,14 @@ export function teenpattiAnnounceGameResult() {
 export function myMessagesFromServer(
   onResponse: (data: any) => void
 ) {
+   const socket = getSocket();
+
+  if (!socket) {
+    console.log('Socket not initialized',socket);
+  return ;
+  }
   useEffect(() => {
-    const socket = initSocket();
+    
     const handleBetResponse = (data: any) => {
       onResponse(data); 
     };
