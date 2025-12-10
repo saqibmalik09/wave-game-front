@@ -50,8 +50,6 @@ export default function TeenPattiPage() {
           token: token,
           tenantDomainURL,
         });
-        console.log("Fetched user info:", response);
-
         if (response.success) {
           dispatch(setUserPlayerInfo({
             success: response.success,
@@ -100,7 +98,7 @@ export default function TeenPattiPage() {
   }
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-slate-900 text-white space-y-6">
+    <div className="flex min-w-2xs flex-col items-center justify-center min-h-screen bg-slate-900 text-white space-y-6">
       <TeenPattiGame />
 
       {/* Modal for displaying messages */}

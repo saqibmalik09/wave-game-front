@@ -1,3 +1,5 @@
+
+// timer.tsx
 'use client';
 
 import React, { useEffect, useState } from 'react';
@@ -26,7 +28,7 @@ export default function Timer() {
     const handleTimer = (data: any) => {
       setTimerData(data);
       if (data.remaining === 3 && data.phase === 'bettingTimer') {
-        // SoundManager.getInstance().play('timerUpSound');
+        SoundManager.getInstance().play('timerUpSound');
       }
       if (data.phase && data.phase !== lastPhase) {
         dispatch(
@@ -65,39 +67,50 @@ export default function Timer() {
   const strokeDashoffset = `${circumference - (progress / 100) * circumference
     }`;
 
-  const strokeColor = isLowTime
-    ? '#ff4646'
+  const strokeColor = isLowTime ? '#ff4646'
     : phase === 'bettingTimer'
       ? '#48e5a6'
       : '#00c2ff';
 
   const phaseLabels: Record<string, string> = {
-    bettingTimer: 'BET',
-    winningCalculationTimer: 'CALC',
-    resultAnnounceTimer: 'RESULT',
-    newGameStartTimer: 'WAIT',
+    bettingTimer: 'Start Betting',
+    winningCalculationTimer: 'Calculating..',
+    resultAnnounceTimer: 'Result',
+    newGameStartTimer: 'Wait',
   };
 
   return (
     <div
       className="position-fixed start-50 translate-middle-x"
-      style={{
-        top: '95px',
-        zIndex: 40,
-      }}
+      // style={{
+      //   top: '95px', // adjust based on TopBar height
+      //   zIndex: 40,
+      //   maxWidth: 'calc(100% - 20px)', // stays within parent
+      // }}
     >
       <div
         className="position-relative"
         style={{
-          width: 'clamp(55px, 12vw, 100px)',
-          height: 'clamp(55px, 12vw, 100px)',
+             width: 'clamp(40px, 5vw, 50px)', // smaller min and max
+             height: 'clamp(40px, 5vw, 50px)',
         }}
       >
+        {/* Use viewBox to make SVG scale */}
         <svg
+          viewBox="0 0 100 100"
           className="w-100 h-100"
           style={{ transform: 'rotate(-90deg)' }}
         >
-          <circle cx="50" cy="50" r="40" stroke="#333" strokeWidth="8" fill="none" />
+          {/* Background circle */}
+          <circle
+            cx="50"
+            cy="50"
+            r="40"
+            stroke="#333"
+            strokeWidth="8"
+            fill="none"
+          />
+          {/* Progress circle */}
           <circle
             cx="50"
             cy="50"
@@ -115,7 +128,7 @@ export default function Timer() {
           />
         </svg>
 
-        {/* Text */}
+        {/* Text inside circle */}
         <div
           className="position-absolute top-50 start-50 translate-middle text-center select-none"
           style={{ animation: isLowTime ? 'pulse 1s infinite' : 'none' }}
@@ -123,39 +136,32 @@ export default function Timer() {
           <div
             className="fw-bold"
             style={{
-              fontSize: 'clamp(18px, 5vw, 32px)',
-              color: isLowTime ? '#ff4646' : '#fff',
+              fontSize: 'clamp(10px, 2.5vw, 12px)',
+              color: isLowTime ? '#ff4656' : '#fff',
               lineHeight: 1,
             }}
           >
             {safeRemaining}
           </div>
 
-          <div
+          {/* <div
             className="text-secondary"
             style={{
-              fontSize: 'clamp(7px, 2.2vw, 12px)',
+              fontSize: 'clamp(7px, 2vw, 12px)',
               marginTop: '2px',
             }}
           >
             {phaseLabels[phase] || phase.toUpperCase()}
-          </div>
+          </div> */}
         </div>
       </div>
 
       <style jsx>{`
     @keyframes pulse {
-      0%, 100% {
-        transform: scale(1);
-        opacity: 1;
-      }
-      50% {
-        transform: scale(1.1);
-        opacity: 0.8;
-      }
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.1); opacity: 0.8; }
     }
   `}</style>
     </div>
-
   );
 }

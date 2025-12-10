@@ -187,10 +187,10 @@ const handleClose = () => {
         </div>
 
         {/* Footer */}
-        <div className="p-4 text-center">
+        <div className="p-2 text-center">
           <button
             onClick={handleClose}
-            className="btn w-100 py-3 fw-bold text-white rounded-pill"
+            className="btn w-100 py-2 fw-bold text-white rounded-pill"
             style={{ background: 'linear-gradient(135deg, #ffd700, #ffed4e)', color: '#000', border: 'none' }}
           >
             Continue

@@ -31,8 +31,8 @@ function CoinButton({ amount, color, isSelected, onClick }: CoinButtonProps) {
       <div
         className="rounded-circle d-flex align-items-center justify-content-center fw-bold text-white"
         style={{
-          width: 'clamp(23px, 8vw, 50px)',
-          height: 'clamp(23px, 8vw, 50px)',
+          width: 'clamp(18px, 6vw, 50px)',
+          height: 'clamp(18px, 6vw, 50px)',
           fontSize: 'clamp(4px, 2.1vw, 16px)',
           background: `radial-gradient(circle at 30% 30%, ${color}, ${color}dd)`,
           // border: `clamp(1px, 0.3vw, 4px) solid rgba(255, 255, 255, 0.3)`,

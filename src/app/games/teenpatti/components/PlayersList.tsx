@@ -33,6 +33,7 @@ export default function PlayersList() {
     if (!socket) return;
 
     const handlePotDataResponse = (response: PlayersUpdateResponse) => {
+      console.log('Received teenpattiGameTableUpdate:', response);
       if (response?.users) {
         setPlayers(response.users);
       }
@@ -49,30 +50,31 @@ export default function PlayersList() {
   const remainingCount = players.length - 4;
 
   return (
-    <div
-      className="position-fixed start-0 top-0 d-flex flex-column align-items-center gap-2 p-2 rounded-3"
-      style={{
-        background: 'rgba(0, 0, 0, 0.5)',
-        backdropFilter: 'blur(8px)',
-        boxShadow: '0 6px 18px rgba(0, 0, 0, 0.35)',
-        zIndex: 40,
-        marginTop: 'clamp(40px, 6vw, 80px)',
-        left: 'clamp(6px, 2vw, 12px)',
-        padding: 'clamp(4px, 1vw, 8px)',
-      }}
-    >
+   <div
+    className="position-absolute d-flex flex-column align-items-center gap-2 p-2 rounded-3"
+    style={{
+      // top: '40%',               // relative to parent container height
+      // left: '15%',            // relative to parent container width
+      // transform: 'translateY(-50%)',
+      background: 'rgba(0, 0, 0, 0.5)',
+      backdropFilter: 'blur(8px)',
+      boxShadow: '0 6px 18px rgba(0, 0, 0, 0.35)',
+      zIndex: 50,
+      padding: 'clamp(4px, 1vw, 4px)',
+    }}
+  >
       {visiblePlayers.map((player) => (
         <div key={player.userId} className="position-relative" title={player.name}>
           <Image
             src={player.profilePicture}
             alt={player.name}
-            width={48}     // required by next/image
-            height={48}    // required by next/image
-             unoptimized
+            width={38}     // required by next/image
+            height={38}    // required by next/image
+            unoptimized
             className="rounded-circle"
             style={{
-              width: 'clamp(28px, 5vw, 48px)',
-              height: 'clamp(28px, 5vw, 48px)',
+              width: 'clamp(20px, 8vw, 30px)',
+              height: 'clamp(28px, 8vw, 30px)',
               border: 'clamp(1px, 0.2vw, 2px) solid rgba(255, 255, 255, 0.3)',
               objectFit: 'cover',
               cursor: 'pointer',
