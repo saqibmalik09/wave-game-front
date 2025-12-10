@@ -1,71 +1,81 @@
 'use client';
 
 import { io, Socket } from 'socket.io-client';
-import { setCache, getCache } from '@/lib/cache';
-import { v4 as uuidv4 } from 'uuid';
+
 const SOCKET_URL = process.env.NEXT_PUBLIC_BACKEND_SOCKET_URL;
-const APPLICATION_INFO_KEY = 'applicationInfo';
-const USERID_KEY = 'userId';
-let userId=getCache(USERID_KEY)
-if(!userId){
- userId = uuidv4();
-setCache(USERID_KEY, userId);
-}
+
 let socket: Socket | null = null;
+let userIdGlobal: string | null = null;
+let appKeyGlobal: string | null = null;
+let tokenGlobal: string | null = null;
+interface InitSocketOptions {
+  userId: string;
+  appKey: string;
+  token: string;
+}
 
 /**
- * Initialize socket with userId as query param
+ * Initialize the socket.
+ * Must provide userId, appKey, token.
+ * If already initialized, returns existing socket.
  */
-export const initSocket = (): Socket => {
+export const initSocket = ({ userId, appKey, token }: InitSocketOptions): Socket => {
+  
+  if (!userId || !appKey || !token) {
+    throw new Error('[Socket] Cannot initialize: missing userId, appKey, or token');
+  }
+  userIdGlobal = userId;
+  appKeyGlobal = appKey;
+  tokenGlobal = token;
+  // If socket already exists and is connected, just return it
   if (socket && socket.connected) {
-    setCache(APPLICATION_INFO_KEY, { socketId: socket.id! });
+    console.log("Socket already connected, reusing:", socket.id);
     return socket;
   }
 
-  if (socket && !socket.connected) {
-    socket.connect();
-    return socket;
-  }
-
-  // Pass userId in query
-  socket = io(SOCKET_URL, {
+  // Create new socket connection
+  socket = io(SOCKET_URL!, {
     transports: ['websocket'],
     reconnection: true,
     reconnectionAttempts: Infinity,
     reconnectionDelay: 2000,
     autoConnect: true,
-    query: {
-      userId:userId, // <-- this will be accessible on server via client.handshake.query.userId
-    },
+    query: { userId, appKey, token },
   });
 
-  socket.on('connect', () => {
-    setCache(APPLICATION_INFO_KEY, { socketId: socket?.id! });
-    // console.log('[SocketClient] ✅ Connected with id:', socket?.id);
-  });
-
-  socket.on('reconnect', () => {
-    setCache(APPLICATION_INFO_KEY, { socketId: socket?.id! });
-  });
-
-  socket.on('connect_error', () => {
-    // console.error('[SocketClient] Connection error:', err.message);
-  });
-
-  socket.on('disconnect', () => {
-    // console.warn('[SocketClient] ⚠️ Disconnected:', reason);
-  });
+  socket.on('connect', () => console.log('🔥 Socket Connected:', socket?.id));
+  socket.on('reconnect', () => console.log('♻️ Socket Reconnected:', socket?.id));
+  socket.on('connect_error', (err) => console.warn('[Socket] Connection error:', err.message));
+  socket.on('disconnect', (reason) => console.warn('[Socket] Disconnected:', reason));
 
   return socket;
 };
 
-export const getSocket = (): Socket | null => socket;
+/**
+ * Returns the socket instance if already initialized and connected.
+ * Otherwise returns null.
+ * ⚠️ DO NOT call initSocket here - let the app initialize it first
+ */
+export const getSocket = ()=> {
+  //return socket if exist else init socket from global and return 
+  if (socket && socket.connected) {
+    return socket;
+  } else if (userIdGlobal && appKeyGlobal && tokenGlobal) { 
+    return initSocket({ userId: userIdGlobal, appKey: appKeyGlobal, token: tokenGlobal });
+  }
+};
 
 /**
- * Get application info from cache (RAM/localStorage)
+ * Disconnect and clean up socket
  */
-export const getApplicationInfo = () => {
-  return getCache(APPLICATION_INFO_KEY);
+export const disconnectSocket = (): void => {
+   if (socket) {
+    socket.disconnect();
+    socket = null;
+    userIdGlobal = null;
+    appKeyGlobal = null;
+    tokenGlobal = null;
+  }
 };
 
 export default initSocket;

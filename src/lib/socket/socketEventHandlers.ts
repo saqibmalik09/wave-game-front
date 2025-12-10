@@ -1,7 +1,6 @@
 'use client';
-import { initSocket } from './socketClient';
+import { getSocket, initSocket } from './socketClient';
 import { setCache, getCache } from "../cache";
-const socket = initSocket();
 /**
  * Global Socket Event Handlers
  * Handles user data from socket responses across all games.
@@ -12,7 +11,12 @@ export function gameConfiguration(
   gameId: number | string | { gameId: number | string },
   callback: (data: any) => void
 ) {
+  const socket = getSocket();
 
+  if (!socket) {
+    console.log('Socket not initialized', socket);
+    return;
+  }
   // Normalize gameId to a number
   const id = typeof gameId === "object" ? Number(gameId.gameId) : Number(gameId);
   const cacheKey = `game_config_${id}`;
@@ -49,7 +53,12 @@ export function tanantDetailsByAppKey(
   appKey: string | undefined,
   callback: (data: any) => void
 ): void {
+  const socket = getSocket();
 
+  if (!socket) {
+    console.log('Socket not initialized', socket);
+    return;
+  }
   socket.emit("tenantDetailsByAppKey", { appKey });
 
   const handleResponse = (data: any) => {

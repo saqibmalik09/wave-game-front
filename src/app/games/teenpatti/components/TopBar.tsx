@@ -29,19 +29,19 @@ export default function TopBar() {
 
   return (
     <div 
-      className="fixed top-0 left-0 right-0 z-50" 
+      className="sticky top-0 z-50 w-full"
       style={{ 
-        padding: 'clamp(8px, 1.5vw, 16px)'
+        padding: 'clamp(3px, 0.6vw, 5px)'
       }}
     >
-      <div className="container mx-auto" style={{ maxWidth: '1600px' }}>
+      <div className="container mx-auto" >
         <div 
           className="d-flex justify-content-between align-items-center rounded-pill"
           style={{
-            padding: 'clamp(8px, 1.2vw, 1px) clamp(12px, 2vw, 24px)',
+            padding: 'clamp(4px, 0.5vw, 1px) clamp(6px, 1.0vw, 12px)',
             background: 'linear-gradient(180deg, #4f2b5f 0%, #3e1842 100%)',
             boxShadow: '0 clamp(2px, 0.5vw, 4px) clamp(10px, 2vw, 20px) rgba(0, 0, 0, 0.5)',
-            gap: 'clamp(8px, 1.5vw, 16px)',
+            gap: 'clamp(6px, 1.0vw, 12px)',
           }}
         >
           {/* Left: Back & Menu */}
@@ -52,8 +52,8 @@ export default function TopBar() {
             <button 
               className="btn btn-dark rounded-circle p-0 d-flex align-items-center justify-content-center"
               style={{ 
-                width: 'clamp(32px, 5vw, 48px)', 
-                height: 'clamp(32px, 5vw, 48px)',
+                width: 'clamp(25px, 4vw, 40px)', 
+                height: 'clamp(25px, 5vw, 40px)',
                 minWidth: '32px',
               }}
               onClick={() => window.history.back()}
@@ -89,7 +89,7 @@ export default function TopBar() {
           {/* Right: Balance, Sound, Settings */}
           <div 
             className="d-flex align-items-center"
-            style={{ gap: 'clamp(4px, 0.8vw, 8px)' }}
+            style={{ gap: 'clamp(4px, 0.5vw, 5px)' }}
           >
             {/* Balance */}
             <div 
@@ -97,7 +97,7 @@ export default function TopBar() {
               style={{ 
                 background: 'rgba(0, 0, 0, 0.4)',
                 gap: 'clamp(4px, 0.6vw, 8px)',
-                padding: 'clamp(4px, 0.6vw, 8px) clamp(8px, 1.2vw, 12px)',
+                padding: 'clamp(4px, 0.6vw, 8px) clamp(8px, 0.8vw, 8px)',
               }}
             >
               <div 

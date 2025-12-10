@@ -51,7 +51,7 @@ export default function PotCard({
   const selectedCoin = useSelector((s: RootState) => s.selectedCoin.coin);
   const currentPhase = useSelector((s: RootState) => s.teenpattiTimer.phase);
   const gameConfig = useSelector((s: RootState) => s.gameConfiguration.data);
-const pendingCoin = useSelector<RootState, PendingCoin | null>( (state) => state.coinAnimation.pendingCoin);
+  const pendingCoin = useSelector<RootState, PendingCoin | null>( (state) => state.coinAnimation.pendingCoin);
   const { ToastContainer, showToast } = useToast();
   const coinsContainerRef = useRef<HTMLDivElement>(null);
 
@@ -78,7 +78,7 @@ const pendingCoin = useSelector<RootState, PendingCoin | null>( (state) => state
     }
   }, [currentPhase]);
 
-  // ✅ Initial coin drop animation (API coins)
+  //  Initial coin drop animation (API coins)
   useEffect(() => {
     const phaseJustStarted =
       previousPhase.current !== 'bettingTimer' && currentPhase === 'bettingTimer';
@@ -186,7 +186,7 @@ const pendingCoin = useSelector<RootState, PendingCoin | null>( (state) => state
     }
 
     const selectedCoinAmount = selectedCoin.amount;
-
+  
     dispatch(
       placeBet({
         userId: '10007',
@@ -203,8 +203,10 @@ const pendingCoin = useSelector<RootState, PendingCoin | null>( (state) => state
       className="position-relative"
       style={{
         width: 'clamp(180px, 5%, 200px)',
-        aspectRatio: '0.74',
-        padding: '3px',
+        //flexible padding to maintain aspect ratio
+        paddingTop: 'calc(clamp(10px, 5%, 100px) * 0.25)',
+        aspectRatio: '0.54',
+        
         background: isWinner && currentPhase === "resultAnnounceTimer"
           ? 'linear-gradient(180deg, #2d7a2d 0%, #1a4d1a 100%)'
           : 'linear-gradient(180deg, #6b1f2b 0%, #4a1520 100%)',
@@ -268,8 +270,11 @@ const pendingCoin = useSelector<RootState, PendingCoin | null>( (state) => state
             key={idx}
             className="overflow-hidden card-flip"
             style={{
-              width: 'clamp(50px, 10%, 50px)',
-              height: 'clamp(70px, 31%, 100px)',
+              padding: '2px',
+              perspective: '600px',
+              transformStyle: 'preserve-3d',
+              // width: 'clamp(50px, 10%, 50px)',
+              // height: 'clamp(70px, 31%, 100px)',
               boxShadow: '0 4px 8px rgba(0,0,0,0.4)',
               borderRadius: '6px',
             }}
@@ -307,13 +312,13 @@ const pendingCoin = useSelector<RootState, PendingCoin | null>( (state) => state
               key={coin.id}
               className="position-absolute rounded-circle d-flex align-items-center justify-content-center fw-bold text-white select-none"
               style={{
-                width: '23px',
-                height: '23px',
+                width: '18px',
+                height: '18px',
                 left: `${coin.x}px`,
                 top: `${coin.y}px`,
                 background: `radial-gradient(circle at 30% 30%, ${thisCoinColor}, ${thisCoinColor}dd)`,
                 border: '2px solid rgba(255,255,255,0.3)',
-                fontSize: '10px',
+                fontSize: '7px',
                 boxShadow: '0 2px 8px rgba(0,0,0,0.3)',
                 transform: coin.isAnimating ? 'translateY(-50px)' : 'translateY(0)',
                 opacity: coin.isAnimating ? 0 : 1,

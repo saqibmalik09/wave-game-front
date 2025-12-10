@@ -21,7 +21,8 @@ export const store = configureStore({
     tenantDetails:tenantDetailsReducer,
     coinAnimation:coinAnimationReducer,
     applicationInfo: applicationInfoReducer,
-    winningPot:winningPotReducer
+    winningPot:winningPotReducer,
+
 
 
   },
