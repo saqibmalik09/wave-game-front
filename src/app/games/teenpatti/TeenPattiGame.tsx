@@ -102,7 +102,7 @@ export default function TeenPattiGame() {
     try {
       console.log("Fetching user info with tenant data:", tenantData, "and userInfo:", userInfo);
       if (!userInfo || !tenantData) return;
-      const tenantDomainURL = tenantData.data.tenantProductionDomain;
+      const tenantDomainURL = 'https://my.wavegames.online';
       console.log("Using tenant domain URL:", tenantDomainURL);
       // let connectionUserId = user.data? user.data.id:null;
       //  connectionUserId playerData.id? connectionUserId=playerData.id:null;
