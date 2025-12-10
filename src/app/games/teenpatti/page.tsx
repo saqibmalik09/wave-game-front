@@ -45,7 +45,7 @@ export default function TeenPattiPage() {
           return;
         }
 
-        const tenantDomainURL = 'http://127.0.0.1:5000';
+        const tenantDomainURL = 'https://my.wavegames.online';
         const response: GameUserInfoResponse = await ApiService.gameUserInfo({
           token: token,
           tenantDomainURL,
