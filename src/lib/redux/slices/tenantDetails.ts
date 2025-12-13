@@ -1,8 +1,7 @@
-// tenantDetails.ts
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 interface TenantState {
-  data: any;
+  data: any | null;
 }
 
 const initialState: TenantState = {
@@ -16,8 +15,13 @@ const tenantDetailsSlice = createSlice({
     setTenantDetails: (state, action: PayloadAction<any>) => {
       state.data = action.payload;
     },
+    clearTenantDetails: (state) => {
+      state.data = null;
+    },
   },
 });
 
-export const { setTenantDetails } = tenantDetailsSlice.actions;
+export const { setTenantDetails, clearTenantDetails } =
+  tenantDetailsSlice.actions;
+
 export default tenantDetailsSlice.reducer;

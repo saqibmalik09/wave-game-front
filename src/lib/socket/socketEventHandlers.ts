@@ -62,7 +62,6 @@ export function tanantDetailsByAppKey(
   socket.emit("tenantDetailsByAppKey", { appKey });
 
   const handleResponse = (data: any) => {
-    console.log("tenantDetailsResponse data:", data);
     socket.off("tenantDetailsResponse", handleResponse);
     callback(data);
   };

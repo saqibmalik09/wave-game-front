@@ -54,7 +54,8 @@ export default function PotCard({
   const pendingCoin = useSelector<RootState, PendingCoin | null>( (state) => state.coinAnimation.pendingCoin);
   const { ToastContainer, showToast } = useToast();
   const coinsContainerRef = useRef<HTMLDivElement>(null);
-
+  const userPlayerData = useSelector((state: RootState) => state.userPlayerData);
+  const currentUserId = userPlayerData.data?.id;
   const bettingCoins: number[] = gameConfig?.bettingCoins || [];
   const colors: string[] = gameConfig?.colors || [];
   const tableBackgroundImage = gameConfig?.tableBackgroundImage;
@@ -186,10 +187,10 @@ export default function PotCard({
     }
 
     const selectedCoinAmount = selectedCoin.amount;
-  
+   
     dispatch(
       placeBet({
-        userId: '10007',
+        userId: currentUserId!,
         amount: selectedCoinAmount,
         tableId: 10,
         betType: 1,

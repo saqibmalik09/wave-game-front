@@ -1,5 +1,18 @@
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from "axios";
+export interface TenantConfig {
+  activeGames: string;
+  tanantName: string;
+  tenantAppKey: string;
+  tenantProductionDomain: string;
+  tenantTestingDomain: string;
+  tenantPassword: string;
+}
 
+export interface TenantConfigResponse {
+  success: boolean;
+  message: string;
+  data: TenantConfig;
+}
 /**
  * Load environment variables
  */
@@ -47,9 +60,15 @@ api.interceptors.response.use(
 /**
  * Define a reusable, typed API helper
  */
-export const ApiService = {
+  export const ApiService = {
+ tenantConfigByAppKey: async (appKey: string): Promise<TenantConfigResponse> => {
+    const response = await api.get<TenantConfigResponse>(
+      `/admin/tenantdatabyappkey/${appKey}`
+    );
+    return response.data;
+  },
   gameUserInfo: async <T>(payload: { token: string; tenantDomainURL: string }): Promise<T> => {
-    const url = `${payload.tenantDomainURL}/admin/game/userInfo`; 
+    const url = `${payload.tenantDomainURL}/wave/game/userInfo`; 
     
     const response = await axios.get<T>(url, {
       headers: {

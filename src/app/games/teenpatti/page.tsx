@@ -3,12 +3,15 @@
 import ApiService from "@/lib/api/api";
 import TeenPattiGame from "./TeenPattiGame";
 import { setUserPlayerInfo } from "@/lib/redux/slices/userSlice";
-import { useDispatch } from "react-redux";
-import { teenpattiGameTableJoin } from "@/lib/socket/game/teenpatti/teenpattiSocketEventHandler";
-import { useState, useEffect } from "react";
+import { setTenantDetails } from "@/lib/redux/slices/tenantDetails";
+import { useDispatch, useSelector } from "react-redux";
+import { useEffect, useRef, useState } from "react";
 import MessageModal from "@/app/components/messageModel";
 import GameLoading from "@/app/components/GameLoading";
 import initSocket from "@/lib/socket/socketClient";
+import type { RootState } from "@/lib/redux/store";
+import { teenpattiGameTableJoin } from "@/lib/socket/game/teenpatti/teenpattiSocketEventHandler";
+
 interface UserData {
   id: string;
   name: string;
@@ -23,12 +26,22 @@ interface GameUserInfoResponse {
 
 export default function TeenPattiPage() {
   const dispatch = useDispatch();
+
+  const tenant = useSelector((state: RootState) => state.tenantDetails.data);
+  const user = useSelector((state: RootState) => state.userPlayerData?.data);
+
   const [loading, setLoading] = useState(true);
-  const [modalMessage, setModalMessage] = useState({ title: "", message: ""});
+  const [modalMessage, setModalMessage] = useState({ title: "", message: "" });
   const [showModal, setShowModal] = useState(false);
 
+  // Prevent double init (StrictMode)
+  const initializedRef = useRef(false);
+
   useEffect(() => {
-    const fetchUserInfo = async () => {
+    if (initializedRef.current) return;
+    initializedRef.current = true;
+
+    const bootstrap = async () => {
       try {
         const params = new URLSearchParams(window.location.search);
         const appKey = params.get("appKey");
@@ -36,72 +49,83 @@ export default function TeenPattiPage() {
         const gameId = params.get("gameId");
 
         if (!appKey || !token || !gameId) {
-          setModalMessage({
-            title: "Invalid Params",
-            message: "appKey, token, and gameId are required",
-          });
-          setShowModal(true);
-          setLoading(false);
-          return;
+          throw new Error("appKey, token, and gameId are required");
         }
 
-        const tenantDomainURL = 'https://my.wavegames.online';
-        const response: GameUserInfoResponse = await ApiService.gameUserInfo({
-          token: token,
-          tenantDomainURL,
-        });
-        if (response.success) {
+        // 2️⃣ Tenant (Redux first)
+        let tenantConfig = tenant;
+        if (!tenantConfig) {
+          const tenantResponse = await ApiService.tenantConfigByAppKey(appKey);
+
+          if (!tenantResponse?.success) {
+            throw new Error("Invalid AppKey OR tenant not found");
+          }
+
+          tenantConfig = tenantResponse.data;
+          dispatch(setTenantDetails(tenantConfig));
+        }
+
+        // 3️⃣ User info
+        let userInfo = user;
+        if (!userInfo) {  
+          const response: GameUserInfoResponse =
+            await ApiService.gameUserInfo({
+              token,
+              tenantDomainURL: tenantConfig.tenantProductionDomain,
+            });
+
+          if (!response.success) {
+            throw new Error(response.message);
+          }
+
+          userInfo = response.data;
           dispatch(setUserPlayerInfo({
-            success: response.success,
-            message: response.message,
-            data: response.data,
-          }));
-          let userId=response.data.id??"00000";
-           initSocket({userId,appKey,token});
-        
-         
-          setTimeout(() => {
-            setLoading(false);
-          }, 2000); 
-          return;
+              success: true,
+              message: response.message,
+              data: userInfo,
+            })
+          );
+          const NewJoiner = {
+          userId: response.data.id,
+          name: response.data.name,
+          imageProfile: response.data.profilePicture,
+          appKey: appKey,
+          token: token
+           };
+         setTimeout(() => {
+          teenpattiGameTableJoin(NewJoiner);
+        }, 2000);
         }
 
-        setModalMessage({
-          title: "Missing information",
-          message: "Invalid or missing userInfo",
+        // 4️⃣ Socket init
+        initSocket({
+          userId: userInfo.id,
+          appKey,
+          token,
         });
-        setShowModal(true);
+
         setLoading(false);
-      } catch (error) {
-        console.error("Error fetching user info:", error);
+      } catch (error: any) {
         setModalMessage({
-          title: "Error",
-          message: "Failed to fetch user info",
+          title: "Initialization Error",
+          message: error.message || "Something went wrong",
         });
         setShowModal(true);
         setLoading(false);
       }
     };
 
-    fetchUserInfo();
-  }, []);
+    bootstrap();
+  }, [dispatch, tenant, user]);
 
-  // -------------------------
-  // Loading Screen
-  // -------------------------
   if (loading) {
-    return (
-    <div>
-       <GameLoading />
-    </div>
-    );
+    return <GameLoading />;
   }
 
   return (
-    <div className="flex min-w-2xs flex-col items-center justify-center min-h-screen bg-slate-900 text-white space-y-6">
+    <div className="flex min-w-2xs flex-col items-center justify-center min-h-screen bg-slate-900 text-white">
       <TeenPattiGame />
 
-      {/* Modal for displaying messages */}
       <MessageModal
         show={showModal}
         header={modalMessage.title}

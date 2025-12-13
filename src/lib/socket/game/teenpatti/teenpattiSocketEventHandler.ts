@@ -38,7 +38,8 @@ export function useTeenpattiTimerListener() {
   token,
   gameId,
   potIndex,
-  socketId
+  socketId,
+ tenantBaseURL 
 }: {
   userId: string;
   amount: number;
@@ -49,6 +50,7 @@ export function useTeenpattiTimerListener() {
   gameId: string;
   potIndex:string;
   socketId:string;
+  tenantBaseURL:string;
 }) {
  const socket = getSocket();
 
@@ -64,9 +66,11 @@ export function useTeenpattiTimerListener() {
     gameId,
     token,
     potIndex,
-    socketId
+    socketId,
+    tenantBaseURL
+
   };
-  
+  console.log("placeTeenpattiBet payload:", payload);
   socket.emit("placeTeenpattiBet", payload);
 }
 
@@ -96,7 +100,7 @@ export function useTeenpattiTimerListener() {
     appKey,
     token
   };
-  console.log("Emitting teenpattiGameTableJoin with payload:", payload);
+  console.log("teenpattiGameTableJoin payload:", payload);
   socket.emit("teenpattiGameTableJoin", payload);
 }
 //  export function mySocketIdEvent({
@@ -148,6 +152,7 @@ export function useTeenpattiBetResponseListener( onResponse: (data: any) => void
   }
   useEffect(() => {
     const handleBetResponse = (data: any) => {
+      console.log("Received teenpattiBetResponse:", data);
       onResponse(data); // send data back to component
     };
     socket.on("teenpattiBetResponse", handleBetResponse);
