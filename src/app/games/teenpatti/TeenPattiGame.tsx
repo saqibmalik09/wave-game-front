@@ -23,6 +23,7 @@ import { setUserPlayerInfo } from '@/lib/redux/slices/userSlice';
 import { setPendingCoin } from '@/lib/redux/slices/teenpatti/coinDropAnimation';
 import { v4 as uuidv4 } from 'uuid';
 import { RootState } from '@/lib/redux/store';
+import GameLoading from "@/app/components/GameLoading";
 
 interface TenantData {
   success: boolean;
@@ -70,11 +71,11 @@ interface GameConfig {
   returnWinngingPotPercentage: number[];
 }
 const phaseLabels: Record<string, string> = {
-    bettingTimer: 'Start Betting',
-    winningCalculationTimer: 'Calculating',
-    resultAnnounceTimer: '',
-    newGameStartTimer: 'Wait',
-  };
+  bettingTimer: 'Start Betting',
+  winningCalculationTimer: 'Calculating',
+  resultAnnounceTimer: '',
+  newGameStartTimer: 'Wait',
+};
 export default function TeenPattiGame() {
   const dispatch = useDispatch();
   const { ToastContainer, showToast } = useToast();
@@ -86,7 +87,7 @@ export default function TeenPattiGame() {
   const latestBet = useAppSelector((s) => s.teenPattiBettingReducer.lastBet);
   const winningPotIndex = useSelector((s: RootState) => s.winningPot.winningPotIndex);
   const currentPhase = useSelector((s: RootState) => s.teenpattiTimer.phase);
-
+  const tenant = useSelector((state: RootState) => state.tenantDetails.data);
   const [showModal, setShowModal] = useState(false);
   const [playerData, setPlayerData] = useState<UserData | null>(null);
   const [tenantData, setTenantData] = useState<TenantData>();
@@ -100,29 +101,28 @@ export default function TeenPattiGame() {
   // ------------------------
   const fetchUserInfo = async () => {
     try {
-      console.log("Fetching user info with tenant data:", tenantData, "and userInfo:", userInfo);
-      if (!userInfo || !tenantData) return;
-      const tenantDomainURL = 'https://my.wavegames.online';
-      console.log("Using tenant domain URL:", tenantDomainURL);
-      // let connectionUserId = user.data? user.data.id:null;
-      //  connectionUserId playerData.id? connectionUserId=playerData.id:null;
-      //check if playerData has user id else get from user.data.id and pass to connectionUserId
-      let connectionUserId = null;
-      if (playerData) {
-        console.log("getting form playerdata")
-        connectionUserId = playerData.id;
-      } else {
-        console.log("getting form connectionUserId2")
-        connectionUserId = user.data?.id;
-      }
-      if (!connectionUserId) {
-        console.warn("User ID not available yet.");
-        //reload window to restart
-        window.location.reload();
+      if (!tenant) {
+        //model error 
+        setModalMessage({
+          title: "Missing information",
+          message: "Invalid or missing userInfo or tenant data",
+        });
+        setShowModal(true);
+        return;
+      };
+      const params = new URLSearchParams(window.location.search);
+      const token = params.get("token");
+      if (!token) {
+        setModalMessage({
+          title: "Missing information",
+          message: "Token is missing in URL parameters",
+        });
+        setShowModal(true);
         return;
       }
+      const tenantDomainURL = tenant.tenantProductionDomain;
       const response: GameUserInfoResponse = await ApiService.gameUserInfo({
-        token: userInfo.token,
+        token: token,
         tenantDomainURL,
       });
       if (response.success) {
@@ -132,21 +132,6 @@ export default function TeenPattiGame() {
           message: response.message,
           data: response.data,
         }));
-
-        const NewJoiner = {
-          userId: connectionUserId,
-          name: response.data.name,
-          imageProfile: response.data.profilePicture,
-          appKey: userInfo.appKey,
-          token: userInfo.token
-        };
-        teenpattiGameTableJoin(NewJoiner);
-        // let socketDetails={
-        //   userId:connectionUserId,
-        //   socketId:socketId
-        // }    
-
-        // mySocketIdEvent(socketDetails)
         return;
       }
       setModalMessage({
@@ -161,14 +146,24 @@ export default function TeenPattiGame() {
   };
 
   useEffect(() => {
-    // const USERID_KEY = 'userId';
-    // let userId=getCache(USERID_KEY)
-    // if(!userId){
-    // userId = uuidv4();
-    // }
-    // setCache(USERID_KEY, userId);
-    // const userId=user.data?.id;
-
+    const params = new URLSearchParams(window.location.search);
+    const appKey = params.get("appKey");
+    const token = params.get("token");
+    const gameId = params.get("gameId");
+    if (!appKey || !token || !gameId) {
+      setModalMessage({
+        title: "Invalid Params",
+        message: "appKey, token, and gameId are required",
+      });
+      setShowModal(true);
+      return;
+    }
+    const userInfo = {
+      appKey,
+      token,
+      gameId
+    }
+    setUserInfo(userInfo);
     const cached = getCache(cacheKey);
     if (cached) {
       setGameConfig(cached);
@@ -193,76 +188,8 @@ export default function TeenPattiGame() {
         });
       }
     });
+    fetchUserInfo();
   }, [gameId]);
-
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const appKey = params.get("appKey");
-    const token = params.get("token");
-    const gameId = params.get("gameId");
-    if (!appKey || !token || !gameId) {
-      setModalMessage({
-        title: "Invalid Params",
-        message: "appKey, token, and gameId are required",
-      });
-      setShowModal(true);
-      return;
-    }
-    const userInfo = {
-      appKey,
-      token,
-      gameId
-    }
-    if (!appKey) {
-      setModalMessage({
-        title: "Invalid Params",
-        message: "app Key Is required",
-      });
-      setShowModal(true);
-      return;
-    }
-    if (!token) {
-      setModalMessage({
-        title: "Invalid Params",
-        message: "token Is required",
-      });
-      setShowModal(true);
-      return;
-    }
-    if (!gameId) {
-      setModalMessage({
-        title: "Invalid Params",
-        message: "Game ID Is required",
-      });
-      setShowModal(true);
-      return;
-    }
-    tanantDetailsByAppKey(appKey, (data) => {
-      if (data.success) {
-        setTenantData(data)
-        dispatch(setTenantDetails(data))
-      } else {
-        setModalMessage({
-          title: "Wrong App Key provided",
-          message: "Invalid AppKey OR invalid data",
-        });
-        setShowModal(true);
-        return;
-      }
-    });
-    setUserInfo(userInfo);
-  }, []);
-
-  useEffect(() => {
-    console.log("Tenant Data or User Info changed:", tenantData, userInfo);
-    if (!tenantData) return; // wait until both are ready
-
-    if (tenantData) {
-      fetchUserInfo();
-    } else {
-      console.warn("Tenant data invalid or unsuccessful:", userInfo);
-    }
-  }, [tenantData, userInfo]);
 
   useEffect(() => {
     if (
@@ -275,8 +202,7 @@ export default function TeenPattiGame() {
 
   useTeenpattiBetResponseListener((data) => {
     if (data.success) {
-      // console.log("Teenpatti Bet Response Data:", data);
-      // showToast(data.message ?? `Bet placed: ₹${data.amount}`, "success");
+      showToast(data.message ?? `Bet placed: ₹${data.amount}`, "success");
       dispatch(setUserPlayerInfo({
         success: data.success,
         message: data.message,
@@ -289,24 +215,41 @@ export default function TeenPattiGame() {
   });
 
   useEffect(() => {
-    if (!latestBet || !userInfo) return;
+    if (!latestBet || !userInfo || !tenant) return;
     const cachedApplicationInfo = getCache("applicationInfo") || {};
     const socketId = cachedApplicationInfo.socketId || "";
     const connectionUserId = playerData ? playerData.id : user.data?.id;
     if (!connectionUserId) {
-      alert("User ID not available for placing bet.");
+      console.log("User ID is missing, cannot place bet.");
+      return;
+    }
+    let tenantBaseURL;
+    if (tenant.environemnt === "production") {
+      tenantBaseURL = tenant.tenantProductionDomain;
+    } else {
+      tenantBaseURL = tenant.tenantTestingDomain;
+    }
+    if (!tenantBaseURL) {
+      MessageModal({
+        show: true,
+        header: "Tenant URL Missing",
+        message: "Cannot place bet without tenant base URL.",
+        onClose: () => { },
+      });
+      setShowModal(true);
       return;
     }
     const betData = {
-      userId: connectionUserId,
+      userId: connectionUserId.toString(),
       amount: latestBet.amount,
       tableId: latestBet.tableId,
       betType: latestBet.betType,
       potIndex: String(latestBet.potIndex), // cast to string
       socketId: String(socketId),
-      appKey: userInfo.appKey!, // non-null assertion
+      appKey: userInfo.appKey!,
       token: userInfo.token!,
       gameId: userInfo.gameId!,
+      tenantBaseURL: tenantBaseURL || "",
     };
     placeTeenpattiBet(betData);
   }, [latestBet, userInfo]);
@@ -366,134 +309,12 @@ export default function TeenPattiGame() {
 
   if (!gameConfig) {
     return (
-      <div className="w-full min-h-screen flex items-center justify-center text-white bg-slate-900">
-        <p className="text-xl">Loading game configuration...</p>
+      <div>
+        <GameLoading />
       </div>
     );
   }
 
-  // return (
-  //   <div
-  //     className="relative w-full h-screen text-white overflow-hidden"
-  //     style={{ background: "#1a1a2e" }}
-  //   >
-  //     {/* Desktop Decorative Borders */}
-  //     <div
-  //       className="fixed inset-0 d-none d-lg-block"
-  //       style={{ pointerEvents: "none", zIndex: 0 }}
-  //     >
-  //       <div
-  //         className="position-absolute top-0 bottom-0 start-0"
-  //         style={{
-  //           width: "calc((100vw - min(100vw, 1280px)) / 2)",
-  //           background: "linear-gradient(90deg, rgba(139,0,0,0.3), transparent)",
-  //         }}
-  //       />
-  //       <div
-  //         className="position-absolute top-0 bottom-0 end-0"
-  //         style={{
-  //           width: "calc((100vw - min(100vw, 1280px)) / 2)",
-  //           background: "linear-gradient(-90deg, rgba(139,0,0,0.3), transparent)",
-  //         }}
-  //       />
-  //     </div>
-
-  //     {/* MAIN CENTERED GAME AREA */}
-  //     <div
-  //       className="position-relative mx-auto d-flex flex-column"
-  //       style={{
-  //         width: "100%",
-  //         maxWidth: "1280px",
-  //         height: "100vh",
-  //         zIndex: 1,
-  //       }}
-  //     >
-  //       <TopBar />
-  //       <PlayersList />
-  //       <Timer />
-  //       <CoinTray key={gameConfig?.gameId ?? 'default'} />
-
-  //       {/* GAME CANVAS */}
-  //       <div
-  //         className="d-flex justify-content-center align-items-center flex-grow-1"
-  //         style={{ padding: "0 10px" }}
-  //       >
-  //         <div
-  //           ref={canvasRef}
-  //           className="position-relative shadow-lg"
-  //           style={{
-  //             width: "100%",
-  //             maxWidth: "1200px",
-  //             aspectRatio: "16/9",
-  //             borderRadius: "14px",
-  //             overflow: "hidden",
-  //           }}
-  //         >
-  //           {/* POTS CENTER SECTION */}
-  //           <div
-  //             className="position-absolute top-0 start-0 end-0 bottom-0 d-flex justify-content-center align-items-center"
-  //             style={{
-  //               padding: "6px",
-  //               gap: "6px",
-  //               // flexWrap: "wrap",
-  //             }}
-  //           >
-  //             {pots.map((pot: any) => (
-  //               <PotCard
-  //                 key={pot.potIndex}
-  //                 {...pot}
-  //                 style={{
-  //                   transform: "scale(0.75)",
-  //                 }}
-  //               />
-  //             ))}
-  //           </div>
-  //         </div>
-  //       </div>
-  //       <MessageModal
-  //         show={showModal}
-  //         header={modalMessage.title}
-  //         message={modalMessage.message}
-  //         onClose={() => setShowModal(false)}
-  //       />
-  //       <ResultModal />
-  //       <ToastContainer />
-  //     </div>
-
-  //     {/* SUPER RESPONSIVE GLOBAL STYLES */}
-  //     <style jsx>{`
-  //     @media (max-width: 400px) {
-  //       .pot-card {
-  //         transform: scale(0.6) !important;
-  //       }
-  //     }
-
-  //     @media (max-width: 320px) {
-  //       .pot-card {
-  //         transform: scale(0.48) !important;
-  //       }
-  //     }
-
-  //     @media (max-width: 260px) {
-  //       .pot-card {
-  //         transform: scale(0.40) !important;
-  //       }
-  //     }
-
-  //     @media (max-width: 220px) {
-  //       .pot-card {
-  //         transform: scale(0.33) !important;
-  //       }
-  //     }
-
-  //     @media (max-width: 190px) {
-  //       .pot-card {
-  //         transform: scale(0.28) !important;
-  //       }
-  //     }
-  //   `}</style>
-  //   </div>
-  // );
   return (
     <div className="w-full min-h-full flex items-center justify-center text-white bg-slate-900">
 
@@ -542,31 +363,44 @@ export default function TeenPattiGame() {
 
               {/* === TIMER ABOVE POT 0 === */}
               {pot.potIndex === 0 && (
-                <span className="absolute -top-12 left-1/4 -translate-x-1/2 z-40">
+                <span className="absolute -top-12 left-1/6 -translate-x-1/2 z-40">
                   <Timer />
                 </span>
               )}
 
               {/* === YELLOW LABEL ABOVE POT 1 === */}
-          {pot.potIndex === 1 && currentPhase && phaseLabels[currentPhase] && (
-            <span className="absolute -top-10 left-2/4 -translate-x-1/2 z-40">
-              <div
-                className="fw-bold text-brown-800 text-center select-none"
-                style={{
-                  width: "clamp(90px, 30vw, 120px)",     
-                  height: "clamp(26px, 8vw, 30px)",     
-                  padding: "4px 10px",
-                  fontSize: "clamp(10px, 2.3vw, 16px)",
-                  background: "linear-gradient(180deg, #ffd76a 0%, #fdc645ff 100%)",
-                  borderRadius: "6px",
-                  boxShadow: "0 3px 6px rgba(255, 200, 0, 0.6)",
-                  color: "#4a2a00",
-                  whiteSpace: "nowrap",
-                }}
-              >
-                {phaseLabels[currentPhase]}
-              </div>
-            </span>
+              {pot.potIndex === 1 && currentPhase && phaseLabels[currentPhase] && (
+                <span className="absolute -top-10 left-2/4 -translate-x-1/2 z-40 pointer-events-none">
+                  <span
+                    className="relative flex items-center justify-center select-none"
+                    style={{
+                      minWidth: "clamp(70px, 25vw, 110px)",
+                      height: "clamp(22px, 7vw, 28px)",
+                      padding: "0 10px",
+                      borderRadius: "14px",
+                      background: "linear-gradient(180deg, #f4d27a 0%, #e9b94f 100%)",
+                      boxShadow:
+                        "0 2px 6px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.4)",
+                      color: "#3b2400",
+                      fontSize: "clamp(10px, 1.8vw, 12px)",
+                      fontWeight: 600,
+                      letterSpacing: "0.4px",
+                      textTransform: "uppercase",
+                    }}
+                  >
+                    <span
+                      style={{
+                        width: 6,
+                        height: 6,
+                        borderRadius: "50%",
+                        background: "#3b2400",
+                        opacity: 0.6,
+                        marginRight: 6,
+                      }}
+                    />
+                    {phaseLabels[currentPhase]}
+                  </span>
+                </span>
               )}
               <PotCard {...pot} />
             </React.Fragment>
