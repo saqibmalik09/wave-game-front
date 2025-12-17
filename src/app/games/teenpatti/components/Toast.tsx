@@ -30,24 +30,25 @@ function Toast({ message, type = 'error', duration = 1000, onClose }: ToastProps
 
   return (
     <div
-      className="position-fixed start-50 translate-middle-x d-flex align-items-center"
+      className="position-fixed start-50 translate-middle-x d-flex align-items-center  size-fit"
       style={{
-        bottom: isVisible ? '90px' : '70px',
+        bottom: isVisible ? 'clamp(60px, 6vw, 90px)' : 'clamp(40px, 5vw, 70px)',
         opacity: isVisible ? 1 : 0,
-        transition: 'all 0.3s ease',
+        transition: 'all 0.1s ease',
         background: bgColors[type],
-        padding: '8px 10px',
-        borderRadius: '10px',
+        padding: 'clamp(6px, 1.5vw, 10px) clamp(10px, 4vw, 12px)',
+        borderRadius: 'clamp(6px, 1vw, 10px)',
         boxShadow: '0 2px 10px rgba(0,0,0,0.25)',
         zIndex: 99999,
-        minWidth: '180px',
-        maxWidth: '260px',
+        // minWidth: 'clamp(140px, 40vw, 220px)',
+        // maxWidth: 'clamp(180px, 60vw, 280px)',
         textAlign: 'center',
       }}
     >
-      <span className="text-white fw-semibold w-100"
+      <span
+        className="text-white fw-semibold size-fit "//fit content width text
         style={{
-          fontSize: '14px',
+          fontSize: 'clamp(12px, 1.5vw, 10px)',
           lineHeight: 1.2,
         }}
       >

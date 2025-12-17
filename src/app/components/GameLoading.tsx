@@ -1,7 +1,10 @@
 import { useEffect, useState } from 'react';
 
-export default function LoadingGame() {
-  const [dots, setDots] = useState('');
+interface GameLoadingProps {
+  message?: string;
+}
+
+export default function GameLoading({ message = 'Hold On please' }: GameLoadingProps) {  const [dots, setDots] = useState('');
 
   useEffect(() => {
     const dotsInterval = setInterval(() => {
@@ -45,7 +48,7 @@ export default function LoadingGame() {
         {/* Loading Text */}
         <div className="text-center space-y-3 px-4">
           <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white">
-            Loading Game{dots}
+            {message}{dots}
           </h1>
           <p className="text-gray-400 text-sm md:text-base lg:text-lg">
             Initializing game environment

@@ -24,7 +24,7 @@ export default function ResultModal() {
   const [show, setShow] = useState(false);
   const [result, setResult] = useState<ResultData | null>(null);
   const [manualClosed, setManualClosed] = useState(false);
-   const dispatch = useDispatch();
+  const dispatch = useDispatch();
   const userPlayerData = useSelector((state: RootState) => state.userPlayerData);
   const currentUserId = userPlayerData.data?.id;
 
@@ -33,55 +33,55 @@ export default function ResultModal() {
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
-  const socket = getSocket();
-  if (!socket) return;
+    const socket = getSocket();
+    if (!socket) return;
 
-  const handleResult = (response: ResultResponse) => {
-    if (!response?.success || !response.data) return;
+    const handleResult = (response: ResultResponse) => {
+      if (!response?.success || !response.data) return;
 
-    // If user manually closed, ignore showing again
-    if (manualClosed) return;
+      // If user manually closed, ignore showing again
+      if (manualClosed) return;
 
-    setResult(response.data);
-    dispatch(setWinningPotIndex(response.data.winningPotIndex));
+      setResult(response.data);
+      dispatch(setWinningPotIndex(response.data.winningPotIndex));
 
-    // Clear previous timeout
-    if (timeoutRef.current) clearTimeout(timeoutRef.current);
+      // Clear previous timeout
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
 
-    // Show modal after 3 seconds
-    timeoutRef.current = setTimeout(() => {
-      setShow(true);
-    }, 3000);
-  };
+      // Show modal after 3 seconds
+      timeoutRef.current = setTimeout(() => {
+        setShow(true);
+      }, 3000);
+    };
 
-  socket.on('teenpattiAnnounceGameResultResponse', handleResult);
+    socket.on('teenpattiAnnounceGameResultResponse', handleResult);
 
-  return () => {
-    socket.off('teenpattiAnnounceGameResultResponse', handleResult);
-    if (timeoutRef.current) clearTimeout(timeoutRef.current);
-  };
-}, [manualClosed, dispatch]);
+    return () => {
+      socket.off('teenpattiAnnounceGameResultResponse', handleResult);
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    };
+  }, [manualClosed, dispatch]);
 
-// Close modal on phase change or manual close
-useEffect(() => {
-  if (!currentPhase) return;
+  // Close modal on phase change or manual close
+  useEffect(() => {
+    if (!currentPhase) return;
 
-  // Close when new game starts or phase changes to any other
-  if (currentPhase !== 'resultAnnounceTimer') {
+    // Close when new game starts or phase changes to any other
+    if (currentPhase !== 'resultAnnounceTimer') {
+      setShow(false);
+      setManualClosed(false); // reset manual close for next round
+      dispatch(clearWinningPot());
+
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    }
+  }, [currentPhase, dispatch]);
+
+  // Manual close
+  const handleClose = () => {
     setShow(false);
-    setManualClosed(false); // reset manual close for next round
-    dispatch(clearWinningPot());
-
+    setManualClosed(true);
     if (timeoutRef.current) clearTimeout(timeoutRef.current);
-  }
-}, [currentPhase, dispatch]);
-
-// Manual close
-const handleClose = () => {
-  setShow(false);
-  setManualClosed(true);
-  if (timeoutRef.current) clearTimeout(timeoutRef.current);
-};
+  };
 
 
   if (!show || !result) return null;
@@ -172,13 +172,28 @@ const handleClose = () => {
                     style={{ width: '40px', height: '40px', objectFit: 'cover', border: '2px solid #ffd700' }}
                   />
 
-                  <div>
-                    <p className="text-white mb-0 fw-semibold" style={{ fontSize: '14px' }}>
-                      {winner.userId === String(currentUserId) ? 'You' : `User ${winner.userId.slice(-4)}`}
-                    </p>
-                    <p className="text-warning mb-0 fw-bold" style={{ fontSize: '12px' }}>
-                      +₹{winner.amountWon.toLocaleString()}
-                    </p>
+                  <div className="d-flex align-items-center gap-1">
+                    <span
+                      className="d-flex align-items-center justify-content-center fw-bold"
+                      style={{
+                        width: 'clamp(16px, 3vw, 20px)',
+                        height: 'clamp(16px, 3vw, 20px)',
+                        borderRadius: '50%',
+                        background: 'linear-gradient(135deg, #ffd700, #ffed4e)',
+                        color: '#000',
+                        fontSize: 'clamp(10px, 1.2vw, 12px)',
+                        boxShadow: '0 1px 3px rgba(0,0,0,0.4)',
+                        flexShrink: 0,
+                      }}
+                    >
+                      G
+                    </span>
+                    <span
+                      className="text-warning fw-bold"
+                      style={{ fontSize: 'clamp(12px, 2.2vw, 14px)' }}
+                    >
+                      +{winner.amountWon.toLocaleString()}
+                    </span>
                   </div>
                 </div>
               </div>
