@@ -33,7 +33,7 @@ export default function PlayersList() {
     if (!socket) return;
 
     const handlePotDataResponse = (response: PlayersUpdateResponse) => {
-      console.log('Received teenpattiGameTableUpdate:', response);
+      console.log("table response:", response)
       if (response?.users) {
         setPlayers(response.users);
       }
@@ -46,79 +46,94 @@ export default function PlayersList() {
     };
   }, []);
 
-  const visiblePlayers = players.slice(0, 4);
+  const visiblePlayers = players.slice(0, 5);
   const remainingCount = players.length - 4;
 
-  return (
-   <div
-    className="position-absolute d-flex flex-column align-items-center gap-2 p-2 rounded-3"
-    style={{
-      // top: '40%',               // relative to parent container height
-      // left: '15%',            // relative to parent container width
-      // transform: 'translateY(-50%)',
-      background: 'rgba(0, 0, 0, 0.5)',
-      backdropFilter: 'blur(8px)',
-      boxShadow: '0 6px 18px rgba(0, 0, 0, 0.35)',
-      zIndex: 50,
-      padding: 'clamp(4px, 1vw, 4px)',
-    }}
-  >
-      {visiblePlayers.map((player) => (
-        <div key={player.userId} className="position-relative" title={player.name}>
-          <Image
-            src={player.profilePicture}
-            alt={player.name}
-            width={38}     // required by next/image
-            height={38}    // required by next/image
-            unoptimized
-            className="rounded-circle"
-            style={{
-              width: 'clamp(20px, 8vw, 30px)',
-              height: 'clamp(28px, 8vw, 30px)',
-              border: 'clamp(1px, 0.2vw, 2px) solid rgba(255, 255, 255, 0.3)',
-              objectFit: 'cover',
-              cursor: 'pointer',
-              transition: 'all 0.3s ease',
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.borderColor = '#ffd700';
-              e.currentTarget.style.transform = 'scale(1.1)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.3)';
-              e.currentTarget.style.transform = 'scale(1)';
-            }}
-          />
-
-          {/* Online indicator */}
-          <div
-            className="position-absolute bottom-0 end-0 rounded-circle"
-            style={{
-              width: 'clamp(8px, 2vw, 12px)',
-              height: 'clamp(8px, 2vw, 12px)',
-              background: '#22c55e',
-              border: 'clamp(1px, 0.1vw, 1px) solid #000',
-            }}
-          />
-        </div>
-      ))}
-
-      {/* Remaining players badge */}
-      {remainingCount > 0 && (
+ return (
+  <div className='w-11 flex flex-col gap-1'>
+    {remainingCount > 0 && (
+      <div
+        className="flex flex-col rounded-r-lg overflow-hidden shadow-lg"
+        style={{
+          background: 'linear-gradient(180deg, #4F1120 0%, #4F1120 100%)',
+        }}
+      >
+        {/* Rank Header */}
         <div
-          className="rounded-circle d-flex align-items-center justify-content-center fw-bold text-white"
-          style={{
-            width: 'clamp(28px, 5vw, 48px)',
-            height: 'clamp(28px, 5vw, 48px)',
-            background: 'linear-gradient(135deg, #8b5cf6, #6366f1)',
-            border: 'clamp(1px, 0.2vw, 2px) solid rgba(255, 255, 255, 0.3)',
-            cursor: 'pointer',
-            fontSize: 'clamp(10px, 2.5vw, 14px)',
-          }}
+          className="text-center font-black text-white text-[8px] tracking-widest bg-gradient-to-b from-[#700D2B] to-[#6B0D2A] border-b border-white/10 py-1"
         >
-          +{remainingCount}
+          Rank
         </div>
-      )}
-    </div>
-  );
+
+        {/* Players List */}
+        <div className="flex flex-col gap-1 p-1"> 
+          {visiblePlayers.map((player, index) => {
+            const crownGradient =
+              index === 0
+                ? 'linear-gradient(135deg, #ffd700, #ffed4e)'
+                : index === 1
+                  ? 'linear-gradient(135deg, #c0c0c0, #e8e8e8)'
+                  : index === 2
+                    ? 'linear-gradient(135deg, #cd7f32, #e9a96b)'
+                    : 'linear-gradient(135deg, #8b5cf6, #6366f1)'
+                    
+
+            return (
+              <div
+                key={player.userId}
+                title={player.name}
+                className="relative flex justify-center items-center"
+                style={{
+                  width: '100%',
+                  height: '30px',
+                }}
+              >
+                {/* Player Image with crown-colored rounded border */}
+                <div
+                  className="rounded-md p-[2px]"
+                  style={{ 
+                    background: crownGradient,
+                    width: '30px',
+                    height: '30px',
+                  }}
+                >
+                  <Image
+                    src={player.profilePicture}
+                    alt={player.name}
+                    width={25}
+                    height={25}
+                    unoptimized
+                    className="object-cover rounded-sm w-full h-full"
+                  />
+                </div>
+
+                {/* Crown Badge - top left corner */}
+                <div
+                  className="absolute flex items-center justify-center rounded-full z-10 border border-black/30 shadow-md"
+                  style={{ 
+                    background: crownGradient,
+                    width: '12px',
+                    height: '12px',
+                    top: '-2px',
+                    left: '0px',
+                  }}
+                >
+                  <svg
+                    viewBox="0 0 24 24"
+                    width="8"
+                    height="8"
+                    fill={index < 3 ? '#000' : '#fff'}
+                  >
+                    <path d="M3 6l4 4 5-6 5 6 4-4v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6z" />
+                    <rect x="5" y="18" width="14" height="2" rx="1" />
+                  </svg>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    )}
+  </div>
+);
 }

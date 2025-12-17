@@ -56,7 +56,6 @@ export default function TeenPattiPage() {
         let tenantConfig = tenant;
         if (!tenantConfig) {
           const tenantResponse = await ApiService.tenantConfigByAppKey(appKey);
-
           if (!tenantResponse?.success) {
             throw new Error("Invalid AppKey OR tenant not found");
           }
@@ -67,7 +66,7 @@ export default function TeenPattiPage() {
 
         // 3️⃣ User info
         let userInfo = user;
-        if (!userInfo) {  
+        if (!userInfo) {
           const response: GameUserInfoResponse =
             await ApiService.gameUserInfo({
               token,
@@ -80,30 +79,30 @@ export default function TeenPattiPage() {
 
           userInfo = response.data;
           dispatch(setUserPlayerInfo({
-              success: true,
-              message: response.message,
-              data: userInfo,
-            })
+            success: true,
+            message: response.message,
+            data: userInfo,
+          })
           );
-          const NewJoiner = {
-          userId: response.data.id,
-          name: response.data.name,
-          imageProfile: response.data.profilePicture,
-          appKey: appKey,
-          token: token
-           };
-         setTimeout(() => {
-          teenpattiGameTableJoin(NewJoiner);
-        }, 2000);
         }
 
         // 4️⃣ Socket init
         initSocket({
           userId: userInfo.id,
           appKey,
-          token,
+          name: userInfo.name,
+          profilePicture: userInfo.profilePicture
         });
-
+        const NewJoiner = {
+          userId: userInfo.id,
+          name: userInfo.name,
+          imageProfile: userInfo.profilePicture,
+          appKey: appKey,
+          token: token
+        };
+        setTimeout(() => {
+          teenpattiGameTableJoin(NewJoiner);
+        }, 2000);
         setLoading(false);
       } catch (error: any) {
         setModalMessage({
@@ -119,11 +118,18 @@ export default function TeenPattiPage() {
   }, [dispatch, tenant, user]);
 
   if (loading) {
-    return <GameLoading />;
+    return <GameLoading message="Loading Game" />;
   }
 
   return (
-    <div className="flex min-w-2xs flex-col items-center justify-center min-h-screen bg-slate-900 text-white">
+    <div
+      className="flex w-full flex-col items-center justify-center min-h-screen text-white top-0  bg-[#6E222E]"
+      style={{
+        backgroundImage: `url(${process.env.NEXT_PUBLIC_BACKEND_ASSET_URL}/teenpatiGameBg.jpg)`,
+      backgroundSize: 'contain',       // fills the container
+      backgroundPosition: 'center',  // keeps image centered
+      backgroundRepeat: 'no-repeat', // no tiling
+      }}>
       <TeenPattiGame />
 
       <MessageModal
@@ -133,5 +139,6 @@ export default function TeenPattiPage() {
         onClose={() => setShowModal(false)}
       />
     </div>
+
   );
 }

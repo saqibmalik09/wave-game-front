@@ -70,7 +70,7 @@ export function useTeenpattiTimerListener() {
     tenantBaseURL
 
   };
-  console.log("placeTeenpattiBet payload:", payload);
+ console.log("teenpattiGameTableJoin payload:", payload);
   socket.emit("placeTeenpattiBet", payload);
 }
 
@@ -132,6 +132,7 @@ export function teenpattiGameTableJoinListener(
   useEffect(() => {
 
     const handleBetResponse = (data: any) => {
+      console.log("bet response:",data)
       onResponse(data); 
     };
 

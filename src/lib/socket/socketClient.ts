@@ -7,11 +7,14 @@ const SOCKET_URL = process.env.NEXT_PUBLIC_BACKEND_SOCKET_URL;
 let socket: Socket | null = null;
 let userIdGlobal: string | null = null;
 let appKeyGlobal: string | null = null;
-let tokenGlobal: string | null = null;
+let nameGlobal: string | null = null;
+let profilePictureGlobal: string | null = null;
+
 interface InitSocketOptions {
   userId: string;
   appKey: string;
-  token: string;
+  name: string;
+  profilePicture:string;
 }
 
 /**
@@ -19,14 +22,15 @@ interface InitSocketOptions {
  * Must provide userId, appKey, token.
  * If already initialized, returns existing socket.
  */
-export const initSocket = ({ userId, appKey, token }: InitSocketOptions): Socket => {
+export const initSocket = ({ userId, appKey, name,profilePicture }: InitSocketOptions): Socket => {
   
-  if (!userId || !appKey || !token) {
+  if (!userId || !appKey || !name || !profilePicture) {
     throw new Error('[Socket] Cannot initialize: missing userId, appKey, or token');
   }
   userIdGlobal = userId;
   appKeyGlobal = appKey;
-  tokenGlobal = token;
+  nameGlobal = name;
+  profilePictureGlobal=profilePicture;
   // If socket already exists and is connected, just return it
   if (socket && socket.connected) {
     console.log("Socket already connected, reusing:", socket.id);
@@ -40,7 +44,7 @@ export const initSocket = ({ userId, appKey, token }: InitSocketOptions): Socket
     reconnectionAttempts: Infinity,
     reconnectionDelay: 2000,
     autoConnect: true,
-    query: { userId, appKey, token },
+    query: { userId, appKey, name,profilePicture },
   });
 
   socket.on('connect', () => console.log('🔥 Socket Connected:', socket?.id));
@@ -60,8 +64,8 @@ export const getSocket = ()=> {
   //return socket if exist else init socket from global and return 
   if (socket && socket.connected) {
     return socket;
-  } else if (userIdGlobal && appKeyGlobal && tokenGlobal) { 
-    return initSocket({ userId: userIdGlobal, appKey: appKeyGlobal, token: tokenGlobal });
+  } else if (userIdGlobal && appKeyGlobal && nameGlobal &&profilePictureGlobal) { 
+    return initSocket({ userId: userIdGlobal, appKey: appKeyGlobal, name: nameGlobal,profilePicture:profilePictureGlobal });
   }
 };
 
@@ -74,7 +78,8 @@ export const disconnectSocket = (): void => {
     socket = null;
     userIdGlobal = null;
     appKeyGlobal = null;
-    tokenGlobal = null;
+    nameGlobal = null;
+    profilePictureGlobal=null
   }
 };
 

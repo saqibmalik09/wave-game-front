@@ -90,7 +90,7 @@ export default function TeenPattiGame() {
   const tenant = useSelector((state: RootState) => state.tenantDetails.data);
   const [showModal, setShowModal] = useState(false);
   const [playerData, setPlayerData] = useState<UserData | null>(null);
-  const [tenantData, setTenantData] = useState<TenantData>();
+  // const [tenantData, setTenantData] = useState<TenantData>();
   const [modalMessage, setModalMessage] = useState({ title: "", message: "" });
   const user = useSelector((state: RootState) => state.userPlayerData);
   const gameId = React.useMemo(() => ({ gameId: 16 }), []);
@@ -170,12 +170,12 @@ export default function TeenPattiGame() {
       dispatch(setGameConfiguration(cached));
       SoundManager.getInstance().loadSounds({
         timerUpSound: `${process.env.NEXT_PUBLIC_BACKEND_ASSET_URL}/${cached.timerUpSound}`,
+        potClickSound: `${process.env.NEXT_PUBLIC_BACKEND_ASSET_URL}/${cached.potClickSound}`,
         cardsShuffleSound: `${process.env.NEXT_PUBLIC_BACKEND_ASSET_URL}/${cached.cardsShuffleSound}`,
         betButtonAndCardClickSound: `${process.env.NEXT_PUBLIC_BACKEND_ASSET_URL}/${cached.betButtonAndCardClickSound}`,
       });
       return;
     }
-
     fetchGameConfiguration(gameId, (data: any) => {
       if (data) {
         setGameConfig(data);
@@ -252,7 +252,7 @@ export default function TeenPattiGame() {
       tenantBaseURL: tenantBaseURL || "",
     };
     placeTeenpattiBet(betData);
-  }, [latestBet, userInfo]);
+  }, [latestBet]);
 
 
   // const onCardClick = () => SoundManager.getInstance().play('betButtonAndCardClickSound');
@@ -296,7 +296,7 @@ export default function TeenPattiGame() {
 
   const pots = gameConfig?.cardImages.map((cards: string[], idx: number) => ({
     potIndex: idx,
-    potName: `Pot ${idx + 1}`,
+     potName: `Pot ${String.fromCharCode(65 + idx)}`, 
     totalBet: 1000 * (idx + 1),
     betCoins: gameConfig.bettingCoins,
     cardImages: cards,
@@ -310,36 +310,54 @@ export default function TeenPattiGame() {
   if (!gameConfig) {
     return (
       <div>
-        <GameLoading />
+        <GameLoading message="Hold on" />
       </div>
     );
   }
 
   return (
-    <div className="w-full min-h-full flex items-center justify-center text-white bg-slate-900">
+    <div className="w-xs min-h-full flex items-center justify-center text-white  ">
 
       <div className="w-full min-w-2xs min-h-screen max-w-xl relative overflow-hidden">
 
         {/* TOP BAR */}
-        <div className="absolute top-0 left-0 w-full z-50">
+        <div className="absolute w-full">
           <TopBar />
         </div>
 
         {/* PLAYER LIST + TIMER ROW */}
-        <div className="absolute top-1/8 left-0 w-full flex items-center justify-between px-3 z-40"
-        //  style={{ top: "clamp(75px, 8vw, 75px)" }}
-        >
+        <div className="  left-0 w-full flex z-40">
 
           {/* LEFT PLAYER LIST */}
-          <div className="flex-shrink-0">
+          <div className=" absolute flex-shrink-0 top-[10%]">
             <PlayersList />
           </div>
+          {/*  in center responsive dealer avatar image png  `${process.env.NEXT_PUBLIC_BACKEND_ASSET_URL}/${gameConfig?.dealerAvatar} make sure */}
 
-          {/* CENTER TIMER */}
-          {/*  I want to move this timer component on top of first pot fro loop its creating as 0 index   not here in center */}
-          <div className="flex-grow flex justify-center">
-            {/* <Timer /> */} {/*moved to pot for loop*/}
-          </div>
+            <div className="absolute flex justify-center top-[20%] left-[15%]">
+              <div
+                className="relative select-none"
+                style={{
+                  width: 'clamp(80px, 18vw, 180px)',
+                  height: 'clamp(80px, 18vw, 180px)',
+                   background: 'transparent',
+                }}
+                draggable={false}
+              >
+                <img
+                  src={`${process.env.NEXT_PUBLIC_BACKEND_ASSET_URL}/${gameConfig?.dealerAvatar}`}
+                  alt="Dealer Avatar"
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'contain',
+                    background: 'transparent',
+                    display: 'block',
+                  }}
+                />
+              </div>
+            </div>
+
         </div>
 
         {/* GAME CANVAS BACKGROUND */}
@@ -351,19 +369,15 @@ export default function TeenPattiGame() {
             height: "100%",
             borderRadius: "14px",
             overflow: "hidden",
-          }}
-        ></div>
+          }}></div>
 
         {/* POTS (center) */}
-        <div
-          className="absolute top-5/7 left-1/2 z-30 -translate-x-1/2 -translate-y-1/2 flex gap-2 px-3"
-        >
+        <div className="absolute top-[68%] left-1/2 z-30 -translate-x-1/2 -translate-y-1/2 flex gap-2 px-3">
           {pots.map((pot) => (
             <React.Fragment key={pot.potIndex}>
-
               {/* === TIMER ABOVE POT 0 === */}
               {pot.potIndex === 0 && (
-                <span className="absolute -top-12 left-1/6 -translate-x-1/2 z-40">
+                <span className="absolute -top-13 left-1/6 -translate-x-1/2 z-40">
                   <Timer />
                 </span>
               )}

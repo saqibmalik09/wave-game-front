@@ -20,7 +20,7 @@ export default function TopBar() {
     const soundManager = SoundManager.getInstance();
     const newState = soundManager.toggle();
     setSoundEnabled(newState);
-    
+
     // Optional: Play a test sound when enabling
     if (newState) {
       soundManager.play('betButtonAndCardClickSound', 0.3);
@@ -28,95 +28,128 @@ export default function TopBar() {
   };
 
   return (
-    <div 
-      className="sticky top-0 z-50 w-full"
-      style={{ 
-        padding: 'clamp(3px, 0.6vw, 5px)'
-      }}
-    >
+    <div  className="sticky w-full" >
       <div className="container mx-auto" >
-        <div 
+        <div
           className="d-flex justify-content-between align-items-center rounded-pill"
           style={{
-            padding: 'clamp(4px, 0.5vw, 1px) clamp(6px, 1.0vw, 12px)',
-            background: 'linear-gradient(180deg, #4f2b5f 0%, #3e1842 100%)',
-            boxShadow: '0 clamp(2px, 0.5vw, 4px) clamp(10px, 2vw, 20px) rgba(0, 0, 0, 0.5)',
-            gap: 'clamp(6px, 1.0vw, 12px)',
+            // background: 'linear-gradient(180deg, #4f2b5f 0%, #3e1842 100%)',
+            // boxShadow: '0 clamp(2px, 0.5vw, 4px) clamp(10px, 2vw, 20px) rgba(0, 0, 0, 0.5)',
+            // gap: 'clamp(6px, 1.0vw, 12px)',
           }}
         >
           {/* Left: Back & Menu */}
-          <div 
-            className="d-flex align-items-center"
-            style={{ gap: 'clamp(4px, 0.8vw, 8px)' }}
-          >
-            <button 
-              className="btn btn-dark rounded-circle p-0 d-flex align-items-center justify-content-center"
-              style={{ 
-                width: 'clamp(25px, 4vw, 40px)', 
-                height: 'clamp(25px, 5vw, 40px)',
-                minWidth: '32px',
+          <div className="d-flex align-items-center" style={{ gap: 'clamp(4px, 0.8vw, 8px)' }}>
+            <button
+              className="rounded-circle p-0 d-flex align-items-center justify-content-center border-0 "
+              style={{
+                minWidth: '20px',
               }}
               onClick={() => window.history.back()}
             >
-              <svg 
-                width="clamp(14px, 2vw, 20px)" 
-                height="clamp(14px, 2vw, 20px)" 
-                viewBox="0 0 24 24" 
-                fill="none" 
-                stroke="white" 
-                strokeWidth="2"
-                style={{
-                  width: 'clamp(14px, 2vw, 20px)',
-                  height: 'clamp(14px, 2vw, 20px)',
-                }}
-              >
-                <path d="M19 12H5M12 19l-7-7 7-7"/>
-              </svg>
+              <svg className='rounded-xl' xmlns="http://www.w3.org/2000/svg" viewBox="-2 -2 12 12" width="26" height="26" fill="#ffc109ff" style={{ opacity: 1, transform: 'rotate(90deg)' }}><rect x="-2" y="-2" width="12" height="12" fill="#853426" /><path d="M4.5 1C2.57 1 1 2.57 1 4.5V5H0l2 2l2-2H3v-.5a2.5 2.5 0 0 1 5 0C8 2.57 6.43 1 4.5 1" /></svg>
             </button>
           </div>
 
+
           {/* Center: Maximum Bet */}
-          <div 
-            className="text-warning fw-bold text-center d-none d-md-block"
-            style={{
-              fontSize: 'clamp(10px, 1.4vw, 16px)',
-              whiteSpace: 'nowrap',
-            }}
-          >
-            Maximum bet 200k
+          <div className="d-md-block m-0 p-0" style={{ maxWidth: '100%' }}>
+            <svg
+              viewBox="0 0 260 70"
+              xmlns="http://www.w3.org/2000/svg"
+              style={{
+                display: 'block',
+                width: 'clamp(110px, 14vw, 160px)', // 🔥 responsive width
+                height: 'auto',                    // keeps ratio
+                maxWidth: '100%',
+                pointerEvents: 'none',              // UI safe
+                userSelect: 'none',
+              }}
+              preserveAspectRatio="xMidYMid meet"
+            >
+              <defs>
+                <linearGradient id="goldBorder" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" stopColor="#D4941E" />
+                  <stop offset="50%" stopColor="#F4C245" />
+                  <stop offset="100%" stopColor="#D4941E" />
+                </linearGradient>
+              </defs>
+
+              {/* OUTER BORDER */}
+              <path
+                d="
+        M 10 4
+        L 250 4
+        L 220 58
+        Q 210 66 200 66
+        L 60 66
+        Q 50 66 40 58
+        Z
+      "
+                fill="url(#goldBorder)"
+              />
+
+              {/* INNER BG */}
+              <path
+                d=" M 16 9
+        L 244 9
+        L 214 55
+        Q 206 62 196 62
+        L 64 62
+        Q 54 62 46 55
+        Z
+      "
+                fill="#4C141B"
+              />
+
+              {/* TOP SHADOW */}
+              <rect x="16" y="9" width="228" height="12" fill="#000" opacity="0.25" />
+
+              {/* TEXT */}
+              <text
+                x="130"
+                y="43"
+                textAnchor="middle"
+                fontSize="13"
+                fontWeight="700"
+                fill="#FFC17B"
+                style={{ letterSpacing: '0.4px' }}
+              >
+                Maximum bet 10000k
+              </text>
+            </svg>
           </div>
 
           {/* Right: Balance, Sound, Settings */}
-          <div 
-            className="d-flex align-items-center"
+          <div className="d-flex align-items-center"
             style={{ gap: 'clamp(4px, 0.5vw, 5px)' }}
           >
             {/* Balance */}
-            <div 
+            <div
               className="d-flex align-items-center rounded-pill"
-              style={{ 
+              style={{
                 background: 'rgba(0, 0, 0, 0.4)',
                 gap: 'clamp(4px, 0.6vw, 8px)',
-                padding: 'clamp(4px, 0.6vw, 8px) clamp(8px, 0.8vw, 8px)',
+                padding: 'clamp(4px, 0.4vw, 3px) clamp(4px, 0.4vw, 3px)',
               }}
             >
-              <div 
+              <div
                 className="rounded-circle d-flex align-items-center justify-content-center fw-bold"
-                style={{ 
-                  width: 'clamp(20px, 3vw, 28px)', 
-                  height: 'clamp(20px, 3vw, 28px)', 
+                style={{
+                  width: 'clamp(12px, 1vw, 12px)',
+                  height: 'clamp(12px, 1vw, 12px)',
                   background: 'linear-gradient(135deg, #ffd700, #ffed4e)',
                   color: '#000',
-                  fontSize: 'clamp(10px, 1.4vw, 14px)',
-                  minWidth: '20px',
+                  fontSize: 'clamp(8px, 1vw, 7px)',
+                  minWidth: '10px',
                 }}
               >
                 G
               </div>
-              <span 
+              <span
                 className="text-white fw-bold"
-                style={{ 
-                  fontSize: 'clamp(11px, 1.4vw, 15px)',
+                style={{
+                  fontSize: 'clamp(5px, 0.8vw, 10px)',
                   whiteSpace: 'nowrap',
                 }}
               >
@@ -125,49 +158,49 @@ export default function TopBar() {
             </div>
 
             {/* Sound Toggle */}
-            <button 
-              className="btn btn-dark rounded-circle p-0 d-flex align-items-center justify-content-center"
-              style={{ 
-                width: 'clamp(32px, 5vw, 48px)', 
-                height: 'clamp(32px, 5vw, 48px)',
-                minWidth: '32px',
+            <button
+              className="btn rounded-circle p-0 d-flex align-items-center justify-content-center"
+              style={{
+                backgroundColor: '#853426',
+                width: 'clamp(18px, 5vw, 25px)',
+                height: 'clamp(18px, 5vw, 25px)',
+                minWidth: '20px',
                 transition: 'all 0.2s ease',
-                opacity: soundEnabled ? 1 : 0.6,
               }}
               onClick={toggleSound}
             >
               {soundEnabled ? (
-                <svg 
-                  width="clamp(14px, 2vw, 20px)" 
-                  height="clamp(14px, 2vw, 20px)" 
-                  viewBox="0 0 24 24" 
-                  fill="none" 
-                  stroke="white" 
+                <svg
+                  width="clamp(10px, 2vw, 16px)"
+                  height="clamp(10px, 2vw, 16px)"
+                  viewBox="0 0 24 24"
+                  fill="#ffde22ff"
+                  stroke="#ffd700"
                   strokeWidth="2"
                   style={{
-                    width: 'clamp(14px, 2vw, 20px)',
-                    height: 'clamp(14px, 2vw, 20px)',
+                    width: 'clamp(10px, 2vw, 16px)',
+                    height: 'clamp(10px, 2vw, 16px)',
                   }}
                 >
-                  <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
-                  <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
+                  <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+                  <path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
                 </svg>
               ) : (
-                <svg 
-                  width="clamp(14px, 2vw, 20px)" 
-                  height="clamp(14px, 2vw, 20px)" 
-                  viewBox="0 0 24 24" 
-                  fill="none" 
-                  stroke="#ff4444" 
+                <svg
+                  width="clamp(10px, 2vw, 16px)"
+                  height="clamp(10px, 2vw, 16px)"
+                  viewBox="0 0 24 24"
+                  fill="#ffd700"
+                  stroke="#ffd700"
                   strokeWidth="2"
                   style={{
-                    width: 'clamp(14px, 2vw, 20px)',
-                    height: 'clamp(14px, 2vw, 20px)',
+                    width: 'clamp(10px, 2vw, 16px)',
+                    height: 'clamp(10px, 2vw, 16px)',
                   }}
                 >
-                  <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
-                  <line x1="23" y1="9" x2="17" y2="15"/>
-                  <line x1="17" y1="9" x2="23" y2="15"/>
+                  <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+                  <line x1="23" y1="9" x2="17" y2="15" />
+                  <line x1="17" y1="9" x2="23" y2="15" />
                 </svg>
               )}
             </button>

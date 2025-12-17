@@ -1,5 +1,4 @@
-
-// timer.tsx
+// src/app/games/teenpatti/components/Timer.tsx
 'use client';
 
 import React, { useEffect, useState } from 'react';
@@ -8,12 +7,16 @@ import { useTeenpattiTimerListener } from '@/lib/socket/game/teenpatti/teenpatti
 import { useDispatch } from 'react-redux';
 import { updateTimer } from '@/lib/redux/slices/teenpatti/teenpattiTimerSlice';
 import { SoundManager } from '../game/SoundManager';
+import dynamic from 'next/dynamic';
+
+const Player = dynamic(() =>import('@lottiefiles/react-lottie-player').then((mod) => mod.Player), { ssr: false });
 interface TimerData {
   phase: string;
   remaining: number;
-  totalTime?: number; // optional
-  phaseDuration?: number; // optional
+  totalTime?: number;
+  phaseDuration?: number;
 }
+
 export default function Timer() {
   const dispatch = useDispatch();
   const [timerData, setTimerData] = useState<TimerData>();
@@ -21,7 +24,7 @@ export default function Timer() {
 
   useEffect(() => {
     const socket = getSocket();
-    if (!socket) return; // 
+    if (!socket) return;
 
     let lastPhase: string | null = null;
 
@@ -44,124 +47,83 @@ export default function Timer() {
 
     socket.on('teenpattiTimer', handleTimer);
 
-    // ✅ Always return a cleanup function
     return () => {
       socket.off('teenpattiTimer', handleTimer);
     };
-  }, [dispatch]); // include dispatch in dependencies
-
+  }, [dispatch]);
 
   if (!timerData) return null;
 
-  const { phase, remaining, phaseDuration } = timerData;
+  const { phase, remaining } = timerData;
   const safeRemaining = typeof remaining === 'number' ? remaining : 0;
-  const totalDuration =
-    typeof phaseDuration === 'number' ? phaseDuration : safeRemaining;
-
-  const progress =
-    totalDuration > 0 ? (safeRemaining / totalDuration) * 100 : 0;
 
   const isLowTime = safeRemaining <= 5 && phase === 'bettingTimer';
 
-  const circumference = 2 * Math.PI * 40;
-  const strokeDashoffset = `${circumference - (progress / 100) * circumference
-    }`;
-
-  const strokeColor = isLowTime ? '#ff4646'
-    : phase === 'bettingTimer'
-      ? '#48e5a6'
-      : '#00c2ff';
-
-  const phaseLabels: Record<string, string> = {
-    bettingTimer: 'Start Betting',
-    winningCalculationTimer: 'Calculating..',
-    resultAnnounceTimer: 'Result',
-    newGameStartTimer: 'Wait',
-  };
-
   return (
-    <div
-      className="position-fixed start-50 translate-middle-x"
-      // style={{
-      //   top: '95px', // adjust based on TopBar height
-      //   zIndex: 40,
-      //   maxWidth: 'calc(100% - 20px)', // stays within parent
-      // }}
+    <div 
+      className={`position-fixed start-50 translate-middle-x z-40 ${isLowTime ? 'shake' : ''}`}
+      style={{ pointerEvents: 'none' }} // Click-safe: doesn't block underlying elements
     >
       <div
-        className="position-relative"
+        className="clock-wrapper"
         style={{
-             width: 'clamp(40px, 5vw, 50px)', // smaller min and max
-             height: 'clamp(40px, 5vw, 50px)',
+          width: 'clamp(38px, 5vw, 40px)',
+          height: 'clamp(38px, 5vw, 40px)',
+          position: 'relative',
         }}
       >
-        {/* Use viewBox to make SVG scale */}
-        <svg
-          viewBox="0 0 100 100"
-          className="w-100 h-100"
-          style={{ transform: 'rotate(-90deg)' }}
-        >
-          {/* Background circle */}
-          <circle
-            cx="50"
-            cy="50"
-            r="40"
-            stroke="#333"
-            strokeWidth="8"
-            fill="none"
-          />
-          {/* Progress circle */}
-          <circle
-            cx="50"
-            cy="50"
-            r="40"
-            stroke={strokeColor}
-            strokeWidth="8"
-            fill="none"
-            strokeDasharray={circumference}
-            strokeDashoffset={strokeDashoffset}
-            strokeLinecap="round"
-            style={{
-              transition: 'stroke-dashoffset 1s linear',
-              filter: isLowTime ? `drop-shadow(0 0 10px ${strokeColor})` : 'none',
-            }}
-          />
-        </svg>
+        {/* Lottie Player loads from public file URL */}
+        <Player
+          src="/lottie/clock.json"  // Path to your JSON file (adjust if folder name changes)
+          loop={true}
+          autoplay={true}  
+          style={{
+            width: '100%',
+            height: '100%',
+          }}
+        />
 
-        {/* Text inside circle */}
+        {/* Time text overlay in center */}
         <div
-          className="position-absolute top-50 start-50 translate-middle text-center select-none"
-          style={{ animation: isLowTime ? 'pulse 1s infinite' : 'none' }}
+          style={{
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            pointerEvents: 'none', // Also click-safe
+            textAlign: 'center',
+          }}
         >
-          <div
-            className="fw-bold"
+          <span
             style={{
-              fontSize: 'clamp(10px, 2.5vw, 12px)',
-              color: isLowTime ? '#ff4656' : '#fff',
-              lineHeight: 1,
+              fontSize: 'clamp(12px, 2vw, 12px)', // Responsive, smaller than before for tiny clock
+              fontWeight: '700',
             }}
           >
             {safeRemaining}
-          </div>
-
-          {/* <div
-            className="text-secondary"
-            style={{
-              fontSize: 'clamp(7px, 2vw, 12px)',
-              marginTop: '2px',
-            }}
-          >
-            {phaseLabels[phase] || phase.toUpperCase()}
-          </div> */}
+          </span>
         </div>
       </div>
 
       <style jsx>{`
-    @keyframes pulse {
-      0%, 100% { transform: scale(1); opacity: 1; }
-      50% { transform: scale(1.1); opacity: 0.8; }
-    }
-  `}</style>
+        .clock-wrapper {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+
+        .shake {
+          animation: shake 0.4s infinite;
+        }
+
+        @keyframes shake {
+          0% { transform: translate(0); }
+          25% { transform: translate(2px, -2px); }
+          50% { transform: translate(-2px, 2px); }
+          75% { transform: translate(2px, 2px); }
+          100% { transform: translate(0); }
+        }
+      `}</style>
     </div>
   );
 }
