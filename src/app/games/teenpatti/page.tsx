@@ -67,15 +67,22 @@ export default function TeenPattiPage() {
         // 3️⃣ User info
         let userInfo = user;
         if (!userInfo) {
+           let tenantBaseURL;
+            if (tenantConfig.environemnt === "production") {
+              tenantBaseURL = tenantConfig.tenantProductionDomain;
+            } else {
+              tenantBaseURL = tenantConfig.tenantTestingDomain;
+            }
           const response: GameUserInfoResponse =
             await ApiService.gameUserInfo({
               token,
-              tenantDomainURL: tenantConfig.tenantProductionDomain,
+              tenantDomainURL: tenantBaseURL,
             });
 
           if (!response.success) {
             throw new Error(response.message);
           }
+          console.log("response:",response)
 
           userInfo = response.data;
           dispatch(setUserPlayerInfo({
@@ -93,6 +100,7 @@ export default function TeenPattiPage() {
           name: userInfo.name,
           profilePicture: userInfo.profilePicture
         });
+        setLoading(false)
         const NewJoiner = {
           userId: userInfo.id,
           name: userInfo.name,
@@ -123,7 +131,7 @@ export default function TeenPattiPage() {
 
   return (
     <div
-      className="flex w-full flex-col items-center justify-center min-h-screen text-white top-0  bg-[#6E222E]"
+      className="flex w-full flex-col items-center justify-center min-h-screen text-white top-0 "
       style={{
         backgroundImage: `url(${process.env.NEXT_PUBLIC_BACKEND_ASSET_URL}/teenpatiGameBg.jpg)`,
       backgroundSize: 'contain',       // fills the container
