@@ -18,7 +18,7 @@ export default function GameLoading({ message = 'Hold On please' }: GameLoadingP
     <div className="flex items-center justify-center min-h-screen w-full bg-gradient-to-br from-slate-950 via-indigo-950 to-slate-950 p-4">
       <div className="flex flex-col items-center space-y-8 md:space-y-12 max-w-md w-full">
         {/* Main Loading Icon */}
-        <div className="relative w-32 h-32 md:w-40 md:h-40">
+        <div className="relative w-28 h-28 md:w-28 md:h-28">
           {/* Outer Ring */}
           <div className="absolute inset-0 border-8 border-indigo-500/30 rounded-full"></div>
           
@@ -47,7 +47,7 @@ export default function GameLoading({ message = 'Hold On please' }: GameLoadingP
 
         {/* Loading Text */}
         <div className="text-center space-y-3 px-4">
-          <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white">
+          <h1 className="text-lg md:text-xl lg:text-2xl font-bold text-white">
             {message}{dots}
           </h1>
           <p className="text-gray-400 text-sm md:text-base lg:text-lg">

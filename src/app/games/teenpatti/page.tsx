@@ -143,7 +143,7 @@
         backgroundPosition: 'center',  // keeps image centered
         backgroundRepeat: 'no-repeat', // no tiling
         }}>
-        {/* <TeenPattiGame /> */}
+        <TeenPattiGame />
 
         <MessageModal
           show={showModal}
