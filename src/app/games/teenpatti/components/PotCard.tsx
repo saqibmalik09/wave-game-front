@@ -221,14 +221,14 @@ export default function PotCard({
   return (
     <div
       className={`relative flex flex-col rounded-2xl transition-all duration-300 border-2 ${isWinner && currentPhase === 'resultAnnounceTimer'
-          ? 'bg-gradient-to-b from-green-700 to-green-900 border-green-500 shadow-[0_0_30px_rgba(34,197,94,0.5)]'
-          : 'bg-gradient-to-b from-slate-800 to-slate-950 border-slate-700'
+        ? 'bg-gradient-to-b from-green-700 to-green-900 border-green-500 shadow-[0_0_30px_rgba(34,197,94,0.5)]'
+        : 'bg-gradient-to-b from-slate-800 to-slate-950 border-slate-700'
         } ${currentPhase === 'bettingTimer' ? 'cursor-pointer opacity-100' : 'cursor-not-allowed opacity-80'
         }`}
       style={{
         width: '80px',
-        minHeight: '75px',
-        maxHeight: '100px',
+        minHeight: '110px',
+        maxHeight: '120px',
       }}
       onClick={handlePotClick}
     >
@@ -247,7 +247,7 @@ export default function PotCard({
             className="bg-white rounded border border-slate-400 shadow-md overflow-hidden"
             style={{
               width: '25px',
-              height: '35px',
+              height: '40 px',
             }}
           >
             <img
@@ -303,11 +303,27 @@ export default function PotCard({
       </div>
 
       <style jsx>{`
-      @keyframes coinDrop {
-        0% { transform: translateY(-60px); opacity: 0; }
-        100% { transform: translateY(0); opacity: 1; }
-      }
-    `}</style>
+  @keyframes coinDrop {
+    0% {
+      transform: translateY(-60px) scale(0.85);
+      opacity: 0;
+    }
+    70% {
+      transform: translateY(6px) scale(1.05);
+      opacity: 1;
+    }
+    100% {
+      transform: translateY(0) scale(1);
+      opacity: 1;
+    }
+  }
+
+  .coin-drop {
+    animation: coinDrop 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+    will-change: transform, opacity;
+  }
+`}</style>
+
 
       <ToastContainer />
     </div>
