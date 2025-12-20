@@ -231,7 +231,7 @@ return (
     style={{
       width: '80px',
       minHeight:'30px',
-      maxHeight: '115px',
+      maxHeight: '100px',
     }}
     onClick={handlePotClick}
   >
@@ -249,8 +249,8 @@ return (
           key={idx}
           className="bg-white rounded border border-slate-400 shadow-md overflow-hidden"
           style={{
-            width: '25px',
-            height: '35px',
+            width: '22px',
+            height: '30px',
           }}
         >
           <img
