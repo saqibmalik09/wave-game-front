@@ -93,7 +93,7 @@ export default function ResultModal() {
   <>
     {/* Backdrop */}
     <div
-      className="position-fixed top-0 start-0 w-100 h-100"
+      className="position-fixed top-0 start-0 w-100 "
       style={{
         background: 'rgba(0,0,0,0.8)',
         backdropFilter: 'blur(8px)',
@@ -108,6 +108,7 @@ export default function ResultModal() {
       className="position-fixed top-50 start-50 translate-middle rounded-4 overflow-hidden"
       style={{
         width: '60%',
+         height: '60%',
         maxWidth: '250px', // 🔹 SMALL SCREEN
         background: 'linear-gradient(180deg, #6b1f2b 0%, #4a1520 100%)',
         boxShadow: '0 20px 60px rgba(0,0,0,0.7)',

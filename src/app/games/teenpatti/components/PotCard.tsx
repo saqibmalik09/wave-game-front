@@ -57,7 +57,6 @@ export default function PotCard({
   const coinsContainerRef = useRef<HTMLDivElement>(null);
   const userPlayerData = useSelector((state: RootState) => state.userPlayerData);
   const tenant = useSelector((state: RootState) => state.tenantDetails.data);
-
   const currentUserId = userPlayerData.data?.id;
   const bettingCoins: number[] = gameConfig?.bettingCoins || [];
   const colors: string[] = gameConfig?.colors || [];
@@ -228,7 +227,7 @@ export default function PotCard({
         }`}
       style={{
         width: '80px',
-        minHeight: '40px',
+        minHeight: '55px',
         maxHeight: '100px',
       }}
       onClick={handlePotClick}

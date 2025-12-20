@@ -347,7 +347,7 @@ export default function TeenPattiGame() {
                   <span
                     className="relative flex items-center justify-center select-none"
                     style={{
-                      minWidth: "clamp(50px, 16vw, 40px)",
+                      minWidth: "clamp(40px, 14vw, 30px)",
                       height: "clamp(15px, 4vw, 12px)",
                       padding: "0 4px",
                       borderRadius: "10px",
@@ -355,7 +355,7 @@ export default function TeenPattiGame() {
                       boxShadow:
                         "0 2px 6px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.4)",
                       color: "#3b2400",
-                      fontSize: "clamp(10px, 1.2vw, 10px)",
+                      fontSize: "clamp(8px, 0.5vw, 7px)",
                       fontWeight: 600,
                       letterSpacing: "0.4px",
                       textTransform: "uppercase",
