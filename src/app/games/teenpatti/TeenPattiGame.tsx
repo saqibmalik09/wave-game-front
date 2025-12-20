@@ -202,13 +202,13 @@ export default function TeenPattiGame() {
 
   useTeenpattiBetResponseListener((data) => {
     if (data.success) {
-      showToast(data.message ?? `Bet placed: ₹${data.amount}`, "success");
+      // showToast(data.message ?? `Bet placed: ₹${data.amount}`, "success");
+      dispatch(setPendingCoin({ potIndex: Number(data.data.potIndex), value: data.data.amount }));
       dispatch(setUserPlayerInfo({
         success: data.success,
         message: data.message,
         data: data.data,
       }));
-      dispatch(setPendingCoin({ potIndex: Number(data.data.potIndex), value: data.data.amount }));
     } else {
       showToast(data.message ?? "Bet failed!", "error");
     }
@@ -330,7 +330,7 @@ export default function TeenPattiGame() {
         </div>
 
         {/* Pots Container - Positioned at 68% from top */}
-        <div className="absolute top-[72%] left-1/2 z-30 -translate-x-1/2 -translate-y-1/2 flex gap-2 px-3">
+        <div className="absolute top-[70%] left-1/2 z-30 -translate-x-1/2 -translate-y-1/2 flex gap-2 px-3">
           {pots.map((pot) => (
             <React.Fragment key={pot.potIndex}>
 
@@ -347,8 +347,8 @@ export default function TeenPattiGame() {
                   <span
                     className="relative flex items-center justify-center select-none"
                     style={{
-                      minWidth: "clamp(60px, 22vw, 60px)",
-                      height: "clamp(18px, 5vw, 15px)",
+                      minWidth: "clamp(50px, 16vw, 40px)",
+                      height: "clamp(15px, 4vw, 12px)",
                       padding: "0 4px",
                       borderRadius: "10px",
                       background: "linear-gradient(180deg, #f4d27a 0%, #e9b94f 100%)",

@@ -31,8 +31,8 @@ function CoinButton({ amount, color, isSelected, onClick }: CoinButtonProps) {
       <div
         className="rounded-circle d-flex align-items-center justify-content-center fw-bold text-white"
         style={{
-          width: 'clamp(18px, 6vw, 50px)',
-          height: 'clamp(18px, 6vw, 50px)',
+          width: 'clamp(18px, 6vw, 40px)',
+          height: 'clamp(18px, 6vw, 40px)',
           fontSize: 'clamp(4px, 2.1vw, 16px)',
           background: `radial-gradient(circle at 30% 30%, ${color}, ${color}dd)`,
           // border: `clamp(1px, 0.3vw, 4px) solid rgba(255, 255, 255, 0.3)`,
@@ -51,8 +51,8 @@ function CoinButton({ amount, color, isSelected, onClick }: CoinButtonProps) {
         <div
           className="position-absolute bottom-0 start-50 translate-middle-x rounded-circle"
           style={{
-            width: 'clamp(6px, 1.5vw, 8px)',
-            height: 'clamp(6px, 1.5vw, 8px)',
+            width: 'clamp(6px, 1.2vw, 8px)',
+            height: 'clamp(6px, 1.2vw, 8px)',
             background: '#ffd700',
             animation: 'pulse 1.5s infinite',
           }}
@@ -115,25 +115,24 @@ export default function CoinTray() {
       >
         {/* Balance */}
         <div
-          className="d-flex align-items-center gap-1 px-2 py-1 rounded-pill flex-shrink-0 select-none"
+          className="d-flex align-items-center gap-1 px-2  rounded-pill flex-shrink-0 select-none"
           style={{
             background: 'rgba(0, 0, 0, 0.5)',
-            fontSize: 'clamp(6px, 2vw, 14px)',
-          }}
-        >
+            fontSize: 'clamp(6px, 1vw, 14px)',
+          }}>
           <div
             className="rounded-circle d-flex align-items-center justify-content-center"
             style={{
-              width: 'clamp(20px, 4vw, 36px)',
-              height: 'clamp(20px, 4vw, 36px)',
+              width: 'clamp(20px, 2vw, 28px)',
+              height: 'clamp(20px, 2vw, 28px)',
               background: 'linear-gradient(135deg, #ffd700, #ffed4e)',
-              fontSize: 'clamp(6px, 1.5vw, 14px)',
+              fontSize: 'clamp(6px, 1.2vw, 18px)',
             }}
           >
             <span className="fw-bold" style={{ color: '#000' }}>G</span>
           </div>
           <div className="d-flex flex-column  ">
-            <small className="text-secondary" style={{ fontSize: 'clamp(5px, 1.2vw, 10px)' }}>
+            <small className="text-secondary text-white" style={{ fontSize: 'clamp(5px, 1.2vw, 10px)' }}>
               Balance
             </small>
             <span className="text-white fw-bold" style={{ fontSize: 'clamp(6px, 1.5vw, 14px)' }}>
