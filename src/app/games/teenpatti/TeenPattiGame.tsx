@@ -330,7 +330,7 @@ export default function TeenPattiGame() {
         </div>
 
         {/* Pots Container - Positioned at 68% from top */}
-        <div className="absolute top-[74%] left-1/2 z-30 -translate-x-1/2 -translate-y-1/2 flex gap-2 px-3">
+        <div className="absolute top-[72%] left-1/2 z-30 -translate-x-1/2 -translate-y-1/2 flex gap-2 px-3">
           {pots.map((pot) => (
             <React.Fragment key={pot.potIndex}>
 
@@ -343,19 +343,19 @@ export default function TeenPattiGame() {
 
               {/* Yellow Label above POT 1 */}
               {pot.potIndex === 1 && currentPhase && phaseLabels[currentPhase] && (
-                <span className="absolute -top-8 left-[50%] -translate-x-1/2 z-40 pointer-events-none">
+                <span className="absolute -top-7 left-[50%] -translate-x-1/2 z-40 pointer-events-none">
                   <span
                     className="relative flex items-center justify-center select-none"
                     style={{
-                      minWidth: "clamp(70px, 22vw, 110px)",
-                      height: "clamp(22px, 7vw, 18px)",
-                      padding: "0 6px",
-                      borderRadius: "14px",
+                      minWidth: "clamp(60px, 22vw, 60px)",
+                      height: "clamp(18px, 5vw, 15px)",
+                      padding: "0 4px",
+                      borderRadius: "10px",
                       background: "linear-gradient(180deg, #f4d27a 0%, #e9b94f 100%)",
                       boxShadow:
                         "0 2px 6px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.4)",
                       color: "#3b2400",
-                      fontSize: "clamp(10px, 1.8vw, 12px)",
+                      fontSize: "clamp(10px, 1.2vw, 10px)",
                       fontWeight: 600,
                       letterSpacing: "0.4px",
                       textTransform: "uppercase",

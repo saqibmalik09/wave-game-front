@@ -95,6 +95,7 @@ export default function Timer() {
           }}
         >
           <span
+          className='text-white'
             style={{
               fontSize: 'clamp(12px, 2vw, 12px)', // Responsive, smaller than before for tiny clock
               fontWeight: '700',
