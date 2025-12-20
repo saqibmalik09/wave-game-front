@@ -89,134 +89,177 @@ export default function ResultModal() {
   const currentUserWinner = result.winners.find((w) => w.userId === String(currentUserId));
   const isWinner = !!currentUserWinner;
 
-  return (
-    <>
-      {/* Backdrop */}
-      <div
-        className="position-fixed top-0 start-0 w-100 h-100"
-        style={{
-          background: 'rgba(0, 0, 0, 0.8)',
-          backdropFilter: 'blur(8px)',
-          zIndex: 100,
-          animation: 'fadeIn 0.3s ease',
-        }}
-        onClick={handleClose}
-      />
+ return (
+  <>
+    {/* Backdrop */}
+    <div
+      className="position-fixed top-0 start-0 w-100 h-100"
+      style={{
+        background: 'rgba(0,0,0,0.8)',
+        backdropFilter: 'blur(8px)',
+        zIndex: 100,
+        animation: 'fadeIn 0.25s ease',
+      }}
+      onClick={handleClose}
+    />
 
-      {/* Modal */}
-      <div
-        className="position-fixed top-50 start-50 translate-middle rounded-4 overflow-hidden"
+    {/* Modal */}
+    <div
+      className="position-fixed top-50 start-50 translate-middle rounded-4 overflow-hidden"
+      style={{
+        width: '50%',
+        maxWidth: '250px', // 🔹 SMALL SCREEN
+        background: 'linear-gradient(180deg, #6b1f2b 0%, #4a1520 100%)',
+        boxShadow: '0 20px 60px rgba(0,0,0,0.7)',
+        zIndex: 101,
+        animation: 'scaleIn 0.25s ease',
+      }}
+    >
+      {/* Close */}
+      <button
+        onClick={handleClose}
+        className="btn btn-dark position-absolute top-0 end-0 rounded-circle"
         style={{
-          width: '90%',
-          maxWidth: '500px',
-          background: 'linear-gradient(180deg, #6b1f2b 0%, #4a1520 100%)',
-          boxShadow: '0 20px 60px rgba(0, 0, 0, 0.7)',
-          zIndex: 101,
-          animation: 'scaleIn 0.3s ease',
+          width: '34px',
+          height: '34px',
+          margin: '10px',
+          zIndex: 10,
         }}
       >
-        <button
-          onClick={handleClose}
-          className="btn btn-dark position-absolute top-0 end-0 m-3 rounded-circle"
-          style={{ width: '40px', height: '40px', zIndex: 10 }}
+        ×
+      </button>
+
+      {/* Header */}
+      <div className="text-center pt-2 pb-2 px-2">
+        <h2
+          className="text-white fw-bold mb-1"
+          style={{ fontSize: 'clamp(16px, 2vw, 18px)' }}
         >
-          ×
-        </button>
+          {isWinner ? '🎉 You Won!' : 'Round Complete'}
+        </h2>
 
-        {/* Header */}
-        <div className="text-center pt-5 pb-3 px-4 position-relative">
-          <h2 className="text-white fw-bold mb-2">
-            {isWinner ? '🎉 You Won!' : 'Round Complete'}
-          </h2>
-          <p className="text-warning fw-semibold mb-1" style={{ fontSize: '18px' }}>
-            Winning Pot: {result.winningPot.toUpperCase()}
-          </p>
-          <p className="text-white-50" style={{ fontSize: '14px' }}>
-            {result.winningPotRankText}
-          </p>
-        </div>
+        <p
+          className="text-warning fw-semibold mb-1"
+          style={{ fontSize: 'clamp(12px, 3vw, 18px)' }}
+        >
+          Winning Pot: {result.winningPot.toUpperCase()}
+        </p>
 
-        {/* Winning Cards */}
-        <div className="d-flex justify-content-center gap-2 px-4 py-3">
-          {result.winningCards.map((cardUrl, idx) => (
-            <img
-              key={idx}
-              src={cardUrl}
-              alt={`Card ${idx + 1}`}
-              className="rounded-3"
-              style={{ width: '70px', height: '100px', boxShadow: '0 4px 12px rgba(0, 0, 0, 0.5)' }}
-            />
-          ))}
-        </div>
+        <p
+          className="text-white-50"
+          style={{ fontSize: 'clamp(11px, 2.5vw, 14px)' }}
+        >
+          {result.winningPotRankText}
+        </p>
+      </div>
 
-        {/* Winners List */}
-        <div className="px-4 py-3" style={{ background: 'rgba(0,0,0,0.3)' }}>
-          <h3 className="text-white fw-semibold mb-3 text-center" style={{ fontSize: '16px' }}>
-            {result.winners.length > 1 ? 'Winners' : 'Winner'}
-          </h3>
-          <div className="d-flex flex-column gap-2" style={{ maxHeight: '200px', overflowY: 'auto' }}>
-            {result.winners.map((winner) => (
-              <div
-                key={winner.userId}
-                className="d-flex align-items-center justify-content-between p-2 rounded-3"
-                style={{
-                  background: winner.userId === String(currentUserId) ? 'rgba(255, 215, 0, 0.2)' : 'rgba(255,255,255,0.1)',
-                  border: winner.userId === String(currentUserId) ? '2px solid rgba(255,215,0,0.5)' : 'none',
-                }}
-              >
-                <div className="d-flex align-items-center gap-2">
-                  <img
-                    src={winner.imageProfile}
-                    alt="Winner"
-                    className="rounded-circle"
-                    style={{ width: '40px', height: '40px', objectFit: 'cover', border: '2px solid #ffd700' }}
-                  />
+      {/* Winning Cards */}
+      <div className="d-flex justify-content-center gap-2 px-3 py-2">
+        {result.winningCards.map((cardUrl, idx) => (
+          <img
+            key={idx}
+            src={cardUrl}
+            alt={`Card ${idx + 1}`}
+            className="rounded-3"
+            style={{
+              width: 'clamp(44px, 14vw, 70px)',
+              height: 'clamp(64px, 20vw, 100px)',
+              boxShadow: '0 4px 12px rgba(0,0,0,0.5)',
+            }}
+          />
+        ))}
+      </div>
 
-                  <div className="d-flex align-items-center gap-1">
-                    <span
-                      className="d-flex align-items-center justify-content-center fw-bold"
-                      style={{
-                        width: 'clamp(16px, 3vw, 20px)',
-                        height: 'clamp(16px, 3vw, 20px)',
-                        borderRadius: '50%',
-                        background: 'linear-gradient(135deg, #ffd700, #ffed4e)',
-                        color: '#000',
-                        fontSize: 'clamp(10px, 1.2vw, 12px)',
-                        boxShadow: '0 1px 3px rgba(0,0,0,0.4)',
-                        flexShrink: 0,
-                      }}
-                    >
-                      G
-                    </span>
-                    <span
-                      className="text-warning fw-bold"
-                      style={{ fontSize: 'clamp(12px, 2.2vw, 14px)' }}
-                    >
-                      +{winner.amountWon.toLocaleString()}
-                    </span>
-                  </div>
+      {/* Winners */}
+      <div
+        className="px-3 py-2"
+        style={{ background: 'rgba(0,0,0,0.3)' }}
+      >
+        <h3
+          className="text-white fw-semibold mb-2 text-center"
+          style={{ fontSize: '14px' }}
+        >
+          {result.winners.length > 1 ? 'Winners' : 'Winner'}
+        </h3>
+
+        <div
+          className="d-flex flex-column gap-2"
+          style={{
+            maxHeight: '140px', // 🔹 SMALL SCREEN HEIGHT
+            overflowY: 'auto',
+          }}
+        >
+          {result.winners.map((winner) => (
+            <div
+              key={winner.userId}
+              className="d-flex align-items-center justify-content-between p-2 rounded-3"
+              style={{
+                background:
+                  winner.userId === String(currentUserId)
+                    ? 'rgba(255,215,0,0.18)'
+                    : 'rgba(255,255,255,0.08)',
+              }}
+            >
+              <div className="d-flex align-items-center gap-2">
+                <img
+                  src={winner.imageProfile}
+                  alt="Winner"
+                  className="rounded-circle"
+                  style={{
+                    width: '34px',
+                    height: '34px',
+                    objectFit: 'cover',
+                    border: '2px solid #ffd700',
+                  }}
+                />
+
+                <div className="d-flex align-items-center gap-1">
+                  <span
+                    className="d-flex align-items-center justify-content-center fw-bold"
+                    style={{
+                      width: '18px',
+                      height: '18px',
+                      borderRadius: '50%',
+                      background:
+                        'linear-gradient(135deg, #ffd700, #ffed4e)',
+                      color: '#000',
+                      fontSize: '11px',
+                      flexShrink: 0,
+                    }}
+                  >
+                    G
+                  </span>
+
+                  <span
+                    className="text-warning fw-bold"
+                    style={{ fontSize: '13px' }}
+                  >
+                    +{winner.amountWon.toLocaleString()}
+                  </span>
                 </div>
               </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Footer */}
-        <div className="p-2 text-center">
-          <button
-            onClick={handleClose}
-            className="btn w-100 py-2 fw-bold text-white rounded-pill"
-            style={{ background: 'linear-gradient(135deg, #ffd700, #ffed4e)', color: '#000', border: 'none' }}
-          >
-            Continue
-          </button>
+            </div>
+          ))}
         </div>
       </div>
 
-      <style jsx>{`
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        @keyframes scaleIn { from { transform: translate(-50%, -50%) scale(0.9); opacity: 0; } to { transform: translate(-50%, -50%) scale(1); opacity: 1; } }
-      `}</style>
-    </>
-  );
+      {/* Footer */}
+      <div className="p-2">
+        <button
+          onClick={handleClose}
+          className="btn w-100 fw-bold rounded-pill"
+          style={{
+            padding: '10px',
+            fontSize: '14px',
+            background: 'linear-gradient(135deg, #ffd700, #ffed4e)',
+            color: '#000',
+            border: 'none',
+          }}
+        >
+          Continue
+        </button>
+      </div>
+    </div>
+  </>
+);
 }
