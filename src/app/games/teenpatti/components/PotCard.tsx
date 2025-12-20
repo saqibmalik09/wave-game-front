@@ -227,7 +227,7 @@ export default function PotCard({
         }`}
       style={{
         width: '80px',
-        minHeight: '55px',
+        minHeight: '75px',
         maxHeight: '100px',
       }}
       onClick={handlePotClick}
@@ -246,8 +246,8 @@ export default function PotCard({
             key={idx}
             className="bg-white rounded border border-slate-400 shadow-md overflow-hidden"
             style={{
-              width: '22px',
-              height: '30px',
+              width: '25px',
+              height: '35px',
             }}
           >
             <img
