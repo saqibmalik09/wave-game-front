@@ -139,7 +139,7 @@
         className="min-h-screen"
         style={{
           backgroundImage: `url(${process.env.NEXT_PUBLIC_BACKEND_ASSET_URL}/teenpatiGameBg.jpg)`,
-        backgroundSize: 'contain',       // fills the container
+        backgroundSize: 'cover',       // fills the container
         backgroundPosition: 'center',  // keeps image centered
         backgroundRepeat: 'no-repeat', // no tiling
         }}>
