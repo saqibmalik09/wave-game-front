@@ -57,7 +57,7 @@ export default function PotCard({
   const coinsContainerRef = useRef<HTMLDivElement>(null);
   const userPlayerData = useSelector((state: RootState) => state.userPlayerData);
   const tenant = useSelector((state: RootState) => state.tenantDetails.data);
-  
+
   const currentUserId = userPlayerData.data?.id;
   const bettingCoins: number[] = gameConfig?.bettingCoins || [];
   const colors: string[] = gameConfig?.colors || [];
@@ -182,7 +182,7 @@ export default function PotCard({
     if (!selectedCoin) {
       showToast(`Please select a coin to bet!`);
       return;
-    } 
+    }
     const params = new URLSearchParams(window.location.search);
     const appKey = params.get("appKey");
     const gameId = params.get("gameId");
@@ -198,119 +198,119 @@ export default function PotCard({
       return;
     }
     const selectedCoinAmount = selectedCoin.amount;
-      const tenantBaseURL =
-    tenant.environemnt === "production"
-      ? tenant.tenantProductionDomain
-      : tenant.tenantTestingDomain;
-   
+    const tenantBaseURL =
+      tenant.environemnt === "production"
+        ? tenant.tenantProductionDomain
+        : tenant.tenantTestingDomain;
+
     let betData = {
       userId: currentUserId.toString(),
       amount: selectedCoinAmount,
       tableId: 10,
       betType: 1,
       potIndex: String(potIndex),
-      socketId:"",
+      socketId: "",
       appKey: appKey!,
       token: token!,
       gameId: gameId!,
       tenantBaseURL,
-  } 
+    }
     placeTeenpattiBet(betData);
   };
 
 
-return (
-  <div
-    className={`relative flex flex-col rounded-2xl transition-all duration-300 border-2 ${
-      isWinner && currentPhase === 'resultAnnounceTimer'
-        ? 'bg-gradient-to-b from-green-700 to-green-900 border-green-500 shadow-[0_0_30px_rgba(34,197,94,0.5)]'
-        : 'bg-gradient-to-b from-slate-800 to-slate-950 border-slate-700'
-    } ${
-      currentPhase === 'bettingTimer' ? 'cursor-pointer opacity-100' : 'cursor-not-allowed opacity-80'
-    }`}
-    style={{
-      width: '80px',
-      minHeight:'35px',
-      maxHeight: '100px',
-    }}
-    onClick={handlePotClick}
-  >
-    {/* Pot Header - Single Line */}
-    <div className="bg-slate-700/50 rounded-t-xl px-2 py-0.5 text-center border-b border-slate-600">
-      <div className="text-white font-bold text-[7px] sm:text-xs whitespace-nowrap">
-        POT {totalBet.toLocaleString()}
-      </div>
-    </div>
-
-    {/* Cards Section - Larger & More Visible, Minimal Spacing */}
-    <div className="flex justify-center items-start gap-0.5 px-0.5 py-1.5">
-      {displayCards.map((cardUrl, idx) => (
-        <div
-          key={idx}
-          className="bg-white rounded border border-slate-400 shadow-md overflow-hidden"
-          style={{
-            width: '22px',
-            height: '30px',
-          }}
-        >
-          <img
-            src={`${process.env.NEXT_PUBLIC_BACKEND_ASSET_URL}/${cardUrl}`}
-            alt={`Card ${idx}`}
-            className="w-full h-full object-cover"
-          />
-        </div>
-      ))}
-    </div>
-
-    {/* Coins Container - No Background, Maximum Width */}
+  return (
     <div
-      ref={coinsContainerRef}
-      className="relative mt-auto mx-0.5 mb-1.5 rounded-lg overflow-hidden"
+      className={`relative flex flex-col rounded-2xl transition-all duration-300 border-2 ${isWinner && currentPhase === 'resultAnnounceTimer'
+          ? 'bg-gradient-to-b from-green-700 to-green-900 border-green-500 shadow-[0_0_30px_rgba(34,197,94,0.5)]'
+          : 'bg-gradient-to-b from-slate-800 to-slate-950 border-slate-700'
+        } ${currentPhase === 'bettingTimer' ? 'cursor-pointer opacity-100' : 'cursor-not-allowed opacity-80'
+        }`}
       style={{
-        width: 'calc(100% - 4px)',
-        height: '85px',
+        width: '80px',
+        minHeight: '40px',
+        maxHeight: '100px',
       }}
+      onClick={handlePotClick}
     >
-      {/* Multiplier as placeholder text when no coins */}
-      {coins.length === 0 && (
-        <div className="absolute inset-0 flex items-center justify-center text-amber-500 font-bold text-xs opacity-40">
-          2.9x
+      {/* Pot Header - Single Line */}
+      <div className="bg-slate-700/50 rounded-t-xl px-2 py-0.5 text-center border-b border-slate-600">
+        <div className="text-white font-bold text-[7px] sm:text-xs whitespace-nowrap">
+          POT {totalBet.toLocaleString()}
         </div>
-      )}
-      
-      {coins.map(coin => {
-        const thisCoinColor = coinColorMap[coin.value] || '#94a3b8';
-        return (
+      </div>
+
+      {/* Cards Section - Larger & More Visible, Minimal Spacing */}
+      <div className="flex justify-center items-start gap-0.5 px-0.5 py-1.5">
+        {displayCards.map((cardUrl, idx) => (
           <div
-            key={coin.id}
-            className="absolute rounded-full flex items-center justify-center font-bold text-white select-none shadow-lg"
+            key={idx}
+            className="bg-white rounded border border-slate-400 shadow-md overflow-hidden"
             style={{
-              width: '18px',
-              height: '18px',
-              left: `${coin.x}px`,
-              top: `${coin.y}px`,
-              background: `radial-gradient(circle at 30% 30%, ${thisCoinColor}, ${thisCoinColor}dd)`,
-              border: '2px solid rgba(255,255,255,0.4)',
-              fontSize: '7px',
-              transform: coin.isAnimating ? 'translateY(-60px)' : 'translateY(0)',
-              opacity: coin.isAnimating ? 0 : 1,
-              animation: coin.isAnimating ? 'coinDrop 0.5s forwards' : 'none',
+              width: '22px',
+              height: '30px',
             }}
           >
-            {coin.value >= 1000 ? `${coin.value / 1000}k` : coin.value}
+            <img
+              src={`${process.env.NEXT_PUBLIC_BACKEND_ASSET_URL}/${cardUrl}`}
+              alt={`Card ${idx}`}
+              className="w-full h-full object-cover"
+            />
           </div>
-        );
-      })}
-    </div>
+        ))}
+      </div>
 
-    <style jsx>{`
+      {/* Coins Container - No Background, Maximum Width */}
+      <div
+        ref={coinsContainerRef}
+        className="relative mt-auto mx-0.5 mb-1.5 rounded-lg overflow-hidden"
+        style={{
+          width: 'calc(100% - 4px)',
+          height: '85px',
+        }}
+      >
+        {/* Multiplier as placeholder text when no coins */}
+        {coins.length === 0 && (
+          <div className="absolute inset-0 flex items-center justify-center text-amber-500 font-bold text-xs opacity-40">
+            2.9x
+          </div>
+        )}
+
+        {coins.map(coin => {
+          const thisCoinColor = coinColorMap[coin.value] || '#94a3b8';
+
+          return (
+            <div
+              key={coin.id}
+              className={`absolute rounded-full flex items-center justify-center font-bold
+                text-white select-none shadow-lg
+                ${coin.isAnimating ? 'coin-drop' : ''}
+              `}
+              style={{
+                width: '18px',
+                height: '18px',
+                left: `${coin.x}px`,
+                top: `${coin.y}px`,
+                background: `radial-gradient(circle at 30% 30%, ${thisCoinColor}, ${thisCoinColor}dd)`,
+                border: '2px solid rgba(255,255,255,0.4)',
+                fontSize: '7px',
+              }}
+            >
+              {coin.value >= 1000 ? `${coin.value / 1000}k` : coin.value}
+            </div>
+          );
+        })}
+
+      </div>
+
+      <style jsx>{`
       @keyframes coinDrop {
         0% { transform: translateY(-60px); opacity: 0; }
         100% { transform: translateY(0); opacity: 1; }
       }
     `}</style>
 
-    <ToastContainer />
-  </div>
-);
+      <ToastContainer />
+    </div>
+  );
 }

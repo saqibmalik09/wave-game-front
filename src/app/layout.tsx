@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "@/app/globals.css";
 import ClientProviders from "./components/ClientProviders";
+import '@/../public/teenpattigamecss.css';
 
 export const metadata: Metadata = {
   title: "Wave Games",
