@@ -221,121 +221,77 @@ export default function PotCard({
 
 return (
   <div
-    className="position-relative d-flex flex-column"
+    className={`relative flex flex-col rounded-2xl transition-all duration-300 border-2 ${
+      isWinner && currentPhase === 'resultAnnounceTimer'
+        ? 'bg-gradient-to-b from-green-700 to-green-900 border-green-500 shadow-[0_0_30px_rgba(34,197,94,0.5)]'
+        : 'bg-gradient-to-b from-slate-800 to-slate-950 border-slate-700'
+    } ${
+      currentPhase === 'bettingTimer' ? 'cursor-pointer opacity-100' : 'cursor-not-allowed opacity-80'
+    }`}
     style={{
-      background: isWinner && currentPhase === "resultAnnounceTimer"
-        ? 'linear-gradient(180deg, #2d7a2d 0%, #1a4d1a 100%)'
-        : 'linear-gradient(180deg, #8b2e3e 0%, #5a1d29 100%)',
-      border: isWinner && currentPhase === "resultAnnounceTimer" 
-        ? '2px solid #22c55e' 
-        : '2px solid rgba(139, 69, 82, 0.8)',
-      boxShadow: isWinner && currentPhase === "resultAnnounceTimer"
-        ? '0 0 30px rgba(34, 197, 94, 0.5), 0 12px 30px rgba(0, 0, 0, 0.5)'
-        : '0 8px 20px rgba(0, 0, 0, 0.6)',
-      cursor: currentPhase === 'bettingTimer' ? 'pointer' : 'not-allowed',
-      transition: 'all 0.3s ease',
-      opacity: currentPhase === 'bettingTimer' ? 1 : 0.8,
-      borderRadius: '16px',
-      padding: '10px',
       width: '100px',
-      minHeight: '180px',
+      minHeight: '140px',
     }}
     onClick={handlePotClick}
   >
-    {/* Pot Header with lighter background */}
-    <div
-      className="text-center w-full"
-      style={{
-        background: 'linear-gradient(180deg, rgba(139, 69, 82, 0.6) 0%, rgba(107, 31, 43, 0.6) 100%)',
-        borderRadius: '10px',
-        padding: '6px 10px',
-        marginBottom: '12px',
-        border: '1px solid rgba(255, 255, 255, 0.1)',
-      }}
-    >
-      <div
-        className="text-white fw-bold"
-        style={{
-          fontSize: '11px',
-          lineHeight: '1.2',
-          letterSpacing: '0.5px',
-        }}
-      >
-        pot {totalBet.toLocaleString()}
+    {/* Pot Header - Single Line */}
+    <div className="bg-slate-700/50 rounded-t-xl px-2 py-1.5 text-center border-b border-slate-600">
+      <div className="text-white font-bold text-[10px] sm:text-xs whitespace-nowrap">
+        POT {totalBet.toLocaleString()}
       </div>
     </div>
 
-    {/* Cards - Centered */}
-    <div
-      className="d-flex justify-content-center align-items-center"
-      style={{ 
-        gap: '5px',
-        marginBottom: '12px',
-      }}
-    >
+    {/* Cards Section - Larger & More Visible, Minimal Spacing */}
+    <div className="flex justify-center items-start gap-0.5 px-0.5 py-1.5">
       {displayCards.map((cardUrl, idx) => (
         <div
           key={idx}
-          className="overflow-hidden card-flip"
+          className="bg-white rounded border border-slate-400 shadow-md overflow-hidden"
           style={{
-            perspective: '600px',
-            transformStyle: 'preserve-3d',
-            width: '28px',
-            height: '42px',
-            boxShadow: '0 4px 8px rgba(0,0,0,0.5)',
-            borderRadius: '4px',
+            width: '30px',
+            height: '45px',
           }}
         >
           <img
             src={`${process.env.NEXT_PUBLIC_BACKEND_ASSET_URL}/${cardUrl}`}
             alt={`Card ${idx}`}
-            className="w-100 h-100"
-            style={{ objectFit: 'cover' }}
+            className="w-full h-full object-cover"
           />
         </div>
       ))}
     </div>
 
-    {/* Multiplier */}
-    <div
-      className="text-center text-warning fw-bold"
-      style={{
-        fontSize: '13px',
-        marginBottom: '12px',
-        opacity: 0.9,
-      }}
-    >
-      x2.9
-    </div>
-
-    {/* Coins Container */}
+    {/* Coins Container - No Background, Maximum Width */}
     <div
       ref={coinsContainerRef}
-      className="position-relative mt-auto"
+      className="relative mt-auto mx-0.5 mb-1.5 rounded-lg overflow-hidden"
       style={{
-        width: '100%',
-        height: '45px',
-        background: 'rgba(0,0,0,0.35)',
-        overflow: 'hidden',
-        borderRadius: '8px',
+        width: 'calc(100% - 4px)',
+        height: '85px',
       }}
     >
+      {/* Multiplier as placeholder text when no coins */}
+      {coins.length === 0 && (
+        <div className="absolute inset-0 flex items-center justify-center text-amber-500 font-bold text-sm opacity-40">
+          2.9x
+        </div>
+      )}
+      
       {coins.map(coin => {
-        const thisCoinColor = coinColorMap[coin.value] || '#ffffff55';
+        const thisCoinColor = coinColorMap[coin.value] || '#94a3b8';
         return (
           <div
             key={coin.id}
-            className="position-absolute rounded-circle d-flex align-items-center justify-content-center fw-bold text-white select-none"
+            className="absolute rounded-full flex items-center justify-center font-bold text-white select-none shadow-lg"
             style={{
               width: '18px',
               height: '18px',
               left: `${coin.x}px`,
               top: `${coin.y}px`,
               background: `radial-gradient(circle at 30% 30%, ${thisCoinColor}, ${thisCoinColor}dd)`,
-              border: '2px solid rgba(255,255,255,0.3)',
+              border: '2px solid rgba(255,255,255,0.4)',
               fontSize: '7px',
-              boxShadow: '0 2px 8px rgba(0,0,0,0.3)',
-              transform: coin.isAnimating ? 'translateY(-50px)' : 'translateY(0)',
+              transform: coin.isAnimating ? 'translateY(-60px)' : 'translateY(0)',
               opacity: coin.isAnimating ? 0 : 1,
               animation: coin.isAnimating ? 'coinDrop 0.5s forwards' : 'none',
             }}
@@ -348,24 +304,8 @@ return (
 
     <style jsx>{`
       @keyframes coinDrop {
-        0% { transform: translateY(-50px); opacity: 0; }
+        0% { transform: translateY(-60px); opacity: 0; }
         100% { transform: translateY(0); opacity: 1; }
-      }
-
-      .card-flip {
-        transition: transform 0.6s ease;
-      }
-      .card-flip.flip {
-        transform: rotateY(180deg) translateX(2px);
-        animation: vibrate 0.2s linear 0s 4;
-      }
-
-      @keyframes vibrate {
-        0% { transform: rotate(0deg); }
-        25% { transform: rotate(1deg); }
-        50% { transform: rotate(-1deg); }
-        75% { transform: rotate(1deg); }
-        100% { transform: rotate(0deg); }
       }
     `}</style>
 
