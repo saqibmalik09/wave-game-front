@@ -110,12 +110,12 @@ export default function TopBar() {
                 x="130"
                 y="43"
                 textAnchor="middle"
-                fontSize="13"
+                fontSize="14"
                 fontWeight="700"
                 fill="#FFC17B"
-                style={{ letterSpacing: '0.4px' }}
+                style={{ letterSpacing: '0.5px' }}
               >
-                Maximum bet 10000k
+                Maximum bet 100000k
               </text>
             </svg>
           </div>
@@ -136,12 +136,12 @@ export default function TopBar() {
               <div
                 className="rounded-circle d-flex align-items-center justify-content-center fw-bold"
                 style={{
-                  width: 'clamp(12px, 1vw, 12px)',
-                  height: 'clamp(12px, 1vw, 12px)',
+                  width: 'clamp(10px, 1vw, 10px)',
+                  height: 'clamp(10px, 1vw, 10px)',
                   background: 'linear-gradient(135deg, #ffd700, #ffed4e)',
                   color: '#000',
-                  fontSize: 'clamp(8px, 1vw, 7px)',
-                  minWidth: '10px',
+                  fontSize: 'clamp(8px, 1vw, 8px)',
+                  minWidth: '8px',
                 }}
               >
                 G
