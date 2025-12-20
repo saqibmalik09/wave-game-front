@@ -18,8 +18,10 @@ import { gameConfiguration as fetchGameConfiguration, tanantDetailsByAppKey } fr
 import { placeTeenpattiBet, teenpattiGameTableJoin, useTeenpattiBetResponseListener } from '@/lib/socket/game/teenpatti/teenpattiSocketEventHandler';
 import { useDispatch, useSelector } from "react-redux";
 import { setGameConfiguration } from '@/lib/redux/slices/teenpatti/gameConfiguration';
+import { setTenantDetails } from '@/lib/redux/slices/tenantDetails';
 import { setUserPlayerInfo } from '@/lib/redux/slices/userSlice';
 import { setPendingCoin } from '@/lib/redux/slices/teenpatti/coinDropAnimation';
+import { v4 as uuidv4 } from 'uuid';
 import { RootState } from '@/lib/redux/store';
 import GameLoading from "@/app/components/GameLoading";
 
@@ -294,7 +296,7 @@ export default function TeenPattiGame() {
 
   const pots = gameConfig?.cardImages.map((cards: string[], idx: number) => ({
     potIndex: idx,
-     potName: `Pot ${String.fromCharCode(65 + idx)}`, 
+    potName: `Pot ${String.fromCharCode(65 + idx)}`,
     totalBet: 1000 * (idx + 1),
     betCoins: gameConfig.bettingCoins,
     cardImages: cards,
@@ -314,23 +316,104 @@ export default function TeenPattiGame() {
   }
 
   return (
-    <></>
+    <>
+      <div className="relative w-full min-h-screen max-w-md mx-auto overflow-hidden" >
+
+        {/* Top Bar - Fixed at top */}
+        <div className="absolute top-0 left-0 w-full z-50">
+          <TopBar />
+        </div>
+
+        {/* Left Players List - Absolute positioned */}
+        <div className="absolute left-2 top-[15%] z-40">
+          <PlayersList />
+        </div>
+
+        {/* Pots Container - Positioned at 68% from top */}
+        <div className="absolute top-[68%] left-1/2 z-30 -translate-x-1/2 -translate-y-1/2 flex gap-2 px-3">
+          {pots.map((pot) => (
+            <React.Fragment key={pot.potIndex}>
+
+              {/* Timer above POT 0 */}
+              {pot.potIndex === 0 && (
+                <span className="absolute -top-24 left-[16%] -translate-x-1/2 z-40">
+                  <Timer />
+                </span>
+              )}
+
+              {/* Yellow Label above POT 1 */}
+              {pot.potIndex === 1 && currentPhase && phaseLabels[currentPhase] && (
+                <span className="absolute -top-14 left-[50%] -translate-x-1/2 z-40 pointer-events-none">
+                  <span
+                    className="relative flex items-center justify-center select-none"
+                    style={{
+                      minWidth: "clamp(70px, 25vw, 110px)",
+                      height: "clamp(22px, 7vw, 28px)",
+                      padding: "0 10px",
+                      borderRadius: "14px",
+                      background: "linear-gradient(180deg, #f4d27a 0%, #e9b94f 100%)",
+                      boxShadow:
+                        "0 2px 6px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.4)",
+                      color: "#3b2400",
+                      fontSize: "clamp(10px, 1.8vw, 12px)",
+                      fontWeight: 600,
+                      letterSpacing: "0.4px",
+                      textTransform: "uppercase",
+                    }}
+                  >
+                    <span
+                      style={{
+                        width: 6,
+                        height: 6,
+                        borderRadius: "50%",
+                        background: "#3b2400",
+                        opacity: 0.6,
+                        marginRight: 6,
+                      }}
+                    />
+                    {phaseLabels[currentPhase]}
+                  </span>
+                </span>
+              )}
+
+              <PotCard {...pot} />
+            </React.Fragment>
+          ))}
+        </div>
+
+        {/* Coin Tray - Fixed at bottom */}
+        <div className="absolute bottom-0 left-0 w-full z-40">
+          <CoinTray key={gameConfig?.gameId ?? "default"} />
+        </div>
+
+        {/* Modals */}
+        <MessageModal
+          show={showModal}
+          header={modalMessage.title}
+          message={modalMessage.message}
+          onClose={() => setShowModal(false)}
+        />
+        <ResultModal />
+        <ToastContainer />
+      </div>
+
+    </>
     // <div className="w-xs min-h-full flex items-center justify-center text-white  ">
 
     //   <div className="w-full min-w-2xs min-h-screen max-w-xl relative overflow-hidden">
 
     //     {/* TOP BAR */}
-    //     <div className="absolute w-full">
-    //       <TopBar />
-    //     </div>
+    // <div className="absolute w-full">
+    //   <TopBar />
+    // </div>
 
     //     {/* PLAYER LIST + TIMER ROW */}
     //     <div className="  left-0 w-full flex z-40">
 
     //       {/* LEFT PLAYER LIST */}
-    //       <div className=" absolute flex-shrink-0 top-[10%]">
-    //         <PlayersList />
-    //       </div>
+    // <div className=" absolute flex-shrink-0 top-[10%]">
+    //   <PlayersList />
+    // </div>
     //       {/*  in center responsive dealer avatar image png  `${process.env.NEXT_PUBLIC_BACKEND_ASSET_URL}/${gameConfig?.dealerAvatar} make sure */}
 
     //         <div className="absolute flex justify-center top-[20%] left-[15%]">
@@ -376,9 +459,9 @@ export default function TeenPattiGame() {
     //         <React.Fragment key={pot.potIndex}>
     //           {/* === TIMER ABOVE POT 0 === */}
     //           {pot.potIndex === 0 && (
-    //             <span className="absolute -top-13 left-1/6 -translate-x-1/2 z-40">
-    //               <Timer />
-    //             </span>
+    // <span className="absolute -top-13 left-1/6 -translate-x-1/2 z-40">
+    //   <Timer />
+    // </span>
     //           )}
 
     //           {/* === YELLOW LABEL ABOVE POT 1 === */}
@@ -424,9 +507,9 @@ export default function TeenPattiGame() {
 
 
     //     {/* COIN TRAY (bottom) */}
-    //     <div className="absolute bottom-0 left-0 w-full z-40">
-    //       <CoinTray key={gameConfig?.gameId ?? "default"} />
-    //     </div>
+    // <div className="absolute bottom-0 left-0 w-full z-40">
+    //   <CoinTray key={gameConfig?.gameId ?? "default"} />
+    // </div>
 
     //     {/* MODALS */}
     //     <MessageModal
