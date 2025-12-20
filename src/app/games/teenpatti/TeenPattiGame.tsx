@@ -336,14 +336,14 @@ export default function TeenPattiGame() {
 
               {/* Timer above POT 0 */}
               {pot.potIndex === 0 && (
-                <span className="absolute -top-24 left-[16%] -translate-x-1/2 z-40">
+                <span className="absolute -top-9 left-[16%] -translate-x-1/2 z-40">
                   <Timer />
                 </span>
               )}
 
               {/* Yellow Label above POT 1 */}
               {pot.potIndex === 1 && currentPhase && phaseLabels[currentPhase] && (
-                <span className="absolute -top-14 left-[50%] -translate-x-1/2 z-40 pointer-events-none">
+                <span className="absolute -top-8 left-[50%] -translate-x-1/2 z-40 pointer-events-none">
                   <span
                     className="relative flex items-center justify-center select-none"
                     style={{
