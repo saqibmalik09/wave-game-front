@@ -99,14 +99,14 @@ export default function CoinTray() {
 
   return (
     <div
-      className="position-fixed bottom-0 start-50 translate-middle-x mb-2"
+      className="position-fixed bottom-0 start-50 translate-middle-x mb-0"
       style={{ zIndex: 50, width: '100%', maxWidth: '100%' }}
     >
       <div
         className="rounded-pill d-flex align-items-center gap-1 justify-content-center flex-nowrap"
         style={{
           // background: 'rgba(0, 0, 0, 0.7)',
-          backdropFilter: 'blur(10px)',
+          // backdropFilter: 'blur(10px)',
           // boxShadow: '0 0.5rem 2rem rgba(0, 0, 0, 0.5)',
           overflow: 'hidden',
           padding: '0.15rem clamp(0.20rem, 1.5vw, 0.5rem)',
@@ -132,7 +132,7 @@ export default function CoinTray() {
           >
             <span className="fw-bold" style={{ color: '#000' }}>G</span>
           </div>
-          <div className="d-flex flex-column ">
+          <div className="d-flex flex-column  ">
             <small className="text-secondary" style={{ fontSize: 'clamp(5px, 1.2vw, 10px)' }}>
               Balance
             </small>

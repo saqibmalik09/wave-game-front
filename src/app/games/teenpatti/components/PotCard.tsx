@@ -229,14 +229,15 @@ return (
       currentPhase === 'bettingTimer' ? 'cursor-pointer opacity-100' : 'cursor-not-allowed opacity-80'
     }`}
     style={{
-      width: '100px',
-      minHeight: '140px',
+      width: '80px',
+      minHeight:'30px',
+      maxHeight: '115px',
     }}
     onClick={handlePotClick}
   >
     {/* Pot Header - Single Line */}
-    <div className="bg-slate-700/50 rounded-t-xl px-2 py-1.5 text-center border-b border-slate-600">
-      <div className="text-white font-bold text-[10px] sm:text-xs whitespace-nowrap">
+    <div className="bg-slate-700/50 rounded-t-xl px-2 py-0.5 text-center border-b border-slate-600">
+      <div className="text-white font-bold text-[7px] sm:text-xs whitespace-nowrap">
         POT {totalBet.toLocaleString()}
       </div>
     </div>
@@ -248,8 +249,8 @@ return (
           key={idx}
           className="bg-white rounded border border-slate-400 shadow-md overflow-hidden"
           style={{
-            width: '30px',
-            height: '45px',
+            width: '25px',
+            height: '35px',
           }}
         >
           <img
@@ -272,7 +273,7 @@ return (
     >
       {/* Multiplier as placeholder text when no coins */}
       {coins.length === 0 && (
-        <div className="absolute inset-0 flex items-center justify-center text-amber-500 font-bold text-sm opacity-40">
+        <div className="absolute inset-0 flex items-center justify-center text-amber-500 font-bold text-xs opacity-40">
           2.9x
         </div>
       )}
