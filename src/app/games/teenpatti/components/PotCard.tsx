@@ -230,7 +230,7 @@ return (
     }`}
     style={{
       width: '80px',
-      minHeight:'30px',
+      minHeight:'35px',
       maxHeight: '100px',
     }}
     onClick={handlePotClick}

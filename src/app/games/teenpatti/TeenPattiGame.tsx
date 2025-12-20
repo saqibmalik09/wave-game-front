@@ -330,7 +330,7 @@ export default function TeenPattiGame() {
         </div>
 
         {/* Pots Container - Positioned at 68% from top */}
-        <div className="absolute top-[76%] left-1/2 z-30 -translate-x-1/2 -translate-y-1/2 flex gap-2 px-3">
+        <div className="absolute top-[74%] left-1/2 z-30 -translate-x-1/2 -translate-y-1/2 flex gap-2 px-3">
           {pots.map((pot) => (
             <React.Fragment key={pot.potIndex}>
 
@@ -347,9 +347,9 @@ export default function TeenPattiGame() {
                   <span
                     className="relative flex items-center justify-center select-none"
                     style={{
-                      minWidth: "clamp(70px, 25vw, 110px)",
-                      height: "clamp(22px, 7vw, 28px)",
-                      padding: "0 10px",
+                      minWidth: "clamp(70px, 22vw, 110px)",
+                      height: "clamp(22px, 7vw, 18px)",
+                      padding: "0 6px",
                       borderRadius: "14px",
                       background: "linear-gradient(180deg, #f4d27a 0%, #e9b94f 100%)",
                       boxShadow:
