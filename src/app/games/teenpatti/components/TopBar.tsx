@@ -28,7 +28,7 @@ export default function TopBar() {
   };
 
   return (
-    <div  className="sticky w-full" >
+    <div className="sticky w-full" >
       <div className="container mx-auto" >
         <div
           className="d-flex justify-content-between align-items-center rounded-pill"
@@ -53,16 +53,16 @@ export default function TopBar() {
 
 
           {/* Center: Maximum Bet */}
-          <div className="d-md-block m-0 p-0" style={{ maxWidth: '100%' }}>
+          <div className="d-md-block p-0" style={{ maxWidth: '100%', marginTop:"-3px" }}>
             <svg
               viewBox="0 0 260 70"
               xmlns="http://www.w3.org/2000/svg"
               style={{
                 display: 'block',
-                width: 'clamp(110px, 14vw, 160px)', // 🔥 responsive width
-                height: 'auto',                    // keeps ratio
+                width: 'clamp(110px, 14vw, 160px)',
+                height: 'auto',
                 maxWidth: '100%',
-                pointerEvents: 'none',              // UI safe
+                pointerEvents: 'none',
                 userSelect: 'none',
               }}
               preserveAspectRatio="xMidYMid meet"
@@ -105,17 +105,29 @@ export default function TopBar() {
               {/* TOP SHADOW */}
               <rect x="16" y="9" width="228" height="12" fill="#000" opacity="0.25" />
 
-              {/* TEXT */}
+              {/* TEXT - TWO ROWS */}
               <text
                 x="130"
-                y="43"
+                y="30"
+                textAnchor="middle"
+                fontSize="16"
+                fontWeight="600"
+                fill="#FFC17B"
+                style={{ letterSpacing: '0.5px' }}
+              >
+                Maximum bet
+              </text>
+
+              <text
+                x="130"
+                y="48"
                 textAnchor="middle"
                 fontSize="14"
                 fontWeight="700"
                 fill="#FFC17B"
                 style={{ letterSpacing: '0.5px' }}
               >
-                Maximum bet 100000k
+                100000k
               </text>
             </svg>
           </div>

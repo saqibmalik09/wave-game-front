@@ -107,7 +107,7 @@ export default function ResultModal() {
     <div
       className="position-fixed top-50 start-50 translate-middle rounded-4 overflow-hidden"
       style={{
-        width: '50%',
+        width: '60%',
         maxWidth: '250px', // 🔹 SMALL SCREEN
         background: 'linear-gradient(180deg, #6b1f2b 0%, #4a1520 100%)',
         boxShadow: '0 20px 60px rgba(0,0,0,0.7)',
@@ -115,8 +115,7 @@ export default function ResultModal() {
         animation: 'scaleIn 0.25s ease',
       }}
     >
-      {/* Close */}
-      <button
+      {/* <button
         onClick={handleClose}
         className="btn btn-dark position-absolute top-0 end-0 rounded-circle"
         style={{
@@ -127,7 +126,7 @@ export default function ResultModal() {
         }}
       >
         ×
-      </button>
+      </button> */}
 
       {/* Header */}
       <div className="text-center pt-2 pb-2 px-2">
