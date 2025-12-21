@@ -212,7 +212,7 @@ export function teenpattiAnnounceGameResult() {
       // console.log('[TeenPatti]  Game teenpattiAnnounceGameResultResponse Pot Bets And Users received successfully:');
       // console.table(data);
     } else {
-      // console.error('[TeenPatti] ❌ Game teenpattiAnnounceGameResultResponse failed:', data.message || data);
+      // console.error('[TeenPatti]  Game teenpattiAnnounceGameResultResponse failed:', data.message || data);
     }
   };
   socket.on('teenpattiAnnounceGameResultResponse', teenpattiAnnounceGameResultResponse);

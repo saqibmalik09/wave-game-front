@@ -5,7 +5,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import { setCoin } from '@/lib/redux/slices/teenpatti/selectedCoinSlice';
 import { SoundManager } from '../game/SoundManager';
 import { RootState } from '@/lib/redux/store';
-import { myMessagesFromServer } from '@/lib/socket/game/teenpatti/teenpattiSocketEventHandler';
 import { useToast } from './Toast';
 
 interface CoinButtonProps {
@@ -87,9 +86,7 @@ export default function CoinTray() {
       dispatch(setCoin({ amount, color }));
     }
   }, [bettingCoins, colors, dispatch]);
-    myMessagesFromServer((message)=>{
-      showToast(`You won ${message.winningAmount}`,'success')
-    })
+  
      const onClickCoin = (amount: number, color: string) => {
       SoundManager.getInstance().play('betButtonAndCardClickSound');
 
@@ -115,6 +112,7 @@ export default function CoinTray() {
       >
         {/* Balance */}
         <div
+        data-balance-area 
           className="d-flex align-items-center gap-1 px-2  rounded-pill flex-shrink-0 select-none"
           style={{
             background: 'rgba(0, 0, 0, 0.5)',

@@ -15,15 +15,16 @@ import MessageModal from '@/app/components/messageModel';
 import Timer from './components/Timer';
 import { useToast } from './components/Toast';
 import { gameConfiguration as fetchGameConfiguration, tanantDetailsByAppKey } from '@/lib/socket/socketEventHandlers';
-import { placeTeenpattiBet, teenpattiGameTableJoin, useTeenpattiBetResponseListener } from '@/lib/socket/game/teenpatti/teenpattiSocketEventHandler';
+import { myMessagesFromServer, placeTeenpattiBet, teenpattiGameTableJoin, useTeenpattiBetResponseListener } from '@/lib/socket/game/teenpatti/teenpattiSocketEventHandler';
 import { useDispatch, useSelector } from "react-redux";
 import { setGameConfiguration } from '@/lib/redux/slices/teenpatti/gameConfiguration';
 import { setTenantDetails } from '@/lib/redux/slices/tenantDetails';
-import { setUserPlayerInfo } from '@/lib/redux/slices/userSlice';
+import { incrementUserBalance, setUserPlayerInfo } from '@/lib/redux/slices/userSlice';
 import { setPendingCoin } from '@/lib/redux/slices/teenpatti/coinDropAnimation';
 import { v4 as uuidv4 } from 'uuid';
 import { RootState } from '@/lib/redux/store';
 import GameLoading from "@/app/components/GameLoading";
+import { CoinsAnimation } from './components/CoinsAnimation';
 
 interface TenantData {
   success: boolean;
@@ -92,6 +93,13 @@ export default function TeenPattiGame() {
   const [playerData, setPlayerData] = useState<UserData | null>(null);
   // const [tenantData, setTenantData] = useState<TenantData>();
   const [modalMessage, setModalMessage] = useState({ title: "", message: "" });
+  const [coinAnimation, setCoinAnimation] = useState({isActive: false,amount: 0,potIndex: 0});
+  const [potBetSum, setPotBetSum] = useState<Record<number, number>>({
+    0: 600,
+    1: 60,
+    2: 666,
+  });
+
   const user = useSelector((state: RootState) => state.userPlayerData);
   const gameId = React.useMemo(() => ({ gameId: 16 }), []);
   const idNumber = gameId.gameId;
@@ -199,7 +207,17 @@ export default function TeenPattiGame() {
       fetchUserInfo(); // <-- call here
     }
   }, [currentPhase]);
-
+  myMessagesFromServer((message)=>{
+    if(message.betType==2 && message.winningAmount>0){
+         setCoinAnimation({
+          isActive: true,
+          amount: message.winningAmount,
+          potIndex:message.winningPotIndex,
+          
+        });
+     dispatch(incrementUserBalance(message.winningAmount));
+    }
+  })
   useTeenpattiBetResponseListener((data) => {
     if (data.success) {
       // showToast(data.message ?? `Bet placed: ₹${data.amount}`, "success");
@@ -213,48 +231,34 @@ export default function TeenPattiGame() {
       showToast(data.message ?? "Bet failed!", "error");
     }
   });
-
+  const handleCoinAnimationComplete = () => {
+    setCoinAnimation(prev => ({ ...prev, isActive: false }));
+  };
   useEffect(() => {
     if (!latestBet || !userInfo || !tenant) return;
-    const cachedApplicationInfo = getCache("applicationInfo") || {};
-    const socketId = cachedApplicationInfo.socketId || "";
-    const connectionUserId = playerData ? playerData.id : user.data?.id;
-    if (!connectionUserId) {
-      console.log("User ID is missing, cannot place bet.");
-      return;
-    }
-    let tenantBaseURL;
-    if (tenant.environemnt === "production") {
-      tenantBaseURL = tenant.tenantProductionDomain;
-    } else {
-      tenantBaseURL = tenant.tenantTestingDomain;
-    }
-    if (!tenantBaseURL) {
-      MessageModal({
-        show: true,
-        header: "Tenant URL Missing",
-        message: "Cannot place bet without tenant base URL.",
-        onClose: () => { },
-      });
-      setShowModal(true);
-      return;
-    }
-    const betData = {
-      userId: connectionUserId.toString(),
-      amount: latestBet.amount,
-      tableId: latestBet.tableId,
-      betType: latestBet.betType,
-      potIndex: String(latestBet.potIndex), // cast to string
-      socketId: String(socketId),
-      appKey: userInfo.appKey!,
-      token: userInfo.token!,
-      gameId: userInfo.gameId!,
-      tenantBaseURL: tenantBaseURL || "",
-    };
-    placeTeenpattiBet(betData);
+   
+    const potIndex = Number(latestBet.potIndex);
+    const betAmount = Number(latestBet.amount);
+        setPotBetSum((prev) => {
+      const newSum = {
+        ...prev,
+        [potIndex]: (prev[potIndex] || 0) + betAmount,
+      };
+      console.log("Updated potBetSum:", newSum); 
+      return newSum;
+    })
+  
   }, [latestBet]);
 
-
+useEffect(() => {
+    if (currentPhase === 'newGameStartTimer') {
+      setPotBetSum({
+        0: 0,
+        1: 0,
+        2: 0,
+      });
+    }
+  }, [currentPhase]);
   // const onCardClick = () => SoundManager.getInstance().play('betButtonAndCardClickSound');
   // const onShuffleCards = () => SoundManager.getInstance().play('cardsShuffleSound');
 
@@ -297,7 +301,7 @@ export default function TeenPattiGame() {
   const pots = gameConfig?.cardImages.map((cards: string[], idx: number) => ({
     potIndex: idx,
     potName: `Pot ${String.fromCharCode(65 + idx)}`,
-    totalBet: 1000 * (idx + 1),
+    totalBet: potBetSum[idx]??10,
     betCoins: gameConfig.bettingCoins,
     cardImages: cards,
     cardBackImages: gameConfig.cardBackImages[idx],
@@ -316,88 +320,94 @@ export default function TeenPattiGame() {
   }
 
   return (
-    <>
-      <div className="relative w-full min-h-screen max-w-md mx-auto overflow-hidden" >
+      <>
+        <div className="relative w-full min-h-screen max-w-md mx-auto overflow-hidden" >
 
-        {/* Top Bar - Fixed at top */}
-        <div className="absolute top-0 left-0 w-full z-50">
-          <TopBar />
-        </div>
+          {/* Top Bar - Fixed at top */}
+          <div className="absolute top-0 left-0 w-full z-50">
+            <TopBar />
+          </div>
 
-        {/* Left Players List - Absolute positioned */}
-        <div className="absolute left-2 top-[15%] z-40">
-          <PlayersList />
-        </div>
+          {/* Left Players List - Absolute positioned */}
+          <div className="absolute left-2 top-[15%] z-40">
+            <PlayersList />
+          </div>
 
-        {/* Pots Container - Positioned at 68% from top */}
-        <div className="absolute top-[71%] left-1/2 z-30 -translate-x-1/2 -translate-y-1/2 flex gap-2 px-3">
-          {pots.map((pot) => (
-            <React.Fragment key={pot.potIndex}>
+          {/* Pots Container - Positioned at 68% from top */}
+          <div className="absolute top-[71%] left-1/2 z-30 -translate-x-1/2 -translate-y-1/2 flex gap-2 px-3">
+            {pots.map((pot) => (
+              <React.Fragment key={pot.potIndex}>
 
-              {/* Timer above POT 0 */}
-              {pot.potIndex === 0 && (
-                <span className="absolute -top-9 left-[16%] -translate-x-1/2 z-40">
-                  <Timer />
-                </span>
-              )}
-
-              {/* Yellow Label above POT 1 */}
-              {pot.potIndex === 1 && currentPhase && phaseLabels[currentPhase] && (
-                <span className="absolute -top-7 left-[50%] -translate-x-1/2 z-40 pointer-events-none">
-                  <span
-                    className="relative flex items-center justify-center select-none"
-                    style={{
-                      minWidth: "clamp(40px, 14vw, 30px)",
-                      height: "clamp(15px, 4vw, 12px)",
-                      padding: "0 4px",
-                      borderRadius: "10px",
-                      background: "linear-gradient(180deg, #f4d27a 0%, #e9b94f 100%)",
-                      boxShadow:
-                        "0 2px 6px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.4)",
-                      color: "#3b2400",
-                      fontSize: "clamp(8px, 0.5vw, 7px)",
-                      fontWeight: 600,
-                      letterSpacing: "0.4px",
-                      textTransform: "uppercase",
-                    }}
-                  >
-                    <span
-                      style={{
-                        width: 6,
-                        height: 6,
-                        borderRadius: "50%",
-                        background: "#3b2400",
-                        opacity: 0.6,
-                        marginRight: 6,
-                      }}
-                    />
-                    {phaseLabels[currentPhase]}
+                {/* Timer above POT 0 */}
+                {pot.potIndex === 0 && (
+                  <span className="absolute -top-9 left-[16%] -translate-x-1/2 z-40">
+                    <Timer />
                   </span>
-                </span>
-              )}
+                )}
 
-              <PotCard {...pot} />
-            </React.Fragment>
-          ))}
-        </div>
+                {/* Yellow Label above POT 1 */}
+                {pot.potIndex === 1 && currentPhase && phaseLabels[currentPhase] && (
+                  <span className="absolute -top-7 left-[50%] -translate-x-1/2 z-40 pointer-events-none">
+                    <span
+                      className="relative flex items-center justify-center select-none"
+                      style={{
+                        minWidth: "clamp(40px, 14vw, 30px)",
+                        height: "clamp(15px, 4vw, 12px)",
+                        padding: "0 4px",
+                        borderRadius: "10px",
+                        background: "linear-gradient(180deg, #f4d27a 0%, #e9b94f 100%)",
+                        boxShadow:
+                          "0 2px 6px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.4)",
+                        color: "#3b2400",
+                        fontSize: "clamp(8px, 0.5vw, 7px)",
+                        fontWeight: 600,
+                        letterSpacing: "0.4px",
+                        textTransform: "uppercase",
+                      }}
+                    >
+                      <span
+                        style={{
+                          width: 6,
+                          height: 6,
+                          borderRadius: "50%",
+                          background: "#3b2400",
+                          opacity: 0.6,
+                          marginRight: 6,
+                        }}
+                      />
+                      {phaseLabels[currentPhase]}
+                    </span>
+                  </span>
+                )}
 
-        {/* Coin Tray - Fixed at bottom */}
-        <div className="absolute bottom-0 left-0 w-full z-40">
-          <CoinTray key={gameConfig?.gameId ?? "default"} />
-        </div>
+                <PotCard {...pot} />
+              </React.Fragment>
+            ))}
+          </div>
 
-        {/* Modals */}
-        <MessageModal
-          show={showModal}
-          header={modalMessage.title}
-          message={modalMessage.message}
-          onClose={() => setShowModal(false)}
+          {/* Coin Tray - Fixed at bottom */}
+          <div className="absolute bottom-0 left-0 w-full z-40">
+            <CoinTray key={gameConfig?.gameId ?? "default"} />
+          </div>
+
+          {/* Modals */}
+          <MessageModal
+            show={showModal}
+            header={modalMessage.title}
+            message={modalMessage.message}
+            onClose={() => setShowModal(false)}
+          />
+          <ResultModal />
+          <ToastContainer />
+          <CoinsAnimation
+          isActive={coinAnimation.isActive}
+          amount={coinAnimation.amount}
+          potIndex={coinAnimation.potIndex}
+          onComplete={handleCoinAnimationComplete}
         />
-        <ResultModal />
-        <ToastContainer />
-      </div>
+        </div>
 
-    </>
+      </>
     // <div className="w-xs min-h-full flex items-center justify-center text-white  ">
 
     //   <div className="w-full min-w-2xs min-h-screen max-w-xl relative overflow-hidden">

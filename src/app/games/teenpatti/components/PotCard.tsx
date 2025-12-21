@@ -61,6 +61,8 @@ export default function PotCard({
   const bettingCoins: number[] = gameConfig?.bettingCoins || [];
   const colors: string[] = gameConfig?.colors || [];
   const tableBackgroundImage = gameConfig?.tableBackgroundImage;
+  const [announcedWinner, setAnnouncedWinner] = useState<string | null>(null);
+  const [winner, setWinner] = useState<string | null>(null);
 
   const coinColorMap: Record<number, string> = {};
   bettingCoins.forEach((value, index) => {
@@ -72,15 +74,41 @@ export default function PotCard({
   const apiCoinsAnimated = useRef(false);
   const previousPhase = useRef(currentPhase);
   const [displayCards, setDisplayCards] = useState<string[]>(cardBackImages);
-
+  const [isCollecting, setIsCollecting] = useState(false);
   // ✅ Clear coins when phase changes
+  console.log("totalBet:",totalBet)
+  useEffect(() => {
+  console.log("isWinner:",isWinner)
+  if (!isWinner) return;
+
+  // prevent duplicate announcement
+  if (announcedWinner === winner) return;
+  setAnnouncedWinner(winner);
+}, [isWinner]);
+
   useEffect(() => {
     if (currentPhase !== 'bettingTimer') {
-      setCoins([]);
-      apiCoinsAnimated.current = false;
+      if (!(currentPhase === 'resultAnnounceTimer' && isWinner)) {
+        apiCoinsAnimated.current = false;
+        setIsCollecting(false);
+      }
     }
-  }, [currentPhase]);
+  }, [currentPhase, isWinner]);
+  useEffect(() => {
+    if(currentPhase=="winningCalculationTimer"){
+      setCoins([]);
+    }
+    if (currentPhase === 'resultAnnounceTimer' && isWinner && coins.length > 0) {
+      setIsCollecting(true);
+      
+      // After collection animation, clear coins
+      const timer = setTimeout(() => {
+        // Coins will be cleared after flying animation
+      }, 1000);
 
+      return () => clearTimeout(timer);
+    }
+  }, [currentPhase, isWinner, coins.length]);
   //  Initial coin drop animation (API coins)
   useEffect(() => {
     const phaseJustStarted =
@@ -170,7 +198,7 @@ export default function PotCard({
       setDisplayCards(cardBackImages);
       const timer = setTimeout(() => {
         setDisplayCards(cardImages);
-      }, 2000);
+      }, 500);
       return () => clearTimeout(timer);
     } else {
       setDisplayCards(cardBackImages);
@@ -214,12 +242,21 @@ export default function PotCard({
       gameId: gameId!,
       tenantBaseURL,
     }
+     dispatch(placeBet({
+      userId: currentUserId.toString(),
+      amount: selectedCoinAmount,
+      tableId: 10,
+      betType: 1,
+      potIndex: potIndex, 
+    }));
     placeTeenpattiBet(betData);
+    
   };
 
 
   return (
     <div
+      data-pot-index={potIndex}
       className={`relative flex flex-col rounded-2xl transition-all duration-300 border-2 ${isWinner && currentPhase === 'resultAnnounceTimer'
         ? 'bg-gradient-to-b from-green-700 to-green-900 border-green-500 shadow-[0_0_30px_rgba(34,197,94,0.5)]'
         : 'bg-gradient-to-b from-slate-800 to-slate-950 border-slate-700'
@@ -277,22 +314,24 @@ export default function PotCard({
 
         {coins.map(coin => {
           const thisCoinColor = coinColorMap[coin.value] || '#94a3b8';
-
+          const containerWidth = coinsContainerRef.current?.offsetWidth || 76;
+          const centerX = containerWidth / 2 - 9; // 9 = half of coin width (18px)
+          const centerY = -20;
           return (
             <div
               key={coin.id}
-              className={`absolute rounded-full flex items-center justify-center font-bold
-                text-white select-none shadow-lg
-                ${coin.isAnimating ? 'coin-drop' : ''}
-              `}
+              className={`absolute rounded-full flex items-center justify-center font-bold text-white select-none shadow-lg ${coin.isAnimating ? 'coin-drop' : ''
+                } ${isCollecting ? 'coin-collect' : ''}`}
               style={{
                 width: '18px',
                 height: '18px',
-                left: `${coin.x}px`,
-                top: `${coin.y}px`,
+                left: isCollecting ? `${centerX}px` : `${coin.x}px`,
+                top: isCollecting ? `${centerY}px` : `${coin.y}px`,
                 background: `radial-gradient(circle at 30% 30%, ${thisCoinColor}, ${thisCoinColor}dd)`,
                 border: '2px solid rgba(255,255,255,0.4)',
                 fontSize: '7px',
+                transition: isCollecting ? 'all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1)' : 'none',
+                zIndex: isCollecting ? 10 : 1,
               }}
             >
               {coin.value >= 1000 ? `${coin.value / 1000}k` : coin.value}
@@ -319,7 +358,7 @@ export default function PotCard({
   }
 
   .coin-drop {
-    animation: coinDrop 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+    animation: coinDrop 0.25s cubic-bezier(0.22, 1, 0.36, 1);
     will-change: transform, opacity;
   }
 `}</style>

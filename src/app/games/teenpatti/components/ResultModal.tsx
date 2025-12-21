@@ -38,13 +38,11 @@ export default function ResultModal() {
 
     const handleResult = (response: ResultResponse) => {
       if (!response?.success || !response.data) return;
-
       // If user manually closed, ignore showing again
       if (manualClosed) return;
 
       setResult(response.data);
       dispatch(setWinningPotIndex(response.data.winningPotIndex));
-
       // Clear previous timeout
       if (timeoutRef.current) clearTimeout(timeoutRef.current);
 

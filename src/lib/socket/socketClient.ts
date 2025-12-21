@@ -9,12 +9,14 @@ let userIdGlobal: string | null = null;
 let appKeyGlobal: string | null = null;
 let nameGlobal: string | null = null;
 let profilePictureGlobal: string | null = null;
+let tokenGlobal: string | null = null;
 
 interface InitSocketOptions {
   userId: string;
   appKey: string;
   name: string;
   profilePicture:string;
+  token:string;
 }
 
 /**
@@ -22,7 +24,7 @@ interface InitSocketOptions {
  * Must provide userId, appKey, token.
  * If already initialized, returns existing socket.
  */
-export const initSocket = ({ userId, appKey, name,profilePicture }: InitSocketOptions): Socket => {
+export const initSocket = ({ userId, appKey, name,profilePicture,token }: InitSocketOptions): Socket => {
   
   if (!userId || !appKey || !name || !profilePicture) {
     throw new Error('[Socket] Cannot initialize: missing userId, appKey, or token');
@@ -31,6 +33,7 @@ export const initSocket = ({ userId, appKey, name,profilePicture }: InitSocketOp
   appKeyGlobal = appKey;
   nameGlobal = name;
   profilePictureGlobal=profilePicture;
+  tokenGlobal=token
   // If socket already exists and is connected, just return it
   if (socket && socket.connected) {
     console.log("Socket already connected, reusing:", socket.id);
@@ -44,7 +47,7 @@ export const initSocket = ({ userId, appKey, name,profilePicture }: InitSocketOp
     reconnectionAttempts: Infinity,
     reconnectionDelay: 2000,
     autoConnect: true,
-    query: { userId, appKey, name,profilePicture },
+    query: { userId, appKey, name,profilePicture,token },
   });
 
   socket.on('connect', () => console.log('🔥 Socket Connected:', socket?.id));
@@ -64,8 +67,8 @@ export const getSocket = ()=> {
   //return socket if exist else init socket from global and return 
   if (socket && socket.connected) {
     return socket;
-  } else if (userIdGlobal && appKeyGlobal && nameGlobal &&profilePictureGlobal) { 
-    return initSocket({ userId: userIdGlobal, appKey: appKeyGlobal, name: nameGlobal,profilePicture:profilePictureGlobal });
+  } else if (userIdGlobal && appKeyGlobal && nameGlobal && profilePictureGlobal && tokenGlobal) { 
+    return initSocket({ userId: userIdGlobal, appKey: appKeyGlobal, name: nameGlobal, profilePicture: profilePictureGlobal, token: tokenGlobal });
   }
 };
 
