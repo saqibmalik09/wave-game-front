@@ -95,9 +95,9 @@ export default function TeenPattiGame() {
   const [modalMessage, setModalMessage] = useState({ title: "", message: "" });
   const [coinAnimation, setCoinAnimation] = useState({isActive: false,amount: 0,potIndex: 0});
   const [potBetSum, setPotBetSum] = useState<Record<number, number>>({
-    0: 600,
-    1: 60,
-    2: 666,
+    0: 0,
+    1: 0,
+    2: 0,
   });
 
   const user = useSelector((state: RootState) => state.userPlayerData);
