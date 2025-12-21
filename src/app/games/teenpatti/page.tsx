@@ -87,7 +87,6 @@
               setShowModal(true);
               setLoading(false);
             }
-            console.log("response:",response)
 
             userInfo = response.data;
             dispatch(setUserPlayerInfo({
@@ -103,7 +102,8 @@
             userId: userInfo.id,
             appKey,
             name: userInfo.name,
-            profilePicture: userInfo.profilePicture
+            profilePicture: userInfo.profilePicture,
+            token
           });
           setLoading(false)
           const NewJoiner = {
