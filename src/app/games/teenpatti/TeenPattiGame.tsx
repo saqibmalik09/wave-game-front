@@ -334,7 +334,7 @@ useEffect(() => {
           </div>
 
           {/* Pots Container - Positioned at 68% from top */}
-          <div className="absolute top-69%] left-1/2 z-30 -translate-x-1/2 -translate-y-1/2 flex gap-2 px-3">
+          <div className="absolute top-[70%] left-1/2 z-30 -translate-x-1/2 -translate-y-1/2 flex gap-2 px-3">
             {pots.map((pot) => (
               <React.Fragment key={pot.potIndex}>
 
