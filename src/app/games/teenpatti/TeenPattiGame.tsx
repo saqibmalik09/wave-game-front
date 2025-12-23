@@ -15,7 +15,7 @@ import MessageModal from '@/app/components/messageModel';
 import Timer from './components/Timer';
 import { useToast } from './components/Toast';
 import { gameConfiguration as fetchGameConfiguration, tanantDetailsByAppKey } from '@/lib/socket/socketEventHandlers';
-import { myMessagesFromServer, placeTeenpattiBet, teenpattiGameTableJoin, useTeenpattiBetResponseListener } from '@/lib/socket/game/teenpatti/teenpattiSocketEventHandler';
+import { gameTeenPattiResultAnnounce, myMessagesFromServer, placeTeenpattiBet, teenpattiGameTableJoin, useTeenpattiBetResponseListener } from '@/lib/socket/game/teenpatti/teenpattiSocketEventHandler';
 import { useDispatch, useSelector } from "react-redux";
 import { setGameConfiguration } from '@/lib/redux/slices/teenpatti/gameConfiguration';
 import { setTenantDetails } from '@/lib/redux/slices/tenantDetails';
@@ -86,7 +86,7 @@ export default function TeenPattiGame() {
   const [gameConfig, setGameConfig] = useState<GameConfig>();
   const [userInfo, setUserInfo] = useState<UserInfoType>();
   const latestBet = useAppSelector((s) => s.teenPattiBettingReducer.lastBet);
-  const winningPotIndex = useSelector((s: RootState) => s.winningPot.winningPotIndex);
+  // const winningPotIndex = useSelector((s: RootState) => s.winningPot.winningPotIndex);
   const currentPhase = useSelector((s: RootState) => s.teenpattiTimer.phase);
   const tenant = useSelector((state: RootState) => state.tenantDetails.data);
   const [showModal, setShowModal] = useState(false);
@@ -99,6 +99,13 @@ export default function TeenPattiGame() {
     1: 0,
     2: 0,
   });
+const [winningCards, setWinningCards] = useState<string[] | null>(null);
+const [loserCards, setLoserCards] = useState<{
+  cardsA: string[];
+  cardsB: string[];
+} | null>(null);
+
+const [winningPotIndex, setWinningPotIndex] = useState<number | null>(null);
 
   const user = useSelector((state: RootState) => state.userPlayerData);
   const gameId = React.useMemo(() => ({ gameId: 16 }), []);
@@ -218,6 +225,16 @@ export default function TeenPattiGame() {
      dispatch(incrementUserBalance(message.winningAmount));
     }
   })
+  gameTeenPattiResultAnnounce((response)=>{
+    if(response.success){
+      let winningCards= response.data.winningCards;
+      let loserCards= response.data.loserCards;
+       let winningPotIndex= response.data.winningPotIndex;
+      setWinningCards(winningCards)
+      setLoserCards(loserCards)
+      setWinningPotIndex(winningPotIndex)
+    }
+  })
   useTeenpattiBetResponseListener((data) => {
     if (data.success) {
       // showToast(data.message ?? `Bet placed: ₹${data.amount}`, "success");
@@ -297,19 +314,30 @@ useEffect(() => {
       engine.flipAllCards();
     }
   }, [engine, configLoaded]);
+const getCardsForPot = (idx: number): string[] => {
+  // Before result → backs
+  if (!winningCards || !loserCards || winningPotIndex === null) {
+    return gameConfig?.cardBackImages[idx] || [];
+  }
+  if (idx === winningPotIndex) {
+    return winningCards;
+  }
+  const loserIndex = idx < winningPotIndex ? idx : idx - 1;
+  return loserIndex === 0
+    ? loserCards.cardsA
+    : loserCards.cardsB;
+};
 
-  const pots = gameConfig?.cardImages.map((cards: string[], idx: number) => ({
+ const pots = gameConfig?.cardBackImages.map((_, idx) => ({
     potIndex: idx,
     potName: `Pot ${String.fromCharCode(65 + idx)}`,
-    totalBet: potBetSum[idx]??10,
+    totalBet: potBetSum[idx] ?? 10,
     betCoins: gameConfig.bettingCoins,
-    cardImages: cards,
+    cardImages: getCardsForPot(idx),  
     cardBackImages: gameConfig.cardBackImages[idx],
     isWinner: idx === winningPotIndex,
-    // multiplier: gameConfig.returnWinngingPotPercentage[idx] || 1,
-    // showFront: true,
-    // onPotClick: () => { },
   })) || [];
+
 
   if (!gameConfig) {
     return (

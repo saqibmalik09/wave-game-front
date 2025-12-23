@@ -192,32 +192,26 @@ export function useTeenpattiBetResponseListener( onResponse: (data: any) => void
 
 
 
-// game users and pots
-export function teenpattiAnnounceGameResult() {
- const socket = getSocket();
-
+export function gameTeenPattiResultAnnounce( onResponse: (data: any) => void) {
+  const socket = getSocket();
   if (!socket) {
     console.log('Socket not initialized',socket);
   return ;
   }
-  socket.emit('teenpattiAnnounceGameResult', {});
+  useEffect(() => {
+    const handleWinningResponse = (data: any) => {
+      console.log("Received teenpattiBetResponse:", data);
+      onResponse(data); // send data back to component
+    };
+    socket.on("teenpattiAnnounceResultResponse", handleWinningResponse);
 
-  const teenpattiAnnounceGameResultResponse = (data: any) => {
-    if (!data) {
-      console.error('[TeenPatti]  No data received from server');
-      return;
-    }  
-      // Some servers don’t send `success` flag — handle both cases
-    if (data.success === undefined || data.success === true) {
-      // console.log('[TeenPatti]  Game teenpattiAnnounceGameResultResponse Pot Bets And Users received successfully:');
-      // console.table(data);
-    } else {
-      // console.error('[TeenPatti]  Game teenpattiAnnounceGameResultResponse failed:', data.message || data);
-    }
-  };
-  socket.on('teenpattiAnnounceGameResultResponse', teenpattiAnnounceGameResultResponse);
+    return () => {
+      socket.off("teenpattiAnnounceResultResponse", handleWinningResponse);
+    };
+  }, [onResponse]);
 
 }
+
 
 export function myMessagesFromServer(
   onResponse: (data: any) => void
@@ -240,5 +234,7 @@ export function myMessagesFromServer(
     };
   }, [onResponse]);
 
+  
 }
+
 

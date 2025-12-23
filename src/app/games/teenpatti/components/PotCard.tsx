@@ -7,7 +7,7 @@ import { placeBet } from '@/lib/redux/slices/teenpatti/teenPattiBettingSlice';
 import { SoundManager } from '../game/SoundManager';
 import { useToast } from './Toast';
 import { clearPendingCoin } from '@/lib/redux/slices/teenpatti/coinDropAnimation';
-import { placeTeenpattiBet } from '@/lib/socket/game/teenpatti/teenpattiSocketEventHandler';
+import { gameTeenPattiResultAnnounce, placeTeenpattiBet } from '@/lib/socket/game/teenpatti/teenpattiSocketEventHandler';
 
 interface PotCardProps {
   potIndex: number;
@@ -75,16 +75,14 @@ export default function PotCard({
   const previousPhase = useRef(currentPhase);
   const [displayCards, setDisplayCards] = useState<string[]>(cardBackImages);
   const [isCollecting, setIsCollecting] = useState(false);
-  // ✅ Clear coins when phase changes
+  //  Clear coins when phase changes
   useEffect(() => {
-  console.log("isWinner:",isWinner)
   if (!isWinner) return;
 
   // prevent duplicate announcement
   if (announcedWinner === winner) return;
   setAnnouncedWinner(winner);
 }, [isWinner]);
-
   useEffect(() => {
     if (currentPhase !== 'bettingTimer') {
       if (!(currentPhase === 'resultAnnounceTimer' && isWinner)) {
@@ -280,7 +278,7 @@ export default function PotCard({
         {displayCards.map((cardUrl, idx) => (
           <div
             key={idx}
-            className="bg-white rounded border border-slate-400 shadow-md overflow-hidden"
+            className="bg-white border border-slate-400 shadow-md overflow-hidden"
             style={{
               width: '35px',
               height: '40 px',
