@@ -334,7 +334,7 @@ useEffect(() => {
           </div>
 
           {/* Pots Container - Positioned at 68% from top */}
-          <div className="absolute top-[71%] left-1/2 z-30 -translate-x-1/2 -translate-y-1/2 flex gap-2 px-3">
+          <div className="absolute top-[68%] left-1/2 z-30 -translate-x-1/2 -translate-y-1/2 flex gap-2 px-3">
             {pots.map((pot) => (
               <React.Fragment key={pot.potIndex}>
 
@@ -347,11 +347,11 @@ useEffect(() => {
 
                 {/* Yellow Label above POT 1 */}
                 {pot.potIndex === 1 && currentPhase && phaseLabels[currentPhase] && (
-                  <span className="absolute -top-7 left-[50%] -translate-x-1/2 z-40 pointer-events-none">
+                  <span className="absolute -top-6 left-[48%] -translate-x-1/2 z-40 pointer-events-none">
                     <span
                       className="relative flex items-center justify-center select-none"
                       style={{
-                        minWidth: "clamp(40px, 14vw, 30px)",
+                        minWidth: "clamp(40px, 14vw, 22px)",
                         height: "clamp(15px, 4vw, 12px)",
                         padding: "0 4px",
                         borderRadius: "10px",

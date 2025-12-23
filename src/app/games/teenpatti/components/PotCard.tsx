@@ -76,7 +76,6 @@ export default function PotCard({
   const [displayCards, setDisplayCards] = useState<string[]>(cardBackImages);
   const [isCollecting, setIsCollecting] = useState(false);
   // ✅ Clear coins when phase changes
-  console.log("totalBet:",totalBet)
   useEffect(() => {
   console.log("isWinner:",isWinner)
   if (!isWinner) return;
@@ -264,8 +263,8 @@ export default function PotCard({
         }`}
       style={{
         width: '80px',
-        minHeight: '110px',
-        maxHeight: '120px',
+        minHeight: '130px',
+        maxHeight: '135px',
       }}
       onClick={handlePotClick}
     >
@@ -283,7 +282,7 @@ export default function PotCard({
             key={idx}
             className="bg-white rounded border border-slate-400 shadow-md overflow-hidden"
             style={{
-              width: '25px',
+              width: '32px',
               height: '40 px',
             }}
           >

@@ -28,8 +28,8 @@ export default function TopBar() {
   };
 
   return (
-    <div className="sticky w-full" >
-      <div className="container mx-auto" >
+    <div className="sticky w-full p-1" >
+      <div className="container mx-auto " >
         <div
           className="d-flex justify-content-between align-items-center rounded-pill"
           style={{
@@ -39,29 +39,62 @@ export default function TopBar() {
           }}
         >
           {/* Left: Back & Menu */}
-          <div className="d-flex align-items-center" style={{ gap: 'clamp(4px, 0.8vw, 8px)' }}>
+          <div className="d-flex align-items-center" style={{ gap: 'clamp(4px, 0.8vw, 6px)' }}>
             <button
               className="rounded-circle p-0 d-flex align-items-center justify-content-center border-0 "
               style={{
-                minWidth: '20px',
+                minWidth: '18px',
+                marginTop:"3px"
               }}
               onClick={() => window.history.back()}
             >
-              <svg className='rounded-xl' xmlns="http://www.w3.org/2000/svg" viewBox="-2 -2 12 12" width="26" height="26" fill="#ffc109ff" style={{ opacity: 1, transform: 'rotate(90deg)' }}><rect x="-2" y="-2" width="12" height="12" fill="#853426" /><path d="M4.5 1C2.57 1 1 2.57 1 4.5V5H0l2 2l2-2H3v-.5a2.5 2.5 0 0 1 5 0C8 2.57 6.43 1 4.5 1" /></svg>
+              <svg className='rounded-xl' xmlns="http://www.w3.org/2000/svg" viewBox="-2 -2 12 12" width="20" height="26" fill="#ffc109ff" style={{ opacity: 1, transform: 'rotate(90deg)',marginTop:"0px"}}><rect x="-2" y="-2" width="12" height="12" fill="#853426" /><path d="M4.5 1C2.57 1 1 2.57 1 4.5V5H0l2 2l2-2H3v-.5a2.5 2.5 0 0 1 5 0C8 2.57 6.43 1 4.5 1" /></svg>
             </button>
           </div>
-
+          <div className="d-flex align-items-center" style={{ gap: 'clamp(4px, 0.5vw, 5px)' }}>
+            {/* Balance */}
+            {/* <div
+              className="d-flex align-items-center rounded-pill"
+              style={{
+                background: 'rgba(0, 0, 0, 0.4)',
+                gap: 'clamp(4px, 0.6vw, 8px)',
+                padding: 'clamp(4px, 0.4vw, 3px) clamp(4px, 0.4vw, 3px)',
+              }}
+            >
+              <div
+                className="rounded-circle d-flex align-items-center justify-content-center fw-bold"
+                style={{
+                  width: 'clamp(10px, 1vw, 10px)',
+                  height: 'clamp(10px, 1vw, 10px)',
+                  background: 'linear-gradient(135deg, #ffd700, #ffed4e)',
+                  color: '#000',
+                  fontSize: 'clamp(8px, 1vw, 8px)',
+                  minWidth: '8px',
+                }}
+              >
+                G
+              </div>
+              <span
+                className="text-white fw-bold"
+                style={{
+                  fontSize: 'clamp(5px, 0.8vw, 10px)',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                {userPlayerData?.data?.balance?.toLocaleString() || '0'}
+              </span>
+            </div> */}
 
           {/* Center: Maximum Bet */}
-          <div className="d-md-block p-0" style={{ maxWidth: '100%', marginTop:"-3px" }}>
+          <div className="d-md-block p-0" style={{ maxWidth: '100%', marginTop:"5px" }}>
             <svg
               viewBox="0 0 260 70"
               xmlns="http://www.w3.org/2000/svg"
               style={{
                 display: 'block',
-                width: 'clamp(110px, 14vw, 160px)',
+                width: 'clamp(110px, 14vw, 130px)',
                 height: 'auto',
-                maxWidth: '100%',
+                maxWidth: '80%',
                 pointerEvents: 'none',
                 userSelect: 'none',
               }}
@@ -103,14 +136,14 @@ export default function TopBar() {
               />
 
               {/* TOP SHADOW */}
-              <rect x="16" y="9" width="160" height="10" fill="#000" opacity="0.25" />
+              <rect x="16" y="9" width="140" height="10" fill="#000" opacity="0.25" />
 
               {/* TEXT - TWO ROWS */}
               <text
                 x="130"
                 y="30"
                 textAnchor="middle"
-                fontSize="16"
+                fontSize="20"
                 fontWeight="600"
                 fill="#FFC17B"
                 style={{ letterSpacing: '0.5px' }}
@@ -122,7 +155,7 @@ export default function TopBar() {
                 x="130"
                 y="48"
                 textAnchor="middle"
-                fontSize="14"
+                fontSize="17"
                 fontWeight="700"
                 fill="#FFC17B"
                 style={{ letterSpacing: '0.5px' }}
@@ -133,41 +166,7 @@ export default function TopBar() {
           </div>
 
           {/* Right: Balance, Sound, Settings */}
-          <div className="d-flex align-items-center"
-            style={{ gap: 'clamp(4px, 0.5vw, 5px)' }}
-          >
-            {/* Balance */}
-            <div
-              className="d-flex align-items-center rounded-pill"
-              style={{
-                background: 'rgba(0, 0, 0, 0.4)',
-                gap: 'clamp(4px, 0.6vw, 8px)',
-                padding: 'clamp(4px, 0.4vw, 3px) clamp(4px, 0.4vw, 3px)',
-              }}
-            >
-              <div
-                className="rounded-circle d-flex align-items-center justify-content-center fw-bold"
-                style={{
-                  width: 'clamp(10px, 1vw, 10px)',
-                  height: 'clamp(10px, 1vw, 10px)',
-                  background: 'linear-gradient(135deg, #ffd700, #ffed4e)',
-                  color: '#000',
-                  fontSize: 'clamp(8px, 1vw, 8px)',
-                  minWidth: '8px',
-                }}
-              >
-                G
-              </div>
-              <span
-                className="text-white fw-bold"
-                style={{
-                  fontSize: 'clamp(5px, 0.8vw, 10px)',
-                  whiteSpace: 'nowrap',
-                }}
-              >
-                {userPlayerData?.data?.balance?.toLocaleString() || '0'}
-              </span>
-            </div>
+         
 
             {/* Sound Toggle */}
             <button
