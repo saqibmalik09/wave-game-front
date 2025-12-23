@@ -324,7 +324,7 @@ useEffect(() => {
         <div className="relative w-full min-h-screen max-w-md mx-auto overflow-hidden" >
 
           {/* Top Bar - Fixed at top */}
-          <div className="absolute top-0 left-0 w-full z-50">
+          <div className="absolute top-0 left-3 w-full z-50">
             <TopBar />
           </div>
 

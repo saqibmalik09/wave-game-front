@@ -103,7 +103,7 @@ export default function TopBar() {
               />
 
               {/* TOP SHADOW */}
-              <rect x="16" y="9" width="228" height="12" fill="#000" opacity="0.25" />
+              <rect x="16" y="9" width="160" height="10" fill="#000" opacity="0.25" />
 
               {/* TEXT - TWO ROWS */}
               <text
