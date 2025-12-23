@@ -263,8 +263,8 @@ export default function PotCard({
         }`}
       style={{
         width: '80px',
-        minHeight: '130px',
-        maxHeight: '135px',
+        minHeight: '125px',
+        maxHeight: '132px',
       }}
       onClick={handlePotClick}
     >
@@ -282,7 +282,7 @@ export default function PotCard({
             key={idx}
             className="bg-white rounded border border-slate-400 shadow-md overflow-hidden"
             style={{
-              width: '32px',
+              width: '35px',
               height: '40 px',
             }}
           >
@@ -300,7 +300,7 @@ export default function PotCard({
         ref={coinsContainerRef}
         className="relative mt-auto mx-0.5 mb-1.5 rounded-lg overflow-hidden"
         style={{
-          width: 'calc(100% - 4px)',
+          width: 'calc(100% - 7px)',
           height: '85px',
         }}
       >
