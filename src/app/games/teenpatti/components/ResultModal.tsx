@@ -261,7 +261,7 @@ export default function ResultModal() {
       </div>
 
       {/* Footer */}
-      <div className="p-0.5 mt-auto">
+      <div className="p-0.5 mt-auto ">
         <button
           onClick={handleClose}
           className="btn w-100 fw-bold rounded-pill"
