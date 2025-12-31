@@ -127,7 +127,7 @@ export default function ResultModal() {
       className="position-fixed top-50 start-50 translate-middle rounded-4 overflow-hidden"
       style={{
         width: '60%',
-         height: '80%',
+         height: '95%',
         maxWidth: '250px', // 🔹 SMALL SCREEN
         background: 'linear-gradient(180deg, #6b1f2b 0%, #4a1520 100%)',
         boxShadow: '0 20px 60px rgba(0,0,0,0.7)',
