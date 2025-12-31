@@ -5,6 +5,7 @@ import { useAppSelector } from '@/lib/redux/hooks';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '@/lib/redux/store';
 import { clearWinningPot, setWinningPotIndex } from '@/lib/redux/slices/teenpatti/winningPotSlice';
+import { gameTeenPattiResultAnnounce } from '@/lib/socket/game/teenpatti/teenpattiSocketEventHandler';
 
 interface ResultData {
   winners: any[]; // you can make a proper type if you know the structure
@@ -32,33 +33,53 @@ export default function ResultModal() {
 
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  useEffect(() => {
-    const socket = getSocket();
-    if (!socket) return;
+  // useEffect(() => {
+  //   const socket = getSocket();
+  //   if (!socket) {
+  //     console.log('Socket not initialized in result modal');
+  //     return;
+  //   };
 
-    const handleResult = (response: ResultResponse) => {
-      if (!response?.success || !response.data) return;
-      // If user manually closed, ignore showing again
-      if (manualClosed) return;
+  //   const handleResult = (response: ResultResponse) => {
+  //     console.log('Received teenpattiAnnounceGameResultResponse33:', response);
+  //     if (!response?.success || !response.data) return;
+  //     // If user manually closed, ignore showing again
+  //     if (manualClosed) return;
 
-      setResult(response.data);
-      dispatch(setWinningPotIndex(response.data.winningPotIndex));
-      // Clear previous timeout
-      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+  //     setResult(response.data);
+  //     dispatch(setWinningPotIndex(response.data.winningPotIndex));
+  //     // Clear previous timeout
+  //     if (timeoutRef.current) clearTimeout(timeoutRef.current);
 
-      // Show modal after 3 seconds
-      timeoutRef.current = setTimeout(() => {
-        setShow(true);
-      }, 3000);
-    };
+  //     // Show modal after 3 seconds
+  //     timeoutRef.current = setTimeout(() => {
+  //       setShow(true);
+  //     }, 3000);
+  //   };
 
-    socket.on('teenpattiAnnounceGameResultResponse', handleResult);
+  //   socket.on('teenpattiAnnounceGameResultResponse', handleResult);
 
-    return () => {
-      socket.off('teenpattiAnnounceGameResultResponse', handleResult);
-      if (timeoutRef.current) clearTimeout(timeoutRef.current);
-    };
-  }, [manualClosed, dispatch]);
+  //   return () => {
+  //     socket.off('teenpattiAnnounceGameResultResponse', handleResult);
+  //     if (timeoutRef.current) clearTimeout(timeoutRef.current);
+  //   };
+  // }, [manualClosed, dispatch]);
+  gameTeenPattiResultAnnounce((response: ResultResponse) => {
+  console.log('Received teenpatti result inside:', response);
+
+  if (!response?.success || !response.data) return;
+  if (manualClosed) return;
+
+  setResult(response.data);
+  dispatch(setWinningPotIndex(response.data.winningPotIndex));
+
+  if (timeoutRef.current) clearTimeout(timeoutRef.current);
+
+  timeoutRef.current = setTimeout(() => {
+    setShow(true);
+  }, 100);
+});
+
 
   // Close modal on phase change or manual close
   useEffect(() => {
@@ -106,7 +127,7 @@ export default function ResultModal() {
       className="position-fixed top-50 start-50 translate-middle rounded-4 overflow-hidden"
       style={{
         width: '60%',
-         height: '60%',
+         height: '70%',
         maxWidth: '250px', // 🔹 SMALL SCREEN
         background: 'linear-gradient(180deg, #6b1f2b 0%, #4a1520 100%)',
         boxShadow: '0 20px 60px rgba(0,0,0,0.7)',
@@ -128,40 +149,40 @@ export default function ResultModal() {
       </button> */}
 
       {/* Header */}
-      <div className="text-center pt-2 pb-2 px-2">
-        <h2
-          className="text-white fw-bold mb-1"
-          style={{ fontSize: 'clamp(16px, 2vw, 18px)' }}
+      <div className="text-center">
+        <h5
+          className="text-white fw-bold m-0"
+          style={{ fontSize: 'clamp(15px, 1vw, 10px)' }}
         >
           {isWinner ? '🎉 You Won!' : 'Round Complete'}
-        </h2>
+        </h5>
 
         <p
-          className="text-warning fw-semibold mb-1"
+          className="text-warning fw-semibold m-0"
           style={{ fontSize: 'clamp(12px, 3vw, 18px)' }}
         >
           Winning Pot: {result.winningPot.toUpperCase()}
         </p>
 
         <p
-          className="text-white-50"
-          style={{ fontSize: 'clamp(11px, 2.5vw, 14px)' }}
+          className="text-white-50 m-0"
+          style={{ fontSize: 'clamp(12px, 1vw, 12px)' }}
         >
           {result.winningPotRankText}
         </p>
       </div>
 
       {/* Winning Cards */}
-      <div className="d-flex justify-content-center gap-2 px-3 py-2">
+      <div className="d-flex justify-content-center gap-1 p-1">
         {result.winningCards.map((cardUrl, idx) => (
           <img
             key={idx}
-            src={cardUrl}
+            src={`${process.env.NEXT_PUBLIC_BACKEND_ASSET_URL}/${cardUrl}`}
             alt={`Card ${idx + 1}`}
             className="rounded-3"
             style={{
-              width: 'clamp(44px, 14vw, 70px)',
-              height: 'clamp(64px, 20vw, 100px)',
+              width: 'clamp(50px, 16vw, 90px)',
+              height: 'clamp(70px, 12vw, 70px)',
               boxShadow: '0 4px 12px rgba(0,0,0,0.5)',
             }}
           />
@@ -170,27 +191,25 @@ export default function ResultModal() {
 
       {/* Winners */}
       <div
-        className="px-3 py-2"
-        style={{ background: 'rgba(0,0,0,0.3)' }}
-      >
-        <h3
-          className="text-white fw-semibold mb-2 text-center"
-          style={{ fontSize: '14px' }}
-        >
+        className="p-1"
+        style={{ background: 'rgba(0,0,0,0.3)' }}>
+        <h5
+          className="text-white fw-semibold text-center"
+          style={{ fontSize: '10px' }}>
           {result.winners.length > 1 ? 'Winners' : 'Winner'}
-        </h3>
+        </h5>
 
         <div
-          className="d-flex flex-column gap-2"
+          className="d-flex flex-column gap-1 "
           style={{
-            maxHeight: '140px', // 🔹 SMALL SCREEN HEIGHT
+            maxHeight: '140px', 
             overflowY: 'auto',
           }}
         >
           {result.winners.map((winner) => (
             <div
               key={winner.userId}
-              className="d-flex align-items-center justify-content-between p-2 rounded-3"
+              className="d-flex align-items-center p-0.4 justify-content-between rounded-3"
               style={{
                 background:
                   winner.userId === String(currentUserId)
@@ -198,14 +217,14 @@ export default function ResultModal() {
                     : 'rgba(255,255,255,0.08)',
               }}
             >
-              <div className="d-flex align-items-center gap-2">
+              <div className="d-flex align-items-center gap-1 p-0.5">
                 <img
                   src={winner.imageProfile}
                   alt="Winner"
                   className="rounded-circle"
                   style={{
-                    width: '34px',
-                    height: '34px',
+                    width: '25px',
+                    height: '25px',
                     objectFit: 'cover',
                     border: '2px solid #ffd700',
                   }}
@@ -215,8 +234,8 @@ export default function ResultModal() {
                   <span
                     className="d-flex align-items-center justify-content-center fw-bold"
                     style={{
-                      width: '18px',
-                      height: '18px',
+                      width: '15px',
+                      height: '15px',
                       borderRadius: '50%',
                       background:
                         'linear-gradient(135deg, #ffd700, #ffed4e)',
@@ -242,13 +261,13 @@ export default function ResultModal() {
       </div>
 
       {/* Footer */}
-      <div className="p-2">
+      <div className="p-0.5 mt-auto">
         <button
           onClick={handleClose}
           className="btn w-100 fw-bold rounded-pill"
           style={{
-            padding: '10px',
-            fontSize: '14px',
+            padding: '1px',
+            fontSize: '12px',
             background: 'linear-gradient(135deg, #ffd700, #ffed4e)',
             color: '#000',
             border: 'none',

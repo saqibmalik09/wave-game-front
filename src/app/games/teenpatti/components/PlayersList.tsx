@@ -98,8 +98,8 @@ export default function PlayersList() {
                   }}
                 >
                   <Image
-                    src={player.profilePicture}
-                    alt={player.name}
+                    src={player.profilePicture??'https://randomuser.me/api/portraits/women/91.jpg'}
+                    alt={player.name??"Player"}
                     width={25}
                     height={25}
                     unoptimized

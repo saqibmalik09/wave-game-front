@@ -192,26 +192,28 @@ export function useTeenpattiBetResponseListener( onResponse: (data: any) => void
 
 
 
-export function gameTeenPattiResultAnnounce( onResponse: (data: any) => void) {
-  const socket = getSocket();
-  if (!socket) {
-    console.log('Socket not initialized',socket);
-  return ;
-  }
+export function gameTeenPattiResultAnnounce(
+  onResponse: (data: any) => void
+) {
   useEffect(() => {
+    const socket = getSocket();
+    if (!socket) {
+      console.log('Socket not initialized in useTeenPattiResultAnnounce');
+      return;
+    }
+
     const handleWinningResponse = (data: any) => {
-      console.log("Received teenpattiBetResponse:", data);
-      onResponse(data); // send data back to component
+      console.log('in socket useTeenPattiResultAnnounce:', data);
+      onResponse(data);
     };
-    socket.on("teenpattiAnnounceResultResponse", handleWinningResponse);
+
+    socket.on('teenpattiAnnounceGameResultResponse', handleWinningResponse);
 
     return () => {
-      socket.off("teenpattiAnnounceResultResponse", handleWinningResponse);
+      socket.off('teenpattiAnnounceGameResultResponse', handleWinningResponse);
     };
   }, [onResponse]);
-
 }
-
 
 export function myMessagesFromServer(
   onResponse: (data: any) => void

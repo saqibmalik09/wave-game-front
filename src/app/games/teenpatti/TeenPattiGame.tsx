@@ -72,9 +72,9 @@ interface GameConfig {
   returnWinngingPotPercentage: number[];
 }
 const phaseLabels: Record<string, string> = {
-  bettingTimer: 'Start Betting',
+  bettingTimer: 'Betting',
   winningCalculationTimer: 'Calculating',
-  resultAnnounceTimer: '',
+  resultAnnounceTimer: 'Announcing',
   newGameStartTimer: 'Wait',
 };
 export default function TeenPattiGame() {
@@ -349,7 +349,7 @@ const getCardsForPot = (idx: number): string[] => {
 
   return (
       <>
-        <div className="relative w-full min-h-screen max-w-md mx-auto overflow-hidden" >
+       <div className="relative w-full min-h-screen max-w-md mx-auto overflow-hidden" >
 
           {/* Top Bar - Fixed at top */}
           <div className="absolute top-0 left-3 w-full z-50">
@@ -362,20 +362,20 @@ const getCardsForPot = (idx: number): string[] => {
           </div>
 
           {/* Pots Container - Positioned at 68% from top */}
-          <div className="absolute top-[70%] left-1/2 z-30 -translate-x-1/2 -translate-y-1/2 flex gap-2 px-3">
+          <div className="absolute top-[63%] left-[56%] z-30 -translate-x-1/2 -translate-y-1/2 flex gap-0.5 px-1">
             {pots.map((pot) => (
               <React.Fragment key={pot.potIndex}>
 
                 {/* Timer above POT 0 */}
                 {pot.potIndex === 0 && (
-                  <span className="absolute -top-9 left-[16%] -translate-x-1/2 z-40">
+                  <span className="absolute -top-9 left-[17%] -translate-x-1/2 z-40">
                     <Timer />
                   </span>
                 )}
 
                 {/* Yellow Label above POT 1 */}
-                {pot.potIndex === 1 && currentPhase && phaseLabels[currentPhase] && (
-                  <span className="absolute -top-6 left-[48%] -translate-x-1/2 z-40 pointer-events-none">
+                {pot.potIndex === 2 && currentPhase && phaseLabels[currentPhase] && (
+                  <span className="absolute -top-6 left-[80%] -translate-x-1/2 z-40 pointer-events-none">
                     <span
                       className="relative flex items-center justify-center select-none"
                       style={{
@@ -413,7 +413,7 @@ const getCardsForPot = (idx: number): string[] => {
             ))}
           </div>
 
-          {/* Coin Tray - Fixed at bottom */}
+           {/* Coin Tray - Fixed at bottom */}
           <div className="absolute bottom-0 left-0 w-full z-40">
             <CoinTray key={gameConfig?.gameId ?? "default"} />
           </div>
@@ -427,7 +427,7 @@ const getCardsForPot = (idx: number): string[] => {
           />
           <ResultModal />
           <ToastContainer />
-          <CoinsAnimation
+           <CoinsAnimation
           isActive={coinAnimation.isActive}
           amount={coinAnimation.amount}
           potIndex={coinAnimation.potIndex}

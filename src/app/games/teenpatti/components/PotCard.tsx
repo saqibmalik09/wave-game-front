@@ -7,7 +7,7 @@ import { placeBet } from '@/lib/redux/slices/teenpatti/teenPattiBettingSlice';
 import { SoundManager } from '../game/SoundManager';
 import { useToast } from './Toast';
 import { clearPendingCoin } from '@/lib/redux/slices/teenpatti/coinDropAnimation';
-import { gameTeenPattiResultAnnounce, placeTeenpattiBet } from '@/lib/socket/game/teenpatti/teenpattiSocketEventHandler';
+import {  placeTeenpattiBet } from '@/lib/socket/game/teenpatti/teenpattiSocketEventHandler';
 
 interface PotCardProps {
   potIndex: number;
@@ -77,12 +77,12 @@ export default function PotCard({
   const [isCollecting, setIsCollecting] = useState(false);
   //  Clear coins when phase changes
   useEffect(() => {
-  if (!isWinner) return;
+    if (!isWinner) return;
 
-  // prevent duplicate announcement
-  if (announcedWinner === winner) return;
-  setAnnouncedWinner(winner);
-}, [isWinner]);
+    // prevent duplicate announcement
+    if (announcedWinner === winner) return;
+    setAnnouncedWinner(winner);
+  }, [isWinner]);
   useEffect(() => {
     if (currentPhase !== 'bettingTimer') {
       if (!(currentPhase === 'resultAnnounceTimer' && isWinner)) {
@@ -92,12 +92,12 @@ export default function PotCard({
     }
   }, [currentPhase, isWinner]);
   useEffect(() => {
-    if(currentPhase=="winningCalculationTimer"){
+    if (currentPhase == "winningCalculationTimer") {
       setCoins([]);
     }
     if (currentPhase === 'resultAnnounceTimer' && isWinner && coins.length > 0) {
       setIsCollecting(true);
-      
+
       // After collection animation, clear coins
       const timer = setTimeout(() => {
         // Coins will be cleared after flying animation
@@ -239,15 +239,15 @@ export default function PotCard({
       gameId: gameId!,
       tenantBaseURL,
     }
-     dispatch(placeBet({
+    dispatch(placeBet({
       userId: currentUserId.toString(),
       amount: selectedCoinAmount,
       tableId: 10,
       betType: 1,
-      potIndex: potIndex, 
+      potIndex: potIndex,
     }));
     placeTeenpattiBet(betData);
-    
+
   };
 
 
@@ -260,9 +260,9 @@ export default function PotCard({
         } ${currentPhase === 'bettingTimer' ? 'cursor-pointer opacity-100' : 'cursor-not-allowed opacity-80'
         }`}
       style={{
-        width: '80px',
-        minHeight: '125px',
-        maxHeight: '132px',
+        width: '97px',
+        minHeight: '150px',
+        maxHeight: '162px',
       }}
       onClick={handlePotClick}
     >
@@ -274,20 +274,20 @@ export default function PotCard({
       </div>
 
       {/* Cards Section - Larger & More Visible, Minimal Spacing */}
-      <div className="flex justify-center items-start gap-0.5 px-0.5 py-1.5">
+      <div className="flex justify-center items-start ">
         {displayCards.map((cardUrl, idx) => (
           <div
             key={idx}
-            className="bg-white border border-slate-400 shadow-md overflow-hidden"
+            className="bg-green"
             style={{
-              width: '35px',
-              height: '40 px',
+              width: '36px',
+              height: '55px',
             }}
           >
             <img
               src={`${process.env.NEXT_PUBLIC_BACKEND_ASSET_URL}/${cardUrl}`}
               alt={`Card ${idx}`}
-              className="w-full h-full object-cover"
+              className="w-full h-full object-contain"
             />
           </div>
         ))}
@@ -296,10 +296,10 @@ export default function PotCard({
       {/* Coins Container - No Background, Maximum Width */}
       <div
         ref={coinsContainerRef}
-        className="relative mt-auto mx-0.5 mb-1.5 rounded-lg overflow-hidden"
+        className="relative mt-auto mx-0.5 mb-0.7 rounded-lg overflow-hidden"
         style={{
-          width: 'calc(100% - 7px)',
-          height: '85px',
+          width: 'calc(100% - 2px)',
+          height: '75px',
         }}
       >
         {/* Multiplier as placeholder text when no coins */}
@@ -359,7 +359,6 @@ export default function PotCard({
     will-change: transform, opacity;
   }
 `}</style>
-
 
       <ToastContainer />
     </div>
