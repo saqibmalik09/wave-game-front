@@ -229,7 +229,7 @@ export default function ResultModal() {
                     border: '2px solid #ffd700',
                   }}
                 />
-
+               <span className="mx-1 text-white">{ winner.name ?? "Ricolive"}</span>
                 <div className="d-flex align-items-center gap-1">
                   <span
                     className="d-flex align-items-center justify-content-center fw-bold"
