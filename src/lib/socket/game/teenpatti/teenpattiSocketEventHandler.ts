@@ -255,10 +255,10 @@ export function useTeenpattiBetSumResponse(
       onResponse(data);
     };
 
-    socket.on('teenpattiBetResponse', handlePotBetSumResponse);
+    socket.on('potTotalBets', handlePotBetSumResponse);
 
     return () => {
-      socket.off('teenpattiBetResponse', handlePotBetSumResponse);
+      socket.off('potTotalBets', handlePotBetSumResponse);
     };
   }, [onResponse]);
 }
