@@ -25,6 +25,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { RootState } from '@/lib/redux/store';
 import GameLoading from "@/app/components/GameLoading";
 import { CoinsAnimation } from './components/CoinsAnimation';
+import { useTeenpattiBetSumResponse } from '@/lib/socket/game/teenpatti/teenpattiSocketEventHandler';
 
 interface TenantData {
   success: boolean;
@@ -251,21 +252,31 @@ const [winningPotIndex, setWinningPotIndex] = useState<number | null>(null);
   const handleCoinAnimationComplete = () => {
     setCoinAnimation(prev => ({ ...prev, isActive: false }));
   };
-  useEffect(() => {
-    if (!latestBet || !userInfo || !tenant) return;
+  // useEffect(() => {
+    // if (!latestBet || !userInfo || !tenant) return;
    
-    const potIndex = Number(latestBet.potIndex);
-    const betAmount = Number(latestBet.amount);
-        setPotBetSum((prev) => {
-      const newSum = {
-        ...prev,
-        [potIndex]: (prev[potIndex] || 0) + betAmount,
-      };
-      console.log("Updated potBetSum:", newSum); 
-      return newSum;
-    })
+    // const potIndex = Number(latestBet.potIndex);
+    // const betAmount = Number(latestBet.amount);
+    //     setPotBetSum((prev) => {
+    //   const newSum = {
+    //     ...prev,
+    //     [potIndex]: (prev[potIndex] || 0) + betAmount,
+      // };
+      // console.log("Updated potBetSum:", newSum); 
+      // return newSum;
+    // })
   
-  }, [latestBet]);
+  // }, [latestBet]);
+useTeenpattiBetSumResponse((data) => {
+  console.log("potbetsum in useTeenpattiBetSumResponse:",data)
+  if (!data) return;
+  setPotBetSum(prev => ({
+    ...prev,
+    0: data[0] ?? prev[0],
+    1: data[1] ?? prev[1],
+    2: data[2] ?? prev[2],
+  }));
+});
 
 useEffect(() => {
     if (currentPhase === 'newGameStartTimer') {

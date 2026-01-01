@@ -240,3 +240,25 @@ export function myMessagesFromServer(
 }
 
 
+export function useTeenpattiBetSumResponse(
+  onResponse: (data: any) => void
+) {
+  useEffect(() => {
+    const socket = getSocket();
+    if (!socket) {
+      console.log('Socket not initialized in teenpattiBetSumResponse');
+      return;
+    }
+
+    const handlePotBetSumResponse = (data: any) => {
+      console.log('in socket teenpattiBetSumResponse:', data);
+      onResponse(data);
+    };
+
+    socket.on('teenpattiBetResponse', handlePotBetSumResponse);
+
+    return () => {
+      socket.off('teenpattiBetResponse', handlePotBetSumResponse);
+    };
+  }, [onResponse]);
+}
