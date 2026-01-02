@@ -77,7 +77,7 @@ export default function ResultModal() {
 
   timeoutRef.current = setTimeout(() => {
     setShow(true);
-  }, 100);
+  }, 2000);
 });
 
 

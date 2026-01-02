@@ -203,7 +203,6 @@ export function gameTeenPattiResultAnnounce(
     }
 
     const handleWinningResponse = (data: any) => {
-      console.log('in socket useTeenPattiResultAnnounce:', data);
       onResponse(data);
     };
 
