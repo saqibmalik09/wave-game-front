@@ -15,8 +15,8 @@ interface InitSocketOptions {
   userId: string;
   appKey: string;
   name: string;
-  profilePicture:string;
-  token:string;
+  profilePicture: string;
+  token: string;
 }
 
 /**
@@ -24,16 +24,16 @@ interface InitSocketOptions {
  * Must provide userId, appKey, token.
  * If already initialized, returns existing socket.
  */
-export const initSocket = ({ userId, appKey, name,profilePicture,token }: InitSocketOptions): Socket => {
-  
+export const initSocket = ({ userId, appKey, name, profilePicture, token }: InitSocketOptions): Socket => {
+
   if (!userId || !appKey || !name || !profilePicture) {
     throw new Error('[Socket] Cannot initialize: missing userId, appKey, or token');
   }
   userIdGlobal = userId;
   appKeyGlobal = appKey;
   nameGlobal = name;
-  profilePictureGlobal=profilePicture;
-  tokenGlobal=token
+  profilePictureGlobal = profilePicture;
+  tokenGlobal = token
   // If socket already exists and is connected, just return it
   if (socket && socket.connected) {
     console.log("Socket already connected, reusing:", socket.id);
@@ -43,11 +43,14 @@ export const initSocket = ({ userId, appKey, name,profilePicture,token }: InitSo
   // Create new socket connection
   socket = io(SOCKET_URL!, {
     transports: ['websocket'],
-    reconnection: true,
-    reconnectionAttempts: 5,
-    reconnectionDelay: 2000,
-    autoConnect: true,
-    query: { userId, appKey, name,profilePicture,token },
+    reconnection: false,
+    reconnectionAttempts: 10,
+    reconnectionDelay: 3000,
+    autoConnect: false,
+    reconnectionDelayMax: 5000,     // cap delay
+    randomizationFactor: 0.5,
+
+    query: { userId, appKey, name, profilePicture, token },
   });
 
   socket.on('connect', () => console.log('🔥 Socket Connected:', socket?.id));
@@ -63,11 +66,11 @@ export const initSocket = ({ userId, appKey, name,profilePicture,token }: InitSo
  * Otherwise returns null.
  *  DO NOT call initSocket here - let the app initialize it first
  */
-export const getSocket = ()=> {
+export const getSocket = () => {
   //return socket if exist else init socket from global and return 
   if (socket && socket.connected) {
     return socket;
-  } else if (userIdGlobal && appKeyGlobal && nameGlobal && profilePictureGlobal && tokenGlobal) { 
+  } else if (userIdGlobal && appKeyGlobal && nameGlobal && profilePictureGlobal && tokenGlobal) {
     return initSocket({ userId: userIdGlobal, appKey: appKeyGlobal, name: nameGlobal, profilePicture: profilePictureGlobal, token: tokenGlobal });
   }
 };
@@ -76,14 +79,14 @@ export const getSocket = ()=> {
  * Disconnect and clean up socket
  */
 export const disconnectSocket = (): void => {
-   if (socket) {
+  if (socket) {
     socket.removeAllListeners();
     socket.disconnect();
     socket = null;
     userIdGlobal = null;
     appKeyGlobal = null;
     nameGlobal = null;
-    profilePictureGlobal=null
+    profilePictureGlobal = null
   }
 };
 
