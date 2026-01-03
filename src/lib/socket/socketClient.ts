@@ -44,8 +44,8 @@ export const initSocket = ({ userId, appKey, name, profilePicture, token }: Init
   socket = io(SOCKET_URL!, {
     transports: ['websocket'],
     reconnection: false,
-    reconnectionAttempts: 10,
-    reconnectionDelay: 3000,
+    reconnectionAttempts: Infinity,
+    reconnectionDelay: 2000,
     autoConnect: false,
     reconnectionDelayMax: 5000,     // cap delay
     randomizationFactor: 0.5,
