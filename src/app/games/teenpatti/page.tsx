@@ -115,7 +115,7 @@
           };
           setTimeout(() => {
             teenpattiGameTableJoin(NewJoiner);
-          }, 2000);
+          }, 7000);
           setLoading(false);
         } catch (error: any) {
           setModalMessage({
