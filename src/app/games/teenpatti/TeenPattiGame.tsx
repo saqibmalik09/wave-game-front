@@ -359,7 +359,7 @@ const getCardsForPot = (idx: number): string[] => {
   })) || [];
 
 
-  if (!gameConfig && !gameLoadedFully) {
+  if (!gameConfig || !gameLoadedFully) {
     return (
       <div>
         <GameLoading message="Hold on " />
