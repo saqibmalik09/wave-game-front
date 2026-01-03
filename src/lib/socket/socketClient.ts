@@ -43,16 +43,16 @@ export const initSocket = ({ userId, appKey, name, profilePicture, token }: Init
   // Create new socket connection
   socket = io(SOCKET_URL!, {
     transports: ['websocket'],
-    reconnection: false,
-    reconnectionAttempts: Infinity,
-    reconnectionDelay: 2000,
     autoConnect: false,
+    reconnection: true,
+    reconnectionAttempts: 15,
+    reconnectionDelay: 2000,
     reconnectionDelayMax: 5000,     // cap delay
     randomizationFactor: 0.5,
+    timeout: 50000,
 
     query: { userId, appKey, name, profilePicture, token },
   });
-
   socket.on('connect', () => console.log('🔥 Socket Connected:', socket?.id));
   socket.on('reconnect', () => console.log('♻️ Socket Reconnected:', socket?.id));
   socket.on('connect_error', (err) => console.warn('[Socket] Connection error:', err.message));
