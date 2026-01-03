@@ -44,9 +44,9 @@ export const initSocket = ({ userId, appKey, name,profilePicture,token }: InitSo
   socket = io(SOCKET_URL!, {
     transports: ['websocket'],
     reconnection: true,
-    reconnectionAttempts: Infinity,
+    reconnectionAttempts: 3,
     reconnectionDelay: 2000,
-    autoConnect: true,
+    autoConnect: false,
     query: { userId, appKey, name,profilePicture,token },
   });
 
@@ -77,6 +77,7 @@ export const getSocket = ()=> {
  */
 export const disconnectSocket = (): void => {
    if (socket) {
+    socket.removeAllListeners();
     socket.disconnect();
     socket = null;
     userIdGlobal = null;
