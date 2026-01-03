@@ -44,9 +44,9 @@ export const initSocket = ({ userId, appKey, name,profilePicture,token }: InitSo
   socket = io(SOCKET_URL!, {
     transports: ['websocket'],
     reconnection: true,
-    reconnectionAttempts: 3,
+    reconnectionAttempts: 5,
     reconnectionDelay: 2000,
-    autoConnect: false,
+    autoConnect: true,
     query: { userId, appKey, name,profilePicture,token },
   });
 
