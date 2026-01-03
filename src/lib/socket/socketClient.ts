@@ -43,7 +43,7 @@ export const initSocket = ({ userId, appKey, name, profilePicture, token }: Init
   // Create new socket connection
   socket = io(SOCKET_URL!, {
     transports: ['websocket'],
-    autoConnect: false,
+    autoConnect: true,
     reconnection: true,
     reconnectionAttempts: 15,
     reconnectionDelay: 2000,
