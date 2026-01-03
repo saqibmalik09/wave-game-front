@@ -61,7 +61,7 @@ export const initSocket = ({ userId, appKey, name,profilePicture,token }: InitSo
 /**
  * Returns the socket instance if already initialized and connected.
  * Otherwise returns null.
- * ⚠️ DO NOT call initSocket here - let the app initialize it first
+ *  DO NOT call initSocket here - let the app initialize it first
  */
 export const getSocket = ()=> {
   //return socket if exist else init socket from global and return 
