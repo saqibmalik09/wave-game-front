@@ -107,6 +107,7 @@ const [loserCards, setLoserCards] = useState<{
 } | null>(null);
 
 const [winningPotIndex, setWinningPotIndex] = useState<number | null>(null);
+  const [gameLoadedFully, setGameLoadedFully] = useState<boolean>(false);
 
   const user = useSelector((state: RootState) => state.userPlayerData);
   const gameId = React.useMemo(() => ({ gameId: 16 }), []);
@@ -237,6 +238,7 @@ const [winningPotIndex, setWinningPotIndex] = useState<number | null>(null);
     }
   })
   useTeenpattiBetResponseListener((data) => {
+    console.log("Teenpatti Bet useTeenpattiBetResponseListener:", data);
     if (data.success) {
       // showToast(data.message ?? `Bet placed: ₹${data.amount}`, "success");
       dispatch(setPendingCoin({ potIndex: Number(data.data.potIndex), value: data.data.amount }));
@@ -325,6 +327,13 @@ useEffect(() => {
       engine.flipAllCards();
     }
   }, [engine, configLoaded]);
+  useEffect(() => {
+    if (gameConfig) {
+      setTimeout(() => {
+        setGameLoadedFully(true);
+      }, 5000); // small delay to ensure smooth transition
+    }
+  }, [gameConfig]);
 const getCardsForPot = (idx: number): string[] => {
   // Before result → backs
   if (!winningCards || !loserCards || winningPotIndex === null) {
@@ -350,10 +359,10 @@ const getCardsForPot = (idx: number): string[] => {
   })) || [];
 
 
-  if (!gameConfig) {
+  if (!gameConfig && !gameLoadedFully) {
     return (
       <div>
-        <GameLoading message="Hold on" />
+        <GameLoading message="Hold on " />
       </div>
     );
   }
