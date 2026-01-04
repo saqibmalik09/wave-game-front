@@ -88,7 +88,7 @@ export function useTeenpattiTimerListener() {
   token:string
 }) {
  const socket = getSocket();
-
+  console.log("teenpattiGameTableJoin socket:", socket);
   if (!socket) {
     console.log('Socket not initialized',socket);
   return ;
@@ -153,7 +153,6 @@ export function useTeenpattiBetResponseListener( onResponse: (data: any) => void
   }
   useEffect(() => {
     const handleBetResponse = (data: any) => {
-      console.log("Received teenpattiBetResponse:", data);
       onResponse(data); // send data back to component
     };
     socket.on("teenpattiBetResponse", handleBetResponse);

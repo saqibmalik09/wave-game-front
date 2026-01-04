@@ -193,7 +193,9 @@ const [winningPotIndex, setWinningPotIndex] = useState<number | null>(null);
       });
       return;
     }
+    console.log("Fetching game configuration from socket...");
     fetchGameConfiguration(gameId, (data: any) => {
+      console.log("Game configuration received:", data);
       if (data) {
         setGameConfig(data);
         setCache(cacheKey, data);
@@ -206,7 +208,7 @@ const [winningPotIndex, setWinningPotIndex] = useState<number | null>(null);
       }
     });
     fetchUserInfo();
-  }, [gameId]);
+  }, [gameId,gameLoadedFully]);
 
   useEffect(() => {
     if (
