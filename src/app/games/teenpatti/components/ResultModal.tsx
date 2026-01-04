@@ -65,8 +65,6 @@ export default function ResultModal() {
   //   };
   // }, [manualClosed, dispatch]);
   gameTeenPattiResultAnnounce((response: ResultResponse) => {
-  console.log('Received teenpatti result inside:', response);
-
   if (!response?.success || !response.data) return;
   if (manualClosed) return;
 

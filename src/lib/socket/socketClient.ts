@@ -45,14 +45,25 @@ export const initSocket = ({ userId, appKey, name, profilePicture, token }: Init
     transports: ['websocket'],
     autoConnect: true,
     reconnection: true,
-    reconnectionAttempts: 15,
+    reconnectionAttempts: 30,
     reconnectionDelay: 2000,
-    reconnectionDelayMax: 5000,     // cap delay
+    reconnectionDelayMax: 5000,  
     randomizationFactor: 0.5,
-    timeout: 50000,
-
+    timeout: 15000,
     query: { userId, appKey, name, profilePicture, token },
   });
+  if(socket.connected==false){
+      console.log(' Initializing new socket connection...', socket.id);
+      setTimeout(() => {
+        if (socket && !socket.connected) {
+          console.warn('[Socket] Connection timeout, disconnecting...');
+          socket.connect();
+        }
+      }, 4000);
+      }else{
+        console.log(' Socket already connected:', socket.id);
+      }
+
   socket.on('connect', () => console.log('🔥 Socket Connected:', socket?.id));
   socket.on('reconnect', () => console.log('♻️ Socket Reconnected:', socket?.id));
   socket.on('connect_error', (err) => console.warn('[Socket] Connection error:', err.message));
