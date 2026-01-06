@@ -22,41 +22,28 @@ function CoinButton({ amount, color, isSelected, onClick }: CoinButtonProps) {
       onClick={onClick}
       className="btn p-0 position-relative"
       style={{
-        transition: 'all 0.2s ease',
-        transform: isSelected ? 'translateY(-8%) scale(1.05)' : 'none',
-        flexShrink: 1,
+        transition: 'all 0.3s ease',
+        transform: isSelected ? 'translateY(-8px) scale(1.1)' : 'translateY(0)',
+        filter: isSelected ? 'brightness(1.2)' : 'brightness(1)',
       }}
     >
       <div
-        className="rounded-circle d-flex align-items-center justify-content-center fw-bold text-white"
+        className="rounded-circle d-flex align-items-center justify-content-center fw-bold"
         style={{
           width: 'clamp(18px, 6vw, 40px)',
           height: 'clamp(18px, 6vw, 40px)',
-          fontSize: 'clamp(4px, 2.1vw, 16px)',
-          background: `radial-gradient(circle at 30% 30%, ${color}, ${color}dd)`,
-          // border: `clamp(1px, 0.3vw, 4px) solid rgba(255, 255, 255, 0.3)`,
-          // boxShadow: isSelected
-          //   ? `0 0.5rem 1.5rem ${color}88, 0 0 1rem ${color}66`
-          //   : `0 0.25rem 0.75rem rgba(0, 0, 0, 0.4)`,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
+          fontSize: 'clamp(6px, 2.1vw, 16px)',
+          background: `linear-gradient(135deg, ${color}ee 0%, ${color} 50%, ${color}99 100%)`,
+          border: `clamp(2px, 0.4vw, 3px) solid ${color}`,
+          boxShadow: isSelected
+            ? `0 8px 20px ${color}77, inset 0 -2px 4px rgba(0,0,0,0.3), inset 0 2px 4px rgba(255,255,255,0.5)`
+            : `0 4px 8px rgba(0,0,0,0.3), inset 0 -2px 4px rgba(0,0,0,0.3), inset 0 2px 4px rgba(255,255,255,0.5)`,
+          color: '#fff',
+          textShadow: '0 1px 2px rgba(0,0,0,0.5)',
         }}
       >
         {displayAmount}
       </div>
-
-      {isSelected && (
-        <div
-          className="position-absolute bottom-0 start-50 translate-middle-x rounded-circle"
-          style={{
-            width: 'clamp(6px, 1.2vw, 8px)',
-            height: 'clamp(6px, 1.2vw, 8px)',
-            background: '#ffd700',
-            animation: 'pulse 1.5s infinite',
-          }}
-        />
-      )}
     </button>
   );
 }
@@ -86,9 +73,9 @@ export default function CoinTray() {
       dispatch(setCoin({ amount, color }));
     }
   }, [bettingCoins, colors, dispatch]);
-  
-     const onClickCoin = (amount: number, color: string) => {
-      SoundManager.getInstance().play('betButtonAndCardClickSound');
+
+  const onClickCoin = (amount: number, color: string) => {
+    SoundManager.getInstance().play('betButtonAndCardClickSound');
 
     setSelectedCoinLocal(amount);
     dispatch(setCoin({ amount, color }));
@@ -96,7 +83,7 @@ export default function CoinTray() {
 
   return (
     <div
-      className="position-fixed bottom-0 start-50 translate-middle-x mb-0"
+      className="position-fixed bottom-0 start-50 translate-middle-x mb-0.8"
       style={{ zIndex: 50, width: '100%', maxWidth: '100%' }}
     >
       <div
@@ -106,14 +93,14 @@ export default function CoinTray() {
           // backdropFilter: 'blur(10px)',
           // boxShadow: '0 0.5rem 2rem rgba(0, 0, 0, 0.5)',
           overflow: 'hidden',
-          padding: '0.15rem clamp(0.20rem, 1.5vw, 0.5rem)',
+          padding: '0.80rem clamp(0.20rem, 1.5vw, 0.5rem)',
           margin: '0 0.5rem',
         }}
       >
         {/* Balance */}
         <div
-        data-balance-area 
-          className="d-flex align-items-center gap-1 px-2  rounded-pill flex-shrink-0 select-none"
+          data-balance-area
+          className="d-flex align-items-center gap-1 px-2 py-1  rounded-pill flex-shrink-0 select-none"
           style={{
             background: 'rgba(0, 0, 0, 0.5)',
             fontSize: 'clamp(6px, 1vw, 14px)',
@@ -124,16 +111,16 @@ export default function CoinTray() {
               width: 'clamp(20px, 2vw, 28px)',
               height: 'clamp(20px, 2vw, 28px)',
               background: 'linear-gradient(135deg, #ffd700, #ffed4e)',
-              fontSize: 'clamp(6px, 1.2vw, 18px)',
+              fontSize: 'clamp(8px, 1.2vw, 18px)',
             }}
           >
             <span className="fw-bold" style={{ color: '#000' }}>G</span>
           </div>
           <div className="d-flex flex-column  ">
-            <small className="text-secondary text-white" style={{ fontSize: 'clamp(5px, 1.2vw, 10px)' }}>
+            <small className="text-secondary text-white" style={{ fontSize: 'clamp(7px, 1.2vw, 10px)' }}>
               Balance
             </small>
-            <span className="text-white fw-bold" style={{ fontSize: 'clamp(6px, 1.5vw, 14px)' }}>
+            <span className="text-white fw-bold" style={{ fontSize: 'clamp(8px, 1.5vw, 14px)' }}>
               {userPlayerData?.data?.balance?.toLocaleString() || '0'}
             </span>
           </div>
@@ -150,7 +137,7 @@ export default function CoinTray() {
           />
         ))}
       </div>
-     <ToastContainer />
+      <ToastContainer />
       <style jsx>{`
         @keyframes pulse {
           0%, 100% { opacity: 1; }
