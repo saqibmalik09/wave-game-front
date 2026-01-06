@@ -207,6 +207,10 @@ export default function PotCard({
       showToast(`Please select a coin to bet!`);
       return;
     }
+     if (userPlayerData.data?.balance==0) {
+      showToast(`Insuffient balance.`);
+      return;
+    }
     const params = new URLSearchParams(window.location.search);
     const appKey = params.get("appKey");
     const gameId = params.get("gameId");
