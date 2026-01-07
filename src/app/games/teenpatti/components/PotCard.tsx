@@ -7,7 +7,7 @@ import { placeBet } from '@/lib/redux/slices/teenpatti/teenPattiBettingSlice';
 import { SoundManager } from '../game/SoundManager';
 import { useToast } from './Toast';
 import { clearPendingCoin } from '@/lib/redux/slices/teenpatti/coinDropAnimation';
-import {  placeTeenpattiBet } from '@/lib/socket/game/teenpatti/teenpattiSocketEventHandler';
+import { placeTeenpattiBet } from '@/lib/socket/game/teenpatti/teenpattiSocketEventHandler';
 
 interface PotCardProps {
   potIndex: number;
@@ -207,10 +207,25 @@ export default function PotCard({
       showToast(`Please select a coin to bet!`);
       return;
     }
-     if (userPlayerData.data?.balance==0) {
-      showToast(`Insuffient balance.`);
+    const balance = Number(userPlayerData.data?.balance || 0);
+    const betAmount = Number(selectedCoin.amount);
+
+    if (!selectedCoin) {
+      showToast(`Please select a coin to bet!`);
       return;
     }
+
+    if (balance <= 0) {
+      showToast(`Insufficient balance.`);
+      return;
+    }
+
+    if (betAmount > balance) {
+      showToast(`Insufficient balance.`);
+      return;
+    }
+
+
     const params = new URLSearchParams(window.location.search);
     const appKey = params.get("appKey");
     const gameId = params.get("gameId");

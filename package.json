@@ -6,7 +6,10 @@
     "dev": "next dev --turbopack",
     "build": "next build --turbopack",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "pm2": "pm2 start npm --name wave-game-front -- run start"
+
+
   },
   "dependencies": {
     "@lottiefiles/react-lottie-player": "^3.6.0",
