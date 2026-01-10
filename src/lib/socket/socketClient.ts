@@ -10,6 +10,7 @@ let appKeyGlobal: string | null = null;
 let nameGlobal: string | null = null;
 let profilePictureGlobal: string | null = null;
 let tokenGlobal: string | null = null;
+let isInitializing = false;
 
 interface InitSocketOptions {
   userId: string;
@@ -22,25 +23,48 @@ interface InitSocketOptions {
 /**
  * Initialize the socket.
  * Must provide userId, appKey, token.
- * If already initialized, returns existing socket.
+ * If already initialized with same credentials, returns existing socket.
  */
 export const initSocket = ({ userId, appKey, name, profilePicture, token }: InitSocketOptions): Socket => {
 
   if (!userId || !appKey || !name || !profilePicture) {
     throw new Error('[Socket] Cannot initialize: missing userId, appKey, or token');
   }
-  userIdGlobal = userId;
-  appKeyGlobal = appKey;
-  nameGlobal = name;
-  profilePictureGlobal = profilePicture;
-  tokenGlobal = token
-  // If socket already exists and is connected, just return it
-  if (socket && socket.connected) {
+
+  // If socket already exists and is connected with same credentials, just return it
+  if (socket && socket.connected && 
+      userIdGlobal === userId && 
+      appKeyGlobal === appKey && 
+      tokenGlobal === token) {
     console.log("Socket already connected, reusing:", socket.id);
     return socket;
   }
 
+  // Prevent multiple simultaneous initializations
+  if (isInitializing && socket) {
+    console.log("Socket initialization already in progress, returning existing socket");
+    return socket;
+  }
+
+  isInitializing = true;
+
+  // Clean up existing socket if it exists (even if not connected)
+  if (socket) {
+    console.log("Cleaning up existing socket before creating new one");
+    socket.removeAllListeners();
+    socket.disconnect();
+    socket = null;
+  }
+
+  // Update global credentials
+  userIdGlobal = userId;
+  appKeyGlobal = appKey;
+  nameGlobal = name;
+  profilePictureGlobal = profilePicture;
+  tokenGlobal = token;
+
   // Create new socket connection
+  console.log('Initializing new socket connection...');
   socket = io(SOCKET_URL!, {
     transports: ['websocket'],
     autoConnect: true,
@@ -52,38 +76,57 @@ export const initSocket = ({ userId, appKey, name, profilePicture, token }: Init
     timeout: 15000,
     query: { userId, appKey, name, profilePicture, token },
   });
-  if(socket.connected==false){
-      console.log(' Initializing new socket connection...', socket.id);
-      setTimeout(() => {
-        if (socket && !socket.connected) {
-          console.warn('[Socket] Connection timeout, disconnecting...');
-          socket.connect();
-        }
-      }, 4000);
-      }else{
-        console.log(' Socket already connected:', socket.id);
-      }
 
-  socket.on('connect', () => console.log('🔥 Socket Connected:', socket?.id));
-  socket.on('reconnect', () => console.log('♻️ Socket Reconnected:', socket?.id));
-  socket.on('connect_error', (err) => console.warn('[Socket] Connection error:', err.message));
-  socket.on('disconnect', (reason) => console.warn('[Socket] Disconnected:', reason));
+  // Add event listeners only once
+  socket.on('connect', () => {
+    console.log('🔥 Socket Connected:', socket?.id);
+    isInitializing = false;
+  });
+
+  socket.on('reconnect', () => {
+    console.log('♻️ Socket Reconnected:', socket?.id);
+    isInitializing = false;
+  });
+
+  socket.on('connect_error', (err) => {
+    console.warn('[Socket] Connection error:', err.message);
+    isInitializing = false;
+  });
+
+  socket.on('disconnect', (reason) => {
+    console.warn('[Socket] Disconnected:', reason);
+    isInitializing = false;
+  });
+
+  // Handle connection timeout
+  if (!socket.connected) {
+    setTimeout(() => {
+      if (socket && !socket.connected) {
+        console.warn('[Socket] Connection timeout, attempting to connect...');
+        socket.connect();
+      }
+    }, 500);
+  } else {
+    console.log('Socket already connected:', socket.id);
+    isInitializing = false;
+  }
 
   return socket;
 };
 
 /**
- * Returns the socket instance if already initialized and connected.
- * Otherwise returns null.
- *  DO NOT call initSocket here - let the app initialize it first
+ * Returns the socket instance if already initialized.
+ * Returns null if socket doesn't exist or is not initialized.
+ * DO NOT automatically re-initialize here to prevent multiple connections.
  */
-export const getSocket = () => {
-  //return socket if exist else init socket from global and return 
-  if (socket && socket.connected) {
+export const getSocket = (): Socket | null => {
+  // Return socket if it exists (connected or not, but initialized)
+  if (socket) {
     return socket;
-  } else if (userIdGlobal && appKeyGlobal && nameGlobal && profilePictureGlobal && tokenGlobal) {
-    return initSocket({ userId: userIdGlobal, appKey: appKeyGlobal, name: nameGlobal, profilePicture: profilePictureGlobal, token: tokenGlobal });
   }
+  // Don't auto-initialize here - let the app explicitly call initSocket
+  // This prevents accidental multiple connections
+  return null;
 };
 
 /**
@@ -97,7 +140,9 @@ export const disconnectSocket = (): void => {
     userIdGlobal = null;
     appKeyGlobal = null;
     nameGlobal = null;
-    profilePictureGlobal = null
+    profilePictureGlobal = null;
+    tokenGlobal = null;
+    isInitializing = false;
   }
 };
 
