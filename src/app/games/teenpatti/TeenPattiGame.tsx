@@ -333,7 +333,7 @@ useEffect(() => {
     if (gameConfig) {
       setTimeout(() => {
         setGameLoadedFully(true);
-      }, 5000); // small delay to ensure smooth transition
+      }, 2000); // small delay to ensure smooth transition
     }
   }, [gameConfig]);
 const getCardsForPot = (idx: number): string[] => {
