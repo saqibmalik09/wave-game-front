@@ -104,7 +104,7 @@ export default function CoinTray() {
           style={{
             background: 'rgba(0, 0, 0, 0.5)',
             fontSize: 'clamp(8px, 1vw, 14px)',
-            width: '22%',
+            width: '27%',
           }}>
           <div
             className="rounded-circle d-flex align-items-center justify-content-center"
