@@ -109,8 +109,8 @@ export default function CoinTray() {
           <div
             className="rounded-circle d-flex align-items-center justify-content-center"
             style={{
-              width: 'clamp(20px, 2vw, 28px)',
-              height: 'clamp(20px, 2vw, 28px)',
+              width: 'clamp(24px, 2vw, 28px)',
+              height: 'clamp(24px, 2vw, 28px)',
               background: 'linear-gradient(135deg, #ffd700, #ffed4e)',
               fontSize: 'clamp(12px, 1.2vw, 18px)',
             }}
