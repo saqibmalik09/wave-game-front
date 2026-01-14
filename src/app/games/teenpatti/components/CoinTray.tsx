@@ -30,9 +30,9 @@ function CoinButton({ amount, color, isSelected, onClick }: CoinButtonProps) {
       <div
         className="rounded-circle d-flex align-items-center justify-content-center fw-bold"
         style={{
-          width: 'clamp(18px, 6vw, 40px)',
-          height: 'clamp(18px, 6vw, 40px)',
-          fontSize: 'clamp(6px, 2.1vw, 16px)',
+          width: 'clamp(31px, 6vw, 40px)',
+          height: 'clamp(31px, 6vw, 40px)',
+          fontSize: 'clamp(10px, 2.1vw, 16px)',
           background: `linear-gradient(135deg, ${color}ee 0%, ${color} 50%, ${color}99 100%)`,
           border: `clamp(2px, 0.4vw, 3px) solid ${color}`,
           boxShadow: isSelected
@@ -103,7 +103,8 @@ export default function CoinTray() {
           className="d-flex align-items-center gap-1 px-2 py-1  rounded-pill flex-shrink-0 select-none"
           style={{
             background: 'rgba(0, 0, 0, 0.5)',
-            fontSize: 'clamp(6px, 1vw, 14px)',
+            fontSize: 'clamp(8px, 1vw, 14px)',
+            width: '22%',
           }}>
           <div
             className="rounded-circle d-flex align-items-center justify-content-center"
@@ -111,16 +112,16 @@ export default function CoinTray() {
               width: 'clamp(20px, 2vw, 28px)',
               height: 'clamp(20px, 2vw, 28px)',
               background: 'linear-gradient(135deg, #ffd700, #ffed4e)',
-              fontSize: 'clamp(8px, 1.2vw, 18px)',
+              fontSize: 'clamp(12px, 1.2vw, 18px)',
             }}
           >
             <span className="fw-bold" style={{ color: '#000' }}>G</span>
           </div>
           <div className="d-flex flex-column  ">
-            <small className="text-secondary text-white" style={{ fontSize: 'clamp(7px, 1.2vw, 10px)' }}>
+            <small className="text-secondary text-white" style={{ fontSize: 'clamp(10px, 1.2vw, 10px)' }}>
               Balance
             </small>
-            <span className="text-white fw-bold" style={{ fontSize: 'clamp(8px, 1.5vw, 14px)' }}>
+            <span className="text-white fw-bold" style={{ fontSize: 'clamp(12px, 1.5vw, 14px)' }}>
               {userPlayerData?.data?.balance?.toLocaleString() || '0'}
             </span>
           </div>
