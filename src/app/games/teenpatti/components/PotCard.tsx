@@ -293,24 +293,26 @@ export default function PotCard({
       </div>
 
       {/* Cards Section - Larger & More Visible, Minimal Spacing */}
-      <div className="flex justify-center items-start ">
-        {displayCards.map((cardUrl, idx) => (
-          <div
-            key={idx}
-            className="bg-green"
-            style={{
-              width: '36px',
-              height: '55px',
-            }}
-          >
-            <img
-              src={`${process.env.NEXT_PUBLIC_BACKEND_ASSET_URL}/${cardUrl}`}
-              alt={`Card ${idx}`}
-              className="w-full h-full object-contain"
-            />
-          </div>
-        ))}
-      </div>
+      <div className="relative flex justify-center items-start mt-1" style={{ height: '80px' }}>
+  {displayCards.map((cardUrl, idx) => (
+    <div
+      key={idx}
+      style={{
+        position: 'absolute',
+        width: '50px',        // larger than before
+        height: '64px',       // larger than before
+        left: `${idx * 22}px`, // 50% overlap (42px / 2 ≈ 21)
+        zIndex: idx,
+      }}
+    >
+      <img
+        src={`${process.env.NEXT_PUBLIC_BACKEND_ASSET_URL}/${cardUrl}`}
+        alt={`Card ${idx}`}
+        className="w-full h-full object-contain"
+      />
+    </div>
+  ))}
+</div>
 
       {/* Coins Container - No Background, Maximum Width */}
       <div
