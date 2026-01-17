@@ -114,7 +114,7 @@ export default function TeenPattiPages() {
         };
         setTimeout(() => {
           teenpattiGameTableJoin(NewJoiner);
-        }, 7000);
+        }, 4000);
         setLoading(false);
       } catch (error: any) {
         setModalMessage({
