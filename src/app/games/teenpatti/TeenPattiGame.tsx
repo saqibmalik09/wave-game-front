@@ -291,9 +291,6 @@ useEffect(() => {
       });
     }
   }, [currentPhase]);
-  // const onCardClick = () => SoundManager.getInstance().play('betButtonAndCardClickSound');
-  // const onShuffleCards = () => SoundManager.getInstance().play('cardsShuffleSound');
-
   // Initialize PixiJS engine AFTER canvas and config are ready
   useEffect(() => {
     if (!canvasRef.current || !gameConfig) return;
@@ -379,18 +376,18 @@ const getCardsForPot = (idx: number): string[] => {
           </div>
 
           {/* Left Players List - Absolute positioned */}
-          <div className="absolute left-2 top-[15%] z-40">
+          <div className="absolute left-4 top-[9%] z-40">
             <PlayersList />
           </div>
 
           {/* Pots Container - Positioned at 68% from top */}
-          <div className="absolute top-[63%] left-[56%] z-30 -translate-x-1/2 -translate-y-1/2 flex gap-0.5 px-1">
+          <div className="absolute top-[70%] left-[52%] z-30 -translate-x-1/2 -translate-y-1/2 flex gap-0.5 px-1">
             {pots.map((pot) => (
               <React.Fragment key={pot.potIndex}>
 
                 {/* Timer above POT 0 */}
                 {pot.potIndex === 0 && (
-                  <span className="absolute -top-9 left-[17%] -translate-x-1/2 z-40">
+                  <span className="absolute -top-9 left-[50%] -translate-x-1/2 z-40">
                     <Timer />
                   </span>
                 )}

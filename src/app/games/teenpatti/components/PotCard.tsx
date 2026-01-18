@@ -274,8 +274,8 @@ export default function PotCard({
     <div
       data-pot-index={potIndex}
       className={`relative flex flex-col rounded-2xl transition-all duration-300 border-2 ${isWinner && currentPhase === 'resultAnnounceTimer'
-        ? 'bg-gradient-to-b from-green-700 to-green-900 border-green-500 shadow-[0_0_30px_rgba(34,197,94,0.5)]'
-        : 'bg-gradient-to-b from-slate-800 to-slate-950 border-slate-700'
+        ? 'bg-gradient-to-b from-yellow-700 to-yellow-900 border-yellow-500 shadow-[0_0_30px_rgba(34,197,94,0.5)]'
+        : 'bg-[#701523] border-[#A24452]'
         } ${currentPhase === 'bettingTimer' ? 'cursor-pointer opacity-100' : 'cursor-not-allowed opacity-80'
         }`}
       style={{
@@ -286,11 +286,16 @@ export default function PotCard({
       onClick={handlePotClick}
     >
       {/* Pot Header - Single Line */}
-      <div className="bg-slate-700/50 rounded-t-xl px-2 py-0.5 text-center border-b border-slate-600">
+       <div className={`rounded-t-xl px-2 py-0.5 text-center border-b border-slate-600
+          ${isWinner && currentPhase === 'resultAnnounceTimer'
+            ? 'bg-yellow-500'
+            : 'bg-[#9E2D3F]'
+          }`}>
         <div className="text-white font-bold text-[7px] sm:text-xs whitespace-nowrap">
           POT {totalBet.toLocaleString()}
         </div>
       </div>
+
 
       {/* Cards Section - Larger & More Visible, Minimal Spacing */}
       <div className="relative flex justify-center items-start mt-1" style={{ height: '80px' }}>
