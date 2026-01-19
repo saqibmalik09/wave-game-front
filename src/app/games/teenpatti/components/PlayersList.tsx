@@ -25,8 +25,27 @@ interface PlayersUpdateResponse {
   users: Player[];
 }
 
+// Configuration constants
+const MIN_VISIBLE_PLAYERS = 3;
+const MAX_VISIBLE_PLAYERS = 4;
+
+// 10 beautiful gradient colors for crown borders (cycles through)
+const CROWN_GRADIENTS = [
+  'linear-gradient(135deg, #ffd700, #ffed4e)',     // 1. Gold
+  'linear-gradient(135deg, #c0c0c0, #e8e8e8)',     // 2. Silver
+  'linear-gradient(135deg, #cd7f32, #e9a96b)',     // 3. Bronze
+  'linear-gradient(135deg, #8b5cf6, #a78bfa)',     // 4. Purple
+  'linear-gradient(135deg, #ec4899, #f472b6)',     // 5. Pink
+  'linear-gradient(135deg, #10b981, #34d399)',     // 6. Green
+  'linear-gradient(135deg, #f59e0b, #fbbf24)',     // 7. Amber
+  'linear-gradient(135deg, #3b82f6, #60a5fa)',     // 8. Blue
+  'linear-gradient(135deg, #ef4444, #f87171)',     // 9. Red
+  'linear-gradient(135deg, #06b6d4, #22d3ee)',     // 10. Cyan
+];
+
 export default function PlayersList() {
   const [players, setPlayers] = useState<Player[]>([]);
+  const [isExpanded, setIsExpanded] = useState(false);
 
   useEffect(() => {
     const socket = getSocket();
@@ -46,12 +65,25 @@ export default function PlayersList() {
     };
   }, []);
 
-  const visiblePlayers = players.slice(0, 7);
-  const remainingCount = players.length - 4;
+  // Calculate visible count based on expanded state
+  const maxVisibleCount = isExpanded ? players.length : MIN_VISIBLE_PLAYERS;
+  const visiblePlayers = players.slice(0, maxVisibleCount);
+  
+  // Calculate remaining count
+  const totalPlayers = players.length;
+  const remainingCount = isExpanded ? 0 : (totalPlayers - MIN_VISIBLE_PLAYERS);
+  
+  // Show component only if there are more than MIN_VISIBLE_PLAYERS
+  const shouldShowComponent = totalPlayers > MIN_VISIBLE_PLAYERS;
 
- return (
-  <div className="w-11 flex flex-col gap-1">
-    {remainingCount > 0 && (
+  const handleToggle = () => {
+    setIsExpanded(!isExpanded);
+  };
+
+  if (!shouldShowComponent) return null;
+
+  return (
+    <div className="w-11 flex flex-col gap-1">
       <div
         className="flex flex-col rounded-r-lg overflow-hidden shadow-lg"
         style={{
@@ -66,16 +98,23 @@ export default function PlayersList() {
         </div>
 
         {/* Players List */}
-        <div className="flex flex-col gap-1 p-1">
+        <div 
+          className="flex flex-col gap-1 p-1"
+          style={{
+            maxHeight: isExpanded ? `${MAX_VISIBLE_PLAYERS * 31}px` : 'auto',
+            overflowY: isExpanded ? 'auto' : 'visible',
+            scrollbarWidth: 'none',
+            msOverflowStyle: 'none',
+          }}
+        >
+          <style jsx>{`
+            div::-webkit-scrollbar {
+              display: none;
+            }
+          `}</style>
           {visiblePlayers.map((player, index) => {
-            const crownGradient =
-              index === 0
-                ? 'linear-gradient(135deg, #ffd700, #ffed4e)'
-                : index === 1
-                ? 'linear-gradient(135deg, #c0c0c0, #e8e8e8)'
-                : index === 2
-                ? 'linear-gradient(135deg, #cd7f32, #e9a96b)'
-                : 'linear-gradient(135deg, #8b5cf6, #6366f1)';
+            // Cycle through 10 colors
+            const crownGradient = CROWN_GRADIENTS[index % CROWN_GRADIENTS.length];
 
             return (
               <div
@@ -133,34 +172,48 @@ export default function PlayersList() {
               </div>
             );
           })}
+        </div>
 
-          {/* +MORE COUNT — ATTACHED AT BOTTOM */}
-          {remainingCount > 0 && (
-            <div
-              className="relative flex justify-center items-center"
-              style={{
-                width: '100%',
-                height: '30px',
-              }}
-              title={`${remainingCount} more players`}
-            >
-              <div
-                className="rounded-md flex items-center justify-center font-extrabold text-white text-[10px]"
-                style={{
-                  width: '30px',
-                  height: '30px',
-                  background: 'linear-gradient(135deg, #255db6, #2156c9)',
-                  border: '1px solid rgba(255,255,255,0.15)',
-                }}
+        {/* TOGGLE BUTTON - Inside, at the bottom */}
+        <div
+          className="flex justify-center items-center p-1 cursor-pointer hover:opacity-90 transition-opacity border-t border-white/10"
+          style={{
+            background: 'linear-gradient(180deg, #3a0e1a 0%, #4F1120 100%)',
+          }}
+          onClick={handleToggle}
+          title={
+            isExpanded
+              ? 'Click to collapse'
+              : `${remainingCount > 0 ? remainingCount : 'No'} more players - Click to expand`
+          }
+        >
+          <div
+            className="rounded-md flex items-center justify-center font-extrabold text-white shadow-lg"
+            style={{
+              width: '34px',
+              height: '34px',
+              background: isExpanded
+                ? 'linear-gradient(135deg, #b62525, #c92121)'
+                : 'linear-gradient(135deg, #255db6, #2156c9)',
+              border: '2px solid rgba(255,255,255,0.25)',
+              fontSize: '11px',
+            }}
+          >
+            {isExpanded ? (
+              <svg
+                viewBox="0 0 24 24"
+                width="16"
+                height="16"
+                fill="white"
               >
-                +{remainingCount >= 100 ? '99+' : remainingCount}
-              </div>
-            </div>
-          )}
+                <path d="M7 14l5-5 5 5H7z" />
+              </svg>
+            ) : (
+              <>+{remainingCount >= 100 ? '99+' : Math.max(0, remainingCount)}</>
+            )}
+          </div>
         </div>
       </div>
-    )}
-  </div>
-);
-
+    </div>
+  );
 }
