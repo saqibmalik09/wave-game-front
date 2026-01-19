@@ -394,7 +394,7 @@ const getCardsForPot = (idx: number): string[] => {
           </div>
 
           {/* Left Players List - Absolute positioned */}
-          <div className="absolute left-2 top-[11%] z-40">
+          <div className="absolute left-13 top-[4%] z-40">
             <PlayersList />
           </div>
 

@@ -28,8 +28,8 @@ export default function TopBar() {
   };
 
   return (
-    <div className="sticky w-full p-1" >
-      <div className="container mx-auto " >
+    <div className="sticky w-full p-1 " >
+      <div className="container mx-auto p-0">
         <div
           className="d-flex justify-content-between align-items-center rounded-pill"
           style={{
@@ -39,7 +39,7 @@ export default function TopBar() {
           }}
         >
           {/* Left: Back & Menu */}
-          <div className="d-flex align-items-center" style={{ gap: 'clamp(4px, 0.8vw, 6px)' }}>
+          <div className="d-flex align-items-center -left-5" style={{ gap: 'clamp(4px, 0.8vw, 6px)' }}>
             <button
               className="rounded-circle p-0 d-flex align-items-center justify-content-center border-0 "
               style={{
@@ -86,7 +86,7 @@ export default function TopBar() {
             </div> */}
 
           {/* Center: Maximum Bet */}
-          <div className="d-md-block p-0" style={{ maxWidth: '100%', marginTop:"5px" }}>
+          <div className="d-md-block p-0" style={{ maxWidth: '70%', marginTop:"5px" }}>
             <svg
               viewBox="0 0 260 70"
               xmlns="http://www.w3.org/2000/svg"
