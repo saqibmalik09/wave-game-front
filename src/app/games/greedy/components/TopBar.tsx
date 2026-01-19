@@ -1,9 +1,12 @@
+import PlayerTopBar from './PlayerTopBar';
+
 export default function TopBar() {
   return (
     <header className="absolute top-0 left-0 right-0 z-30
       flex justify-between items-start px-2 pt-2">
 
       <div className="flex items-center gap-1">
+        {/* Hamburger Menu */}
         <button className="w-9 h-9 bg-orange-400 rounded-full
           flex flex-col items-center justify-center gap-[3px]
           shadow-md">
@@ -12,10 +15,8 @@ export default function TopBar() {
           <span className="w-4 h-[2.5px] bg-white rounded"></span>
         </button>
 
-        <button className="bg-orange-400 text-white text-xs font-bold
-          px-3 py-1 rounded-full shadow-md">
-          👥 Players
-        </button>
+        {/* Player Icon */}
+        <PlayerTopBar />
       </div>
 
       <div className="flex flex-col items-end gap-1 mt-14">
