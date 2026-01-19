@@ -399,20 +399,20 @@ const getCardsForPot = (idx: number): string[] => {
           </div>
 
           {/* Pots Container - Positioned at 68% from top */}
-          <div className="absolute top-[63%] left-[56%] z-30 -translate-x-1/2 -translate-y-1/2 flex gap-0.5 px-1">
+          <div className="absolute top-[63%] left-[51%] z-30 -translate-x-1/2 -translate-y-1/2 flex gap-0.5 px-1">
             {pots.map((pot) => (
               <React.Fragment key={pot.potIndex}>
 
                 {/* Timer above POT 0 */}
                 {pot.potIndex === 0 && (
-                  <span className="absolute -top-9 left-[17%] -translate-x-1/2 z-40">
+                  <span className="absolute -top-9 left-[84%] -translate-x-1/2 z-40">
                     <Timer />
                   </span>
                 )}
 
                 {/* Yellow Label above POT 1 */}
-                {pot.potIndex === 2 && currentPhase && phaseLabels[currentPhase] && (
-                  <span className="absolute -top-6 left-[80%] -translate-x-1/2 z-40 pointer-events-none">
+                {pot.potIndex === 1 && currentPhase && phaseLabels[currentPhase] && (
+                  <span className="absolute -top-10 left-[52%] -translate-x-1/2 z-40 pointer-events-none">
                     <span
                       className="relative flex items-center justify-center select-none"
                       style={{
