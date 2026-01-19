@@ -323,7 +323,7 @@ export default function PotCard({
       {/* Coins Container - No Background, Maximum Width */}
       <div
         ref={coinsContainerRef}
-        className="absolute left-0 right-0 mx-0.2 rounded-lg overflow-hidden"
+        className="absolute left-0 right-0 mx-0.5 rounded-lg overflow-hidden"
         style={{
           top: 'calc(70px + 16px)', // ⬅ EXACTLY where cards end (adjust if needed)
           height: '42%',           // ⬅ now grows ONLY DOWN
