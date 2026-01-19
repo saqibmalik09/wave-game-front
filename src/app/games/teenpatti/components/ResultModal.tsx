@@ -232,8 +232,8 @@ export default function ResultModal() {
                   <span
                     className="d-flex align-items-center justify-content-center fw-bold"
                     style={{
-                      width: '15px',
-                      height: '15px',
+                      width: '18px',
+                      height: '18px',
                       borderRadius: '50%',
                       background:
                         'linear-gradient(135deg, #ffd700, #ffed4e)',

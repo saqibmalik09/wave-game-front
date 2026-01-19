@@ -13,6 +13,7 @@ interface PotCardProps {
   potIndex: number;
   potName: string;
   totalBet: number;
+  myBet: number;
   betCoins: number[];
   cardImages: string[];
   cardBackImages: string[];
@@ -39,6 +40,7 @@ export default function PotCard({
   potIndex,
   potName,
   totalBet,
+  myBet,
   betCoins,
   cardImages,
   cardBackImages,
@@ -189,7 +191,7 @@ export default function PotCard({
     }
   }, [pendingCoin, potIndex, coinIdCounter, dispatch]);
 
-  // ✅ Card flip animation
+  //  Card flip animation
   useEffect(() => {
     if (currentPhase === 'resultAnnounceTimer') {
       setDisplayCards(cardBackImages);
@@ -273,34 +275,40 @@ export default function PotCard({
   return (
     <div
       data-pot-index={potIndex}
-      className={`relative flex flex-col rounded-2xl transition-all duration-300 border-2 ${isWinner && currentPhase === 'resultAnnounceTimer'
-        ? 'bg-gradient-to-b from-green-700 to-green-900 border-green-500 shadow-[0_0_30px_rgba(34,197,94,0.5)]'
-        : 'bg-gradient-to-b from-slate-800 to-slate-950 border-slate-700'
+      className={`relative flex flex-col rounded-2xl transition-all duration-300 border-2 pb-7 ${isWinner && currentPhase === 'resultAnnounceTimer'
+        ? 'bg-gradient-to-b from-yellow-700 to-yellow-900 border-yellow-500 shadow-[0_0_30px_rgba(34,197,94,0.5)]'
+        : 'bg-[#701523] border-[#A24452]'
         } ${currentPhase === 'bettingTimer' ? 'cursor-pointer opacity-100' : 'cursor-not-allowed opacity-80'
         }`}
       style={{
         width: '97px',
-        minHeight: '150px',
-        maxHeight: '162px',
+        minHeight: '168px',
+        maxHeight: '180px',
       }}
       onClick={handlePotClick}
     >
       {/* Pot Header - Single Line */}
-      <div className="bg-slate-700/50 rounded-t-xl px-2 py-0.5 text-center border-b border-slate-600">
+       <div className={`rounded-t-xl px-2 py-0.5 text-center border-b border-slate-600
+          ${isWinner && currentPhase === 'resultAnnounceTimer'
+            ? 'bg-yellow-500'
+            : 'bg-[#9E2D3F]'
+          }`}>
         <div className="text-white font-bold text-[7px] sm:text-xs whitespace-nowrap">
           POT {totalBet.toLocaleString()}
         </div>
       </div>
 
       {/* Cards Section - Larger & More Visible, Minimal Spacing */}
-      <div className="flex justify-center items-start ">
+      <div className="relative flex justify-center items-start mt-0.5" style={{ height: '70px' }}>
         {displayCards.map((cardUrl, idx) => (
           <div
             key={idx}
-            className="bg-green"
             style={{
-              width: '36px',
-              height: '55px',
+              position: 'absolute',
+              width: '50px',        // larger than before
+              height: '70px',       // larger than before
+              left: `${idx * 22}px`, // 50% overlap (42px / 2 ≈ 21)
+              zIndex: idx,
             }}
           >
             <img
@@ -315,12 +323,14 @@ export default function PotCard({
       {/* Coins Container - No Background, Maximum Width */}
       <div
         ref={coinsContainerRef}
-        className="relative mt-auto mx-0.5 mb-0.7 rounded-lg overflow-hidden"
+        className="absolute left-0 right-0 mx-0.2 rounded-lg overflow-hidden"
         style={{
-          width: 'calc(100% - 2px)',
-          height: '75px',
+          top: 'calc(70px + 16px)', // ⬅ EXACTLY where cards end (adjust if needed)
+          height: '42%',           // ⬅ now grows ONLY DOWN
+          width: 'calc(100% - 1px)',
         }}
       >
+
         {/* Multiplier as placeholder text when no coins */}
         {coins.length === 0 && (
           <div className="absolute inset-0 flex items-center justify-center text-amber-500 font-bold text-xs opacity-40">
@@ -355,6 +365,12 @@ export default function PotCard({
           );
         })}
 
+      </div>
+      {/* my bet total here  */}
+      <div className="absolute bottom-0 left-0 right-0 flex justify-center">
+        <div className="bg-opacity-50 text-white text-xs px-0.5 py-0.5 rounded">
+          My Bet: {myBet.toLocaleString()}
+        </div>
       </div>
 
       <style jsx>{`

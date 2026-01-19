@@ -100,6 +100,11 @@ export default function TeenPattiGame() {
     1: 0,
     2: 0,
   });
+    const [myBetSum, setMyPotBetSum] = useState<Record<number, number>>({
+    0: 0,
+    1: 0,
+    2: 0,
+  });
 const [winningCards, setWinningCards] = useState<string[] | null>(null);
 const [loserCards, setLoserCards] = useState<{
   cardsA: string[];
@@ -256,25 +261,29 @@ const [winningPotIndex, setWinningPotIndex] = useState<number | null>(null);
   const handleCoinAnimationComplete = () => {
     setCoinAnimation(prev => ({ ...prev, isActive: false }));
   };
-  // useEffect(() => {
-    // if (!latestBet || !userInfo || !tenant) return;
+  useEffect(() => {
+    if (!latestBet || !userInfo || !tenant) return;
    
-    // const potIndex = Number(latestBet.potIndex);
-    // const betAmount = Number(latestBet.amount);
-    //     setPotBetSum((prev) => {
-    //   const newSum = {
-    //     ...prev,
-    //     [potIndex]: (prev[potIndex] || 0) + betAmount,
-      // };
-      // console.log("Updated potBetSum:", newSum); 
-      // return newSum;
-    // })
+    const potIndex = Number(latestBet.potIndex);
+    const betAmount = Number(latestBet.amount);
+      setMyPotBetSum((prev) => {
+      const newSum = {
+        ...prev,
+        [potIndex]: (prev[potIndex] || 0) + betAmount,
+      };
+      return newSum;
+    })
   
-  // }, [latestBet]);
+  }, [latestBet]);
 useTeenpattiBetSumResponse((data) => {
-  console.log("potbetsum in useTeenpattiBetSumResponse:",data)
   if (!data) return;
   setPotBetSum(prev => ({
+    ...prev,
+    0: data[0] ?? prev[0],
+    1: data[1] ?? prev[1],
+    2: data[2] ?? prev[2],
+  }));
+   setMyPotBetSum(prev => ({
     ...prev,
     0: data[0] ?? prev[0],
     1: data[1] ?? prev[1],
@@ -285,6 +294,11 @@ useTeenpattiBetSumResponse((data) => {
 useEffect(() => {
     if (currentPhase === 'newGameStartTimer') {
       setPotBetSum({
+        0: 0,
+        1: 0,
+        2: 0,
+      });
+      setMyPotBetSum({
         0: 0,
         1: 0,
         2: 0,
@@ -354,6 +368,7 @@ const getCardsForPot = (idx: number): string[] => {
     potIndex: idx,
     potName: `Pot ${String.fromCharCode(65 + idx)}`,
     totalBet: potBetSum[idx] ?? 10,
+    myBet: myBetSum[idx] ?? 10,
     betCoins: gameConfig.bettingCoins,
     cardImages: getCardsForPot(idx),  
     cardBackImages: gameConfig.cardBackImages[idx],
@@ -379,7 +394,7 @@ const getCardsForPot = (idx: number): string[] => {
           </div>
 
           {/* Left Players List - Absolute positioned */}
-          <div className="absolute left-2 top-[15%] z-40">
+          <div className="absolute left-2 top-[11%] z-40">
             <PlayersList />
           </div>
 
@@ -458,131 +473,7 @@ const getCardsForPot = (idx: number): string[] => {
         </div>
 
       </>
-    // <div className="w-xs min-h-full flex items-center justify-center text-white  ">
-
-    //   <div className="w-full min-w-2xs min-h-screen max-w-xl relative overflow-hidden">
-
-    //     {/* TOP BAR */}
-    // <div className="absolute w-full">
-    //   <TopBar />
-    // </div>
-
-    //     {/* PLAYER LIST + TIMER ROW */}
-    //     <div className="  left-0 w-full flex z-40">
-
-    //       {/* LEFT PLAYER LIST */}
-    // <div className=" absolute flex-shrink-0 top-[10%]">
-    //   <PlayersList />
-    // </div>
-    //       {/*  in center responsive dealer avatar image png  `${process.env.NEXT_PUBLIC_BACKEND_ASSET_URL}/${gameConfig?.dealerAvatar} make sure */}
-
-    //         <div className="absolute flex justify-center top-[20%] left-[15%]">
-    //           <div
-    //             className="relative select-none"
-    //             style={{
-    //               width: 'clamp(80px, 18vw, 180px)',
-    //               height: 'clamp(80px, 18vw, 180px)',
-    //                background: 'transparent',
-    //             }}
-    //             draggable={false}
-    //           >
-    //             <img
-    //               src={`${process.env.NEXT_PUBLIC_BACKEND_ASSET_URL}/${gameConfig?.dealerAvatar}`}
-    //               alt="Dealer Avatar"
-    //               style={{
-    //                 width: '100%',
-    //                 height: '100%',
-    //                 objectFit: 'contain',
-    //                 background: 'transparent',
-    //                 display: 'block',
-    //               }}
-    //             />
-    //           </div>
-    //         </div>
-
-    //     </div>
-
-    //     {/* GAME CANVAS BACKGROUND */}
-    //     <div
-    //       ref={canvasRef}
-    //       className="absolute inset-0 z-10 shadow-lg"
-    //       style={{
-    //         width: "100%",
-    //         height: "100%",
-    //         borderRadius: "14px",
-    //         overflow: "hidden",
-    //       }}></div>
-
-    //     {/* POTS (center) */}
-    //     <div className="absolute top-[68%] left-1/2 z-30 -translate-x-1/2 -translate-y-1/2 flex gap-2 px-3">
-    //       {pots.map((pot) => (
-    //         <React.Fragment key={pot.potIndex}>
-    //           {/* === TIMER ABOVE POT 0 === */}
-    //           {pot.potIndex === 0 && (
-    // <span className="absolute -top-13 left-1/6 -translate-x-1/2 z-40">
-    //   <Timer />
-    // </span>
-    //           )}
-
-    //           {/* === YELLOW LABEL ABOVE POT 1 === */}
-    //           {pot.potIndex === 1 && currentPhase && phaseLabels[currentPhase] && (
-    //             <span className="absolute -top-10 left-2/4 -translate-x-1/2 z-40 pointer-events-none">
-    //               <span
-    //                 className="relative flex items-center justify-center select-none"
-    //                 style={{
-    //                   minWidth: "clamp(70px, 25vw, 110px)",
-    //                   height: "clamp(22px, 7vw, 28px)",
-    //                   padding: "0 10px",
-    //                   borderRadius: "14px",
-    //                   background: "linear-gradient(180deg, #f4d27a 0%, #e9b94f 100%)",
-    //                   boxShadow:
-    //                     "0 2px 6px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.4)",
-    //                   color: "#3b2400",
-    //                   fontSize: "clamp(10px, 1.8vw, 12px)",
-    //                   fontWeight: 600,
-    //                   letterSpacing: "0.4px",
-    //                   textTransform: "uppercase",
-    //                 }}
-    //               >
-    //                 <span
-    //                   style={{
-    //                     width: 6,
-    //                     height: 6,
-    //                     borderRadius: "50%",
-    //                     background: "#3b2400",
-    //                     opacity: 0.6,
-    //                     marginRight: 6,
-    //                   }}
-    //                 />
-    //                 {phaseLabels[currentPhase]}
-    //               </span>
-    //             </span>
-    //           )}
-    //           <PotCard {...pot} />
-    //         </React.Fragment>
-    //       ))}
-    //     </div>
-
-
-
-
-    //     {/* COIN TRAY (bottom) */}
-    // <div className="absolute bottom-0 left-0 w-full z-40">
-    //   <CoinTray key={gameConfig?.gameId ?? "default"} />
-    // </div>
-
-    //     {/* MODALS */}
-    //     <MessageModal
-    //       show={showModal}
-    //       header={modalMessage.title}
-    //       message={modalMessage.message}
-    //       onClose={() => setShowModal(false)}
-    //     />
-    //     <ResultModal />
-    //     <ToastContainer />
-
-    //   </div>
-    // </div>
+  
   );
 
 }

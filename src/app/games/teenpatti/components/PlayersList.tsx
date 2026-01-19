@@ -46,11 +46,11 @@ export default function PlayersList() {
     };
   }, []);
 
-  const visiblePlayers = players.slice(0, 5);
+  const visiblePlayers = players.slice(0, 7);
   const remainingCount = players.length - 4;
 
  return (
-  <div className='w-11 flex flex-col gap-1'>
+  <div className="w-11 flex flex-col gap-1">
     {remainingCount > 0 && (
       <div
         className="flex flex-col rounded-r-lg overflow-hidden shadow-lg"
@@ -66,17 +66,16 @@ export default function PlayersList() {
         </div>
 
         {/* Players List */}
-        <div className="flex flex-col gap-1 p-1"> 
+        <div className="flex flex-col gap-1 p-1">
           {visiblePlayers.map((player, index) => {
             const crownGradient =
               index === 0
                 ? 'linear-gradient(135deg, #ffd700, #ffed4e)'
                 : index === 1
-                  ? 'linear-gradient(135deg, #c0c0c0, #e8e8e8)'
-                  : index === 2
-                    ? 'linear-gradient(135deg, #cd7f32, #e9a96b)'
-                    : 'linear-gradient(135deg, #8b5cf6, #6366f1)'
-                    
+                ? 'linear-gradient(135deg, #c0c0c0, #e8e8e8)'
+                : index === 2
+                ? 'linear-gradient(135deg, #cd7f32, #e9a96b)'
+                : 'linear-gradient(135deg, #8b5cf6, #6366f1)';
 
             return (
               <div
@@ -88,18 +87,21 @@ export default function PlayersList() {
                   height: '30px',
                 }}
               >
-                {/* Player Image with crown-colored rounded border */}
+                {/* Player Image */}
                 <div
                   className="rounded-md p-[2px]"
-                  style={{ 
+                  style={{
                     background: crownGradient,
                     width: '30px',
                     height: '30px',
                   }}
                 >
                   <Image
-                    src={player.profilePicture??'https://randomuser.me/api/portraits/women/91.jpg'}
-                    alt={player.name??"Player"}
+                    src={
+                      player.profilePicture ??
+                      'https://randomuser.me/api/portraits/women/91.jpg'
+                    }
+                    alt={player.name ?? 'Player'}
                     width={25}
                     height={25}
                     unoptimized
@@ -107,10 +109,10 @@ export default function PlayersList() {
                   />
                 </div>
 
-                {/* Crown Badge - top left corner */}
+                {/* Crown Badge */}
                 <div
                   className="absolute flex items-center justify-center rounded-full z-10 border border-black/30 shadow-md"
-                  style={{ 
+                  style={{
                     background: crownGradient,
                     width: '12px',
                     height: '12px',
@@ -131,9 +133,34 @@ export default function PlayersList() {
               </div>
             );
           })}
+
+          {/* +MORE COUNT — ATTACHED AT BOTTOM */}
+          {remainingCount > 0 && (
+            <div
+              className="relative flex justify-center items-center"
+              style={{
+                width: '100%',
+                height: '30px',
+              }}
+              title={`${remainingCount} more players`}
+            >
+              <div
+                className="rounded-md flex items-center justify-center font-extrabold text-white text-[10px]"
+                style={{
+                  width: '30px',
+                  height: '30px',
+                  background: 'linear-gradient(135deg, #255db6, #2156c9)',
+                  border: '1px solid rgba(255,255,255,0.15)',
+                }}
+              >
+                +{remainingCount >= 100 ? '99+' : remainingCount}
+              </div>
+            </div>
+          )}
         </div>
       </div>
     )}
   </div>
 );
+
 }
