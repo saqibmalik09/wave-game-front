@@ -281,7 +281,7 @@ export default function PotCard({
         } ${currentPhase === 'bettingTimer' ? 'cursor-pointer opacity-100' : 'cursor-not-allowed opacity-80'
         }`}
       style={{
-        width: '128px',
+        width: '112px',
         minHeight: '168px',
         maxHeight: '180px',
       }}
@@ -305,9 +305,9 @@ export default function PotCard({
             key={idx}
             style={{
               position: 'absolute',
-              width: '53px',        // larger than before
+              width: '49px',        // larger than before
               height: '70px',       // larger than before
-              left: `${idx * 35}px`, // 50% overlap (42px / 2 ≈ 21)
+              left: `${idx * 30}px`, // 50% overlap (42px / 2 ≈ 21)
               zIndex: idx,
             }}
           >
