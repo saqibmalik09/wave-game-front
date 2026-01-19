@@ -7,33 +7,36 @@ import RightPanel from "./components/RightPanel";
 import TopBar from "./components/TopBar";
 import Wheel from "./components/Wheel";
 
-
-
 export default function GreedyGame() {
   return (
-    <div className="min-h-screen relative overflow-hidden  bg-gradient-to-b from-sky-300 to-blue-600">
-
-      {/* stars overlay */}
-      <div className="absolute inset-0 pointer-events-none opacity-60
-        [background-image:radial-gradient(2px_2px_at_20px_30px,white,transparent),
-        radial-gradient(2px_2px_at_40px_70px,rgba(255,255,255,0.8),transparent),
+    <div className="min-h-screen w-full flex items-center justify-center bg-gradient-to-b from-sky-300 to-blue-600 overflow-hidden">
+      
+      {/* Stars overlay - full screen */}
+      <div className="absolute inset-0 pointer-events-none opacity-60 
+        [background-image:radial-gradient(2px_2px_at_20px_30px,white,transparent), 
+        radial-gradient(2px_2px_at_40px_70px,rgba(255,255,255,0.8),transparent), 
         radial-gradient(2px_2px_at_50px_160px,white,transparent)]">
       </div>
 
-      <div className="relative w-full min-h-screen max-w-full mx-auto">
+      {/* Centered container with fixed max width */}
+      <div className="relative w-full max-w-lg h-screen flex items-center justify-center">
+        
+        {/* Game content wrapper */}
+        <div className="relative w-full h-full">
+          
+          <TopBar />
+          <LeftPanel />
+          <RightPanel />
 
-        <TopBar />
-        <LeftPanel />
-        <RightPanel />
+          <div className="absolute inset-0 flex items-center justify-center 
+            px-[70px] pt-[35px] pb-[120px]">
+            <Wheel />
+          </div>
 
-        <div className="absolute inset-0 flex items-center justify-center
-          px-[70px] pt-[60px] pb-[120px]">
-          <Wheel />
+          <BetCategory />
+          <BottomBar />
+
         </div>
-
-        <BetCategory />
-        <BottomBar />
-
       </div>
     </div>
   );

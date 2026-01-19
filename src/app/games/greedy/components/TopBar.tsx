@@ -3,16 +3,17 @@ import PlayerTopBar from './PlayerTopBar';
 export default function TopBar() {
   return (
     <header className="absolute top-0 left-0 right-0 z-30
-      flex justify-between items-start px-2 pt-2">
+      flex justify-between items-start px-1 pt-2">
 
       <div className="flex items-center gap-1">
-        {/* Hamburger Menu */}
+        {/* Back Button Icon instead of Hamburger */}
         <button className="w-9 h-9 bg-orange-400 rounded-full
-          flex flex-col items-center justify-center gap-[3px]
-          shadow-md">
-          <span className="w-4 h-[2.5px] bg-white rounded"></span>
-          <span className="w-4 h-[2.5px] bg-white rounded"></span>
-          <span className="w-4 h-[2.5px] bg-white rounded"></span>
+          flex items-center justify-center shadow-md">
+          {/* Back Arrow SVG */}
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-white" fill="none"
+               viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+          </svg>
         </button>
 
         {/* Player Icon */}
