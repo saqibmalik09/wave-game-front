@@ -260,3 +260,27 @@ export function useTeenpattiBetSumResponse(
     };
   }, [onResponse]);
 }
+
+
+export function useTeenpattiPatternResponse(
+  onResponse: (data: any) => void
+) {
+  useEffect(() => {
+    const socket = getSocket();
+    if (!socket) {
+      console.log('Socket not initialized in TeenpattiPatternResponse');
+      return;
+    }
+
+    const handlePatternResponse = (data: any) => {
+      console.log('in socket TeenpattiPatternResponse:', data);
+      onResponse(data);
+    };
+
+    socket.on('teenpattiWinningCombinationResponse', handlePatternResponse);
+
+    return () => {
+      socket.off('teenpattiWinningCombinationResponse', handlePatternResponse);
+    };
+  }, [onResponse]);
+}

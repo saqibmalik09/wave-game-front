@@ -26,6 +26,9 @@ import { RootState } from '@/lib/redux/store';
 import GameLoading from "@/app/components/GameLoading";
 import { CoinsAnimation } from './components/CoinsAnimation';
 import { useTeenpattiBetSumResponse } from '@/lib/socket/game/teenpatti/teenpattiSocketEventHandler';
+import RightPanel from './components/WinningPattern';
+import Image from 'next/image';
+import WinningPatternPanel from './components/WinningPattern';
 
 interface TenantData {
   success: boolean;
@@ -394,30 +397,62 @@ const getCardsForPot = (idx: number): string[] => {
           </div>
 
           {/* Left Players List - Absolute positioned */}
-          <div className="absolute left-10 top-[2%] z-40">
+          <div className="absolute left-10 top-[2%]">
             <PlayersList />
           </div>
 
+           {/* Right panel winning Pattern */}
+          <div className="absolute right-1 top-[7%]">
+            <WinningPatternPanel />
+          </div>
+
           {/* Pots Container - Positioned at 68% from top */}
-          <div className="absolute top-[63%] left-[51%] z-30 -translate-x-1/2 -translate-y-1/2 flex gap-0.5 px-1">
+          <div className="absolute top-[66%] left-[51%] z-30 -translate-x-1/2 -translate-y-1/2 flex gap-0.5 px-1">
             {pots.map((pot) => (
               <React.Fragment key={pot.potIndex}>
 
                 {/* Timer above POT 0 */}
                 {pot.potIndex === 0 && (
-                  <span className="absolute -top-9 left-[84%] -translate-x-1/2 z-40">
+                  <>
+                  {/*  */}
+                   <span className="absolute -top-7 left-[75%] -translate-x-1/2 z-40">
+                   <Image
+                      src="/BPOT.png"
+                      alt="Diamond"
+                      width={30}
+                      height={30}
+                      // className="drop-shadow-[0_0_6px_rgba(0,255,255,0.6)]"
+
+                    />
+                    {/* gem_9414704 */}
+                    </span>
+                 
+                   <span className="absolute -top-9 left-[23%] -translate-x-1/2 z-40">
+                   <Image
+                      src="/APOT.png"
+                      alt="Guardian"
+                      width={40}
+                      height={35}
+                      // className="drop-shadow-[0_0_6px_rgba(0,255,255,0.6)]"
+
+                    />
+                  </span>
+                  <span className="absolute -top-9 left-[86%] -translate-x-1/2 z-40">
                     <Timer />
                   </span>
+
+                </>  
                 )}
 
                 {/* Yellow Label above POT 1 */}
                 {pot.potIndex === 1 && currentPhase && phaseLabels[currentPhase] && (
-                  <span className="absolute -top-10 left-[52%] -translate-x-1/2 z-40 pointer-events-none">
+                  <>
+                  <span className="absolute -top-12 left-[52%] -translate-x-1/2 z-40 pointer-events-none">
                     <span
                       className="relative flex items-center justify-center select-none"
                       style={{
-                        minWidth: "clamp(40px, 14vw, 22px)",
-                        height: "clamp(15px, 4vw, 12px)",
+                        minWidth: "clamp(40px, 14vw, 24px)",
+                        height: "clamp(15px, 4vw, 16px)",
                         padding: "0 4px",
                         borderRadius: "10px",
                         background: "linear-gradient(180deg, #f4d27a 0%, #e9b94f 100%)",
@@ -443,6 +478,19 @@ const getCardsForPot = (idx: number): string[] => {
                       {phaseLabels[currentPhase]}
                     </span>
                   </span>
+                   <span className="absolute -top-8 left-[43%] -translate-x-1/2 z-40">
+                   <Image
+                      src="/CPOT.png"
+                      alt="Guardian"
+                      width={33}
+                      height={33}
+                      // className="drop-shadow-[0_0_6px_rgba(0,255,255,0.6)]"
+
+                    />
+                    {/* */}
+                    </span>
+                  </>
+                  
                 )}
 
                 <PotCard {...pot} />

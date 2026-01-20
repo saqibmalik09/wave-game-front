@@ -21,14 +21,14 @@ export function gameConfiguration(
   const id = typeof gameId === "object" ? Number(gameId.gameId) : Number(gameId);
   const cacheKey = `game_config_${id}`;
 
-  // 1️⃣ Check cache first
+  // Check cache first
   const cached = getCache(cacheKey);
   if (cached) {
     callback(cached);
     return;
   }
 
-  // 2️⃣ Fetch from socket if not cached
+  //  Fetch from socket if not cached
   socket.emit("gameConfiguration", { gameId: id });
 
   const handleResponse = (data: any) => {

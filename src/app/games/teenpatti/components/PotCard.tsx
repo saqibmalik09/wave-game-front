@@ -294,7 +294,7 @@ export default function PotCard({
             : 'bg-[#9E2D3F]'
           }`}>
         <div className="text-white font-bold text-[7px] sm:text-xs whitespace-nowrap">
-          POT {totalBet.toLocaleString()}
+          POT  {totalBet.toLocaleString()}
         </div>
       </div>
 
