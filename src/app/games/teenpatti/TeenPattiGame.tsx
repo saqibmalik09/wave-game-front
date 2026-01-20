@@ -412,7 +412,7 @@ const getCardsForPot = (idx: number): string[] => {
                 {pot.potIndex === 0 && (
                   <>
                   {/*  */}
-                   <span className="absolute -top-9 left-[21%] -translate-x-1/2 z-40">
+                   <span className="absolute -top-9 left-[16%] -translate-x-1/2 z-40">
                    <Image
                       src="/APOT.png"
                       alt="Guardian"
