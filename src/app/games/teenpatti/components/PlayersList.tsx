@@ -3,7 +3,12 @@
 import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { getSocket } from '@/lib/socket/socketClient';
-
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 interface Player {
   id: number;
   userId: string;
@@ -54,6 +59,7 @@ export default function PlayersList() {
     const handlePotDataResponse = (response: PlayersUpdateResponse) => {
       console.log("table response:", response)
       if (response?.users) {
+        console.log("players:", response.users)
         setPlayers(response.users);
       }
     };
@@ -68,11 +74,11 @@ export default function PlayersList() {
   // Calculate visible count based on expanded state
   const maxVisibleCount = isExpanded ? players.length : MIN_VISIBLE_PLAYERS;
   const visiblePlayers = players.slice(0, maxVisibleCount);
-  
+
   // Calculate remaining count
   const totalPlayers = players.length;
   const remainingCount = isExpanded ? 0 : (totalPlayers - MIN_VISIBLE_PLAYERS);
-  
+
   // Show component only if there are more than MIN_VISIBLE_PLAYERS
   const shouldShowComponent = totalPlayers > MIN_VISIBLE_PLAYERS;
 
@@ -98,7 +104,7 @@ export default function PlayersList() {
         </div>
 
         {/* Players List */}
-        <div 
+        <div
           className="flex flex-col gap-1 p-1"
           style={{
             maxHeight: isExpanded ? `${MAX_VISIBLE_PLAYERS * 31}px` : 'auto',
@@ -119,7 +125,6 @@ export default function PlayersList() {
             return (
               <div
                 key={player.userId}
-                title={player.name}
                 className="relative flex justify-center items-center"
                 style={{
                   width: '100%',
@@ -127,26 +132,43 @@ export default function PlayersList() {
                 }}
               >
                 {/* Player Image */}
-                <div
-                  className="rounded-md p-[2px]"
-                  style={{
-                    background: crownGradient,
-                    width: '30px',
-                    height: '30px',
-                  }}
-                >
-                  <Image
-                    src={
-                      player.profilePicture ??
-                      'https://randomuser.me/api/portraits/women/91.jpg'
-                    }
-                    alt={player.name ?? 'Player'}
-                    width={25}
-                    height={25}
-                    unoptimized
-                    className="object-cover rounded-sm w-full h-full"
-                  />
-                </div>
+                <TooltipProvider delayDuration={100}>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <div
+                        tabIndex={0}
+                        role="button"
+                        aria-label={player.name}
+                        className="rounded-md p-[2px] cursor-pointer focus:outline-none focus:ring-0"
+                        style={{
+                          background: crownGradient,
+                          width: '30px',
+                          height: '30px',
+                        }}
+                      >
+                        <Image
+                          src={
+                            player.profilePicture ??
+                            'https://randomuser.me/api/portraits/women/91.jpg'
+                          }
+                          alt={player.name ?? 'Player'}
+                          width={25}
+                          height={25}
+                          unoptimized
+                          className="object-cover rounded-sm w-full h-full"
+                        />
+                      </div>
+                    </TooltipTrigger>
+
+                    <TooltipContent
+                      side="right"
+                      align="center"
+                      className="px-2 py-1 text-xs font-semibold z-[9999]"
+                    >
+                      {player.name}
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
 
                 {/* Crown Badge */}
                 <div
