@@ -1,3 +1,5 @@
+// bottombar greedy
+
 export default function BottomBar() {
   return (
     <div className="absolute bottom-0 left-0 right-0

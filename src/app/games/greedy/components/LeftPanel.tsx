@@ -1,3 +1,4 @@
+// LeftPanel
 export default function LeftPanel() {
   return (
     <aside className="absolute left-1 top-1/2 -translate-y-1/2

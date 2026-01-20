@@ -1,3 +1,5 @@
+// bet category file in greedy
+
 export default function BetCategory() {
   return (
     <div className="absolute bottom-[80px] left-[72px]

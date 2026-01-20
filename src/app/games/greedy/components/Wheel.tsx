@@ -1,3 +1,5 @@
+// wheel.tsx file
+
 import Image from "next/image";
 import Banana from "./Banana";
 import Burger from "./Burger";
@@ -9,17 +11,22 @@ import Shrink from "./Shrink";
 import Strawberry from "./Strawberry";
 
 const cabins = [
-    { pos: 'top-[2%] left-1/2', icon: <Burger />, mult: 'x10' }, //burger 🍔
-    { pos: 'top-[15%] left-[85%]', icon: <Shrink />, mult: 'x15' },// Jheenga 🍤
-    { pos: 'top-1/2 left-[98%]', icon: <Fish />, mult: 'x25' }, //fish 🐟
-    { pos: 'top-[85%] left-[85%]', icon: <Meat />, mult: 'x45' }, //🥩 Meat
-    { pos: 'top-[98%] left-1/2', icon: <Cherry />, mult: 'x5' },//cherry🍒
-    { pos: 'top-[85%] left-[15%]', icon: <Orange />, mult: 'x5' },  //🍊 orange or grapes
-    { pos: 'top-1/2 left-[2%]', icon: <Banana />, mult: 'x5' }, //🍌 banana
-    { pos: 'top-[15%] left-[15%]', icon: <Strawberry />, mult: 'x5' }, //strawberry
+    { pos: 'top-[2%] left-1/2', icon: <Burger />, mult: 'x10', index: 1 }, //burger 🍔
+    { pos: 'top-[15%] left-[85%]', icon: <Shrink />, mult: 'x15', index: 2 },// Jheenga 🍤
+    { pos: 'top-1/2 left-[98%]', icon: <Fish />, mult: 'x25', index: 3 }, //fish 🐟
+    { pos: 'top-[85%] left-[85%]', icon: <Meat />, mult: 'x45', index: 4 }, //🥩 Meat
+    { pos: 'top-[98%] left-1/2', icon: <Cherry />, mult: 'x5', index: 5 },//cherry🍒
+    { pos: 'top-[85%] left-[15%]', icon: <Orange />, mult: 'x5', index: 6 },  //🍊 orange or grapes
+    { pos: 'top-1/2 left-[2%]', icon: <Banana />, mult: 'x5', index: 7 }, //🍌 banana
+    { pos: 'top-[15%] left-[15%]', icon: <Strawberry />, mult: 'x5', index: 8 }, //strawberry
 ];
 
 export default function Wheel() {
+    const handleCabinClicked = (index: number) => {
+        console.log(`Cabin ${index} clicked!`);
+        // You can add more logic here
+    };
+
     return (
         <div className="relative w-full max-w-[280px] aspect-square">
 
@@ -52,24 +59,26 @@ export default function Wheel() {
             </svg>
 
             {/* ===== CABINS ===== */}
-            {cabins.map((c, i) => (
+            {cabins.map((c) => (
                 <div
-                    key={i}
+                    key={c.index}
+                    onClick={() => handleCabinClicked(c.index)}
                     className={`absolute ${c.pos} -translate-x-1/2 -translate-y-1/2
-          w-[52px] h-[52px] bg-white rounded-full
-          flex flex-col items-center justify-center
-          font-bold shadow-lg z-10`}
+                        w-[52px] h-[52px] bg-white rounded-full
+                        flex flex-col items-center justify-center
+                        font-bold shadow-lg z-10
+                        cursor-pointer hover:scale-110 active:scale-95
+                        transition-transform duration-200`}
                 >
-                    <span className="text-lg">{c.icon}</span>
-                    {/* <span className="text-[10px] -mt-1">{c.mult}</span> */}
+                    <span className="text-lg pointer-events-none">{c.icon}</span>
                 </div>
             ))}
 
             {/* ===== CENTER HUB ===== */}
             <div
                 className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2
-      w-[100px] h-[100px] bg-orange-400 rounded-full shadow-xl
-      flex flex-col items-center justify-center z-20 overflow-visible"
+                    w-[100px] h-[100px] bg-orange-400 rounded-full shadow-xl
+                    flex flex-col items-center justify-center z-20 overflow-visible"
             >
                 {/* Dealer Image */}
                 <Image
@@ -81,18 +90,11 @@ export default function Wheel() {
                 />
 
                 {/* Text stays inside hub */}
-                {/*  overawrap wave like so we can show game step and seconds */}
-                <div className="text-white text-center
-                        font-bold text-sm leading-tight
-                        z-10 bg-green">
-                <div className="text-[13px] font-semibold relative z-10  top-3">Select Time</div>
+                <div className="text-white text-center font-bold text-sm leading-tight z-10">
+                    <div className="text-[13px] font-semibold relative z-10 top-3">Select Time</div>
                     <div className="text-lg font-extrabold relative z-10 top-4">12s</div>
                 </div>
-
             </div>
-
-
-
         </div>
     );
 }
