@@ -1,3 +1,5 @@
+// GreedyGame.tsx file
+
 'use client';
 
 import BetCategory from "./components/BetCategory";

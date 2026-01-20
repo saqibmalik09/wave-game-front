@@ -1,4 +1,4 @@
-// ResponsiveFoodItem.tsx
+// ResponsiveFoodItem.tsx file
 import React, { useEffect, useRef, useState } from 'react';
 import * as PIXI from 'pixi.js';
 

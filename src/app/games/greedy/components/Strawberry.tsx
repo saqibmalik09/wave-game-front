@@ -1,4 +1,4 @@
-// Strawberry.tsx
+// Strawberry.tsx file
 import React from 'react';
 import ResponsiveFoodItem from './ResponsiveFoodItem';
 

@@ -1,3 +1,5 @@
+// PlayerTopBar.tsx file
+
 import PlayerTopBar from './PlayerTopBar';
 
 export default function TopBar() {

@@ -1,4 +1,4 @@
-// Shrink.tsx
+// Shrink.tsx file
 import React from 'react';
 import ResponsiveFoodItem from './ResponsiveFoodItem';
 

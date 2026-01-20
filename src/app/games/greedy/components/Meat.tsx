@@ -1,4 +1,4 @@
-// Meat.tsx
+// Meat.tsx 
 import React from 'react';
 import ResponsiveFoodItem from './ResponsiveFoodItem';
 

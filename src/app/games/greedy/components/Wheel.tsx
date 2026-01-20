@@ -1,3 +1,5 @@
+// wheel.tsx file
+
 import Image from "next/image";
 import Banana from "./Banana";
 import Burger from "./Burger";

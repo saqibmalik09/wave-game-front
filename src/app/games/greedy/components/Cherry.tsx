@@ -1,4 +1,4 @@
-// Cherry.tsx
+// Cherry.tsx file
 import React from 'react';
 import ResponsiveFoodItem from './ResponsiveFoodItem';
 
