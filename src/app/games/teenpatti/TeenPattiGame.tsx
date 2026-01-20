@@ -286,12 +286,6 @@ useTeenpattiBetSumResponse((data) => {
     1: data[1] ?? prev[1],
     2: data[2] ?? prev[2],
   }));
-   setMyPotBetSum(prev => ({
-    ...prev,
-    0: data[0] ?? prev[0],
-    1: data[1] ?? prev[1],
-    2: data[2] ?? prev[2],
-  }));
 });
 
 useEffect(() => {
@@ -392,12 +386,12 @@ const getCardsForPot = (idx: number): string[] => {
        <div className="relative w-full min-h-screen max-w-md mx-auto overflow-hidden" >
 
           {/* Top Bar - Fixed at top */}
-          <div className="absolute top-0 left-3 w-full z-50">
+          <div className="absolute top-0 left-3 w-full ">
             <TopBar />
           </div>
 
           {/* Left Players List - Absolute positioned */}
-          <div className="absolute left-11 top-[2%]">
+          <div className="absolute left-11 top-[2%] ">
             <PlayersList />
           </div>
           <span className="absolute left-[80%] top-[23%] -translate-x-1/4 z-40">
@@ -410,7 +404,7 @@ const getCardsForPot = (idx: number): string[] => {
           </div>
 
           {/* Pots Container - Positioned at 68% from top */}
-          <div className="absolute top-[66%] left-[51%] z-30 -translate-x-1/2 -translate-y-1/2 flex gap-0.5 px-1">
+          <div className="absolute top-[66%] left-[51%]  -translate-x-1/2 -translate-y-1/2 flex gap-0.5 px-1">
             {pots.map((pot) => (
               <React.Fragment key={pot.potIndex}>
 
@@ -418,7 +412,7 @@ const getCardsForPot = (idx: number): string[] => {
                 {pot.potIndex === 0 && (
                   <>
                   {/*  */}
-                   <span className="absolute -top-9 left-[16%] -translate-x-1/2 z-40">
+                   <span className="absolute -top-9 left-[21%] -translate-x-1/2 z-40">
                    <Image
                       src="/APOT.png"
                       alt="Guardian"

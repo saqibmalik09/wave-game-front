@@ -83,7 +83,7 @@ export default function PlayersList() {
   if (!shouldShowComponent) return null;
 
   return (
-    <div className="w-11 flex flex-col gap-1">
+    <div className={`w-11 flex flex-col gap-1 relative ${isExpanded ? 'z-[999]' : 'z-auto'}`}>
       <div
         className="flex flex-col rounded-r-lg overflow-hidden shadow-lg"
         style={{

@@ -57,7 +57,7 @@ export default function WinningPatternPanel() {
 
   if (!shouldShowComponent) {
     return (
-      <aside className="absolute right-1 w-8 bg-green-700 rounded px-0.5 py-2 flex flex-col items-center gap-2 shadow-lg z-20">
+      <aside className="absolute right-1 w-8 bg-green-700 rounded px-0.5 py-2 flex flex-col items-center gap-2 shadow-lg z-40">
         <div className="flex justify-center items-center h-[120px]">
           <span
             className="text-white text-[9px] font-semibold tracking-widest"
