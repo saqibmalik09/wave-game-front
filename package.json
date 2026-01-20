@@ -15,6 +15,7 @@
     "@pixi/filter-drop-shadow": "^5.2.0",
     "@pixi/filter-glow": "^5.2.1",
     "@pixi/sound": "^6.0.1",
+    "@radix-ui/react-tooltip": "^1.2.8",
     "@reduxjs/toolkit": "^2.9.2",
     "axios": "^1.13.1",
     "bootstrap": "^5.3.8",
@@ -34,7 +35,7 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
-    "@tailwindcss/postcss": "^4",
+    "@tailwindcss/postcss": "^4.1.18",
     "@types/node": "20.19.28",
     "@types/react": "19.2.8",
     "@types/react-dom": "^19",

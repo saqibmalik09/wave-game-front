@@ -383,7 +383,7 @@ const getCardsForPot = (idx: number): string[] => {
 
   return (
       <>
-       <div className="relative w-full min-h-screen max-w-md mx-auto overflow-hidden" >
+       <div className="relative w-full min-h-screen max-w-md mx-auto overflow-hidden " >
 
           {/* Top Bar - Fixed at top */}
           <div className="absolute top-0 left-3 w-full ">
