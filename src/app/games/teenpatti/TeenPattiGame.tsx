@@ -397,9 +397,12 @@ const getCardsForPot = (idx: number): string[] => {
           </div>
 
           {/* Left Players List - Absolute positioned */}
-          <div className="absolute left-10 top-[2%]">
+          <div className="absolute left-11 top-[2%]">
             <PlayersList />
           </div>
+          <span className="absolute left-[80%] top-[23%] -translate-x-1/4 z-40">
+              <Timer />
+          </span>
 
            {/* Right panel winning Pattern */}
           <div className="absolute right-1 top-[7%]">
@@ -415,7 +418,7 @@ const getCardsForPot = (idx: number): string[] => {
                 {pot.potIndex === 0 && (
                   <>
                   {/*  */}
-                   <span className="absolute -top-7 left-[75%] -translate-x-1/2 z-40">
+                   <span className="absolute -top-7 left-[80%] -translate-x-1/2 z-40">
                    <Image
                       src="/BPOT.png"
                       alt="Diamond"
@@ -437,9 +440,6 @@ const getCardsForPot = (idx: number): string[] => {
 
                     />
                   </span>
-                  <span className="absolute -top-9 left-[86%] -translate-x-1/2 z-40">
-                    <Timer />
-                  </span>
 
                 </>  
                 )}
@@ -447,13 +447,13 @@ const getCardsForPot = (idx: number): string[] => {
                 {/* Yellow Label above POT 1 */}
                 {pot.potIndex === 1 && currentPhase && phaseLabels[currentPhase] && (
                   <>
-                  <span className="absolute -top-12 left-[52%] -translate-x-1/2 z-40 pointer-events-none">
+                  <span className="absolute -top-15 left-[52%] -translate-x-1/2 z-40 pointer-events-none">
                     <span
                       className="relative flex items-center justify-center select-none"
                       style={{
-                        minWidth: "clamp(40px, 14vw, 24px)",
+                        minWidth: "clamp(40px, 14vw, 28px)",
                         height: "clamp(15px, 4vw, 16px)",
-                        padding: "0 4px",
+                        padding: "0 6px",
                         borderRadius: "10px",
                         background: "linear-gradient(180deg, #f4d27a 0%, #e9b94f 100%)",
                         boxShadow:
@@ -478,7 +478,7 @@ const getCardsForPot = (idx: number): string[] => {
                       {phaseLabels[currentPhase]}
                     </span>
                   </span>
-                   <span className="absolute -top-8 left-[43%] -translate-x-1/2 z-40">
+                   <span className="absolute -top-8 left-[49%] -translate-x-1/2 z-40">
                    <Image
                       src="/CPOT.png"
                       alt="Guardian"

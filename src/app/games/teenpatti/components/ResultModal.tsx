@@ -122,32 +122,19 @@ export default function ResultModal() {
 
     {/* Modal */}
     <div
-      className="position-fixed top-50 start-50 translate-middle rounded-4 overflow-hidden"
+      className="position-fixed top-50 start-50 translate-middle rounded-4 overflow-hidden d-flex flex-column"
       style={{
         width: '60%',
-         height: '95%',
-        maxWidth: '250px', // 🔹 SMALL SCREEN
+        height: '95%',
+        maxWidth: '250px',
         background: 'linear-gradient(180deg, #6b1f2b 0%, #4a1520 100%)',
         boxShadow: '0 20px 60px rgba(0,0,0,0.7)',
         zIndex: 101,
         animation: 'scaleIn 0.25s ease',
       }}
     >
-      {/* <button
-        onClick={handleClose}
-        className="btn btn-dark position-absolute top-0 end-0 rounded-circle"
-        style={{
-          width: '34px',
-          height: '34px',
-          margin: '10px',
-          zIndex: 10,
-        }}
-      >
-        ×
-      </button> */}
-
       {/* Header */}
-      <div className="text-center">
+      <div className="text-center flex-shrink-0 pt-2">
         <h5
           className="text-white fw-bold m-0"
           style={{ fontSize: 'clamp(15px, 1vw, 10px)' }}
@@ -171,7 +158,7 @@ export default function ResultModal() {
       </div>
 
       {/* Winning Cards */}
-      <div className="d-flex justify-content-center gap-1 p-1">
+      <div className="d-flex justify-content-center gap-1 p-1 flex-shrink-0">
         {result.winningCards.map((cardUrl, idx) => (
           <img
             key={idx}
@@ -179,55 +166,64 @@ export default function ResultModal() {
             alt={`Card ${idx + 1}`}
             className="rounded-3"
             style={{
-              width: 'clamp(50px, 16vw, 90px)',
-              height: 'clamp(70px, 12vw, 70px)',
+              width: 'clamp(50px, 16vw, 100px)',
+              height: 'clamp(70px, 12vw, 80px)',
               boxShadow: '0 4px 12px rgba(0,0,0,0.5)',
             }}
           />
         ))}
       </div>
 
-      {/* Winners */}
+      {/* Winners Section - Scrollable */}
       <div
-        className="p-1"
-        style={{ background: 'rgba(0,0,0,0.3)' }}>
+        className="flex-grow-1 d-flex flex-column"
+        style={{ 
+          background: 'rgba(0,0,0,0.3)',
+          minHeight: 0,
+        }}
+      >
         <h5
-          className="text-white fw-semibold text-center"
-          style={{ fontSize: '10px' }}>
+          className="text-white fw-semibold text-center flex-shrink-0 pt-2 mb-1"
+          style={{ fontSize: '10px' }}
+        >
           {result.winners.length > 1 ? 'Winners' : 'Winner'}
         </h5>
 
         <div
-          className="d-flex flex-column gap-1 "
+          className="flex-grow-1 px-2 pb-2"
           style={{
-            maxHeight: '140px', 
             overflowY: 'auto',
+            overflowX: 'hidden',
           }}
         >
-          {result.winners.map((winner) => (
-            <div
-              key={winner.userId}
-              className="d-flex align-items-center p-0.4 justify-content-between rounded-3"
-              style={{
-                background:
-                  winner.userId === String(currentUserId)
-                    ? 'rgba(255,215,0,0.18)'
-                    : 'rgba(255,255,255,0.08)',
-              }}
-            >
-              <div className="d-flex align-items-center gap-1 p-0.5">
-                <img
-                  src={winner.imageProfile}
-                  alt="Winner"
-                  className="rounded-circle"
-                  style={{
-                    width: '25px',
-                    height: '25px',
-                    objectFit: 'cover',
-                    border: '2px solid #ffd700',
-                  }}
-                />
-               <span className="mx-1 text-white">{ winner.name ?? "Ricolive"}</span>
+          <div className="d-flex flex-column gap-1">
+            {result.winners.map((winner) => (
+              <div
+                key={winner.userId}
+                className="d-flex align-items-center p-1 justify-content-between rounded-3"
+                style={{
+                  background:
+                    winner.userId === String(currentUserId)
+                      ? 'rgba(255,215,0,0.18)'
+                      : 'rgba(255,255,255,0.08)',
+                }}
+              >
+                <div className="d-flex align-items-center gap-1">
+                  <img
+                    src={winner.imageProfile}
+                    alt="Winner"
+                    className="rounded-circle"
+                    style={{
+                      width: '25px',
+                      height: '25px',
+                      objectFit: 'cover',
+                      border: '2px solid #ffd700',
+                    }}
+                  />
+                  <span className="text-white" style={{ fontSize: '12px' }}>
+                    {winner.name ?? "Ricolive"}
+                  </span>
+                </div>
                 <div className="d-flex align-items-center gap-1">
                   <span
                     className="d-flex align-items-center justify-content-center fw-bold"
@@ -235,8 +231,7 @@ export default function ResultModal() {
                       width: '18px',
                       height: '18px',
                       borderRadius: '50%',
-                      background:
-                        'linear-gradient(135deg, #ffd700, #ffed4e)',
+                      background: 'linear-gradient(135deg, #ffd700, #ffed4e)',
                       color: '#000',
                       fontSize: '11px',
                       flexShrink: 0,
@@ -244,7 +239,6 @@ export default function ResultModal() {
                   >
                     G
                   </span>
-
                   <span
                     className="text-warning fw-bold"
                     style={{ fontSize: '13px' }}
@@ -253,18 +247,18 @@ export default function ResultModal() {
                   </span>
                 </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </div>
 
-      {/* Footer */}
-      <div className="p-0.5 mt-auto ">
+      {/* Footer - Fixed at Bottom */}
+      <div className="p-2 flex-shrink-0">
         <button
           onClick={handleClose}
           className="btn w-100 fw-bold rounded-pill"
           style={{
-            padding: '1px',
+            padding: '8px',
             fontSize: '12px',
             background: 'linear-gradient(135deg, #ffd700, #ffed4e)',
             color: '#000',
