@@ -418,19 +418,7 @@ const getCardsForPot = (idx: number): string[] => {
                 {pot.potIndex === 0 && (
                   <>
                   {/*  */}
-                   <span className="absolute -top-7 left-[80%] -translate-x-1/2 z-40">
-                   <Image
-                      src="/BPOT.png"
-                      alt="Diamond"
-                      width={30}
-                      height={30}
-                      // className="drop-shadow-[0_0_6px_rgba(0,255,255,0.6)]"
-
-                    />
-                    {/* gem_9414704 */}
-                    </span>
-                 
-                   <span className="absolute -top-9 left-[23%] -translate-x-1/2 z-40">
+                   <span className="absolute -top-9 left-[16%] -translate-x-1/2 z-40">
                    <Image
                       src="/APOT.png"
                       alt="Guardian"
@@ -440,6 +428,19 @@ const getCardsForPot = (idx: number): string[] => {
 
                     />
                   </span>
+                   <span className="absolute -top-9 left-[50%] -translate-x-1/2 z-40">
+                   <Image
+                      src="/BPOT.png"
+                      alt="Diamond"
+                      width={35}
+                      height={35}
+                      // className="drop-shadow-[0_0_6px_rgba(0,255,255,0.6)]"
+
+                    />
+                    {/* gem_9414704 */}
+                    </span>
+                 
+                  
 
                 </>  
                 )}
@@ -478,7 +479,7 @@ const getCardsForPot = (idx: number): string[] => {
                       {phaseLabels[currentPhase]}
                     </span>
                   </span>
-                   <span className="absolute -top-8 left-[49%] -translate-x-1/2 z-40">
+                   <span className="absolute -top-8 left-[80%] -translate-x-1/2 z-40">
                    <Image
                       src="/CPOT.png"
                       alt="Guardian"

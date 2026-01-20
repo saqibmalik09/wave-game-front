@@ -9,8 +9,8 @@ interface WinningPattern {
   winningPotImageURL: string;
 }
 
-const INITIAL_VISIBLE = 4;
-const MAX_VISIBLE_ITEMS = 5;
+const INITIAL_VISIBLE = 5;
+const MAX_VISIBLE_ITEMS = 8;
 
 export default function WinningPatternPanel() {
   const [patterns, setPatterns] = useState<WinningPattern[]>([]);

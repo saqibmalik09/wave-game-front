@@ -124,8 +124,8 @@ export default function ResultModal() {
     <div
       className="position-fixed top-50 start-50 translate-middle rounded-4 overflow-hidden d-flex flex-column"
       style={{
-        width: '60%',
-        height: '95%',
+        width: '70%',
+        height: '90%',
         maxWidth: '250px',
         background: 'linear-gradient(180deg, #6b1f2b 0%, #4a1520 100%)',
         boxShadow: '0 20px 60px rgba(0,0,0,0.7)',
