@@ -27,7 +27,7 @@ interface PlayersUpdateResponse {
 
 // Configuration constants
 const MIN_VISIBLE_PLAYERS = 3;
-const MAX_VISIBLE_PLAYERS = 4;
+const MAX_VISIBLE_PLAYERS = 7;
 
 // 10 beautiful gradient colors for crown borders (cycles through)
 const CROWN_GRADIENTS = [
