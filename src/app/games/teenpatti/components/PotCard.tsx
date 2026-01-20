@@ -298,6 +298,7 @@ export default function PotCard({
         </div>
       </div>
 
+
       {/* Cards Section - Larger & More Visible, Minimal Spacing */}
       <div className="relative flex justify-center items-start mt-0.5" style={{ height: '70px' }}>
         {displayCards.map((cardUrl, idx) => (

@@ -302,9 +302,6 @@ useEffect(() => {
       });
     }
   }, [currentPhase]);
-  // const onCardClick = () => SoundManager.getInstance().play('betButtonAndCardClickSound');
-  // const onShuffleCards = () => SoundManager.getInstance().play('cardsShuffleSound');
-
   // Initialize PixiJS engine AFTER canvas and config are ready
   useEffect(() => {
     if (!canvasRef.current || !gameConfig) return;

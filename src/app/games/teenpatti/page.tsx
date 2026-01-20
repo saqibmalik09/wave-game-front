@@ -156,6 +156,5 @@ export default function TeenPattiPages() {
         onClose={() => setShowModal(false)}
       />
     </div>
-
   );
 }

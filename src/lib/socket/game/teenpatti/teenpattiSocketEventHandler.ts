@@ -249,7 +249,6 @@ export function useTeenpattiBetSumResponse(
     }
 
     const handlePotBetSumResponse = (data: any) => {
-      console.log('in socket teenpattiBetSumResponse:', data);
       onResponse(data);
     };
 
