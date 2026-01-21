@@ -29,7 +29,7 @@ export default function TopBar() {
         </div>
 
         <button className="bg-orange-400 text-white text-[11px]
-          px-3 py-1 rounded-lg font-bold shadow">
+          px-1 py-0.5 rounded-lg font-bold shadow">
           🕐 Record
         </button>
       </div>
