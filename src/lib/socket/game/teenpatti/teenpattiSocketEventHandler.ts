@@ -70,7 +70,6 @@ export function useTeenpattiTimerListener() {
     tenantBaseURL
 
   };
- console.log("teenpattiGameTableJoin payload:", payload);
   socket.emit("placeTeenpattiBet", payload);
 }
 
@@ -103,23 +102,7 @@ export function useTeenpattiTimerListener() {
   console.log("teenpattiGameTableJoin payload:", payload);
   socket.emit("teenpattiGameTableJoin", payload);
 }
-//  export function mySocketIdEvent({
-//   userId,
-//   socketId,
-// }: {
-//   userId: string;
-//   socketId: string;
-// }) {
-
-//   const payload = {
-//     userId,
-//     socketId
-//   };
-//   socket.emit("mySocketId", payload)
-// }
-
-
-      
+   
 export function teenpattiGameTableJoinListener(
   onResponse: (data: any) => void
 ) {
@@ -163,33 +146,6 @@ export function useTeenpattiBetResponseListener( onResponse: (data: any) => void
   }, [onResponse]);
 
 }
-
-// // game users and pots
-// export function teenpattiPotBetsAndUsers({ gameId }: { gameId: number }): Promise<any> {
-//   const socket = initSocket();
-
-//   return new Promise((resolve, reject) => {
-//     const payload = { gameId };
-
-//     // Response handler
-//     const handleResponse = (data: any) => {
-//       socket.off('teenpattiPotBetsAndUsersResponse', handleResponse); // remove listener after response
-
-//       if (!data) return reject(new Error('No data received from server'));
-
-//       if (data.success === undefined || data.success === true) {
-//         resolve(data); // Keep data format exactly as is
-//       } else {
-//         reject(new Error(data.message || 'Failed to fetch pot and users'));
-//       }
-//     };
-//     socket.emit('teenpattiPotBetsAndUsers', payload);
-//     socket.on('teenpattiPotBetsAndUsersResponse', handleResponse);
-
-//   });
-// }
-
-
 
 export function gameTeenPattiResultAnnounce(
   onResponse: (data: any) => void
