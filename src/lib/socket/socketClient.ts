@@ -7,6 +7,7 @@ const SOCKET_URL = process.env.NEXT_PUBLIC_BACKEND_SOCKET_URL;
 let socket: Socket | null = null;
 let userIdGlobal: string | null = null;
 let appKeyGlobal: string | null = null;
+let gameIdGlobal: string | null = null;
 let nameGlobal: string | null = null;
 let profilePictureGlobal: string | null = null;
 let tokenGlobal: string | null = null;
@@ -15,6 +16,7 @@ let isInitializing = false;
 interface InitSocketOptions {
   userId: string;
   appKey: string;
+  gameId: string;
   name: string;
   profilePicture: string;
   token: string;
@@ -25,9 +27,9 @@ interface InitSocketOptions {
  * Must provide userId, appKey, token.
  * If already initialized with same credentials, returns existing socket.
  */
-export const initSocket = ({ userId, appKey, name, profilePicture, token }: InitSocketOptions): Socket => {
+export const initSocket = ({ userId, appKey,gameId, name, profilePicture, token }: InitSocketOptions): Socket => {
 
-  if (!userId || !appKey || !name || !profilePicture) {
+  if (!userId || !appKey || !name || !profilePicture || !gameId) {
     throw new Error('[Socket] Cannot initialize: missing userId, appKey, or token');
   }
 
@@ -35,6 +37,7 @@ export const initSocket = ({ userId, appKey, name, profilePicture, token }: Init
   if (socket && socket.connected && 
       userIdGlobal === userId && 
       appKeyGlobal === appKey && 
+      gameIdGlobal === gameId &&
       tokenGlobal === token) {
     console.log("Socket already connected, reusing:", socket.id);
     return socket;
@@ -59,6 +62,7 @@ export const initSocket = ({ userId, appKey, name, profilePicture, token }: Init
   // Update global credentials
   userIdGlobal = userId;
   appKeyGlobal = appKey;
+  gameIdGlobal = gameId;
   nameGlobal = name;
   profilePictureGlobal = profilePicture;
   tokenGlobal = token;
@@ -79,12 +83,12 @@ export const initSocket = ({ userId, appKey, name, profilePicture, token }: Init
 
   // Add event listeners only once
   socket.on('connect', () => {
-    console.log('🔥 Socket Connected:', socket?.id);
+    console.log(' Socket Connected:', socket?.id);
     isInitializing = false;
   });
 
   socket.on('reconnect', () => {
-    console.log('♻️ Socket Reconnected:', socket?.id);
+    console.log(' Socket Reconnected:', socket?.id);
     isInitializing = false;
   });
 
@@ -139,6 +143,7 @@ export const disconnectSocket = (): void => {
     socket = null;
     userIdGlobal = null;
     appKeyGlobal = null;
+    gameIdGlobal = null;
     nameGlobal = null;
     profilePictureGlobal = null;
     tokenGlobal = null;

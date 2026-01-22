@@ -11,18 +11,9 @@ import GameLoading from "@/app/components/GameLoading";
 import initSocket from "@/lib/socket/socketClient";
 import type { RootState } from "@/lib/redux/store";
 import { teenpattiGameTableJoin } from "@/lib/socket/game/teenpatti/teenpattiSocketEventHandler";
+import { GameUserInfoResponse } from "../dto/games.dto";
 
-interface UserData {
-  id: string;
-  name: string;
-  balance: number;
-  profilePicture: string;
-}
-interface GameUserInfoResponse {
-  success: boolean;
-  message: string;
-  data: UserData;
-}
+
 
 export default function TeenPattiPages() {
   const dispatch = useDispatch();
@@ -96,11 +87,10 @@ export default function TeenPattiPages() {
           })
           );
         }
-
-        // 4️⃣ Socket init
         initSocket({
           userId: userInfo.id,
           appKey,
+          gameId,
           name: userInfo.name,
           profilePicture: userInfo.profilePicture,
           token
@@ -115,7 +105,7 @@ export default function TeenPattiPages() {
         };
         setTimeout(() => {
           teenpattiGameTableJoin(NewJoiner);
-        }, 3000);
+        }, 2000);
         setLoading(false);
       } catch (error: any) {
         setModalMessage({
@@ -156,6 +146,5 @@ export default function TeenPattiPages() {
         onClose={() => setShowModal(false)}
       />
     </div>
-
   );
 }

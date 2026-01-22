@@ -18,63 +18,16 @@ import { gameConfiguration as fetchGameConfiguration, tanantDetailsByAppKey } fr
 import { gameTeenPattiResultAnnounce, myMessagesFromServer, placeTeenpattiBet, teenpattiGameTableJoin, useTeenpattiBetResponseListener } from '@/lib/socket/game/teenpatti/teenpattiSocketEventHandler';
 import { useDispatch, useSelector } from "react-redux";
 import { setGameConfiguration } from '@/lib/redux/slices/teenpatti/gameConfiguration';
-import { setTenantDetails } from '@/lib/redux/slices/tenantDetails';
 import { incrementUserBalance, setUserPlayerInfo } from '@/lib/redux/slices/userSlice';
 import { setPendingCoin } from '@/lib/redux/slices/teenpatti/coinDropAnimation';
-import { v4 as uuidv4 } from 'uuid';
 import { RootState } from '@/lib/redux/store';
 import GameLoading from "@/app/components/GameLoading";
 import { CoinsAnimation } from './components/CoinsAnimation';
 import { useTeenpattiBetSumResponse } from '@/lib/socket/game/teenpatti/teenpattiSocketEventHandler';
-import RightPanel from './components/WinningPattern';
 import Image from 'next/image';
 import WinningPatternPanel from './components/WinningPattern';
+import { GameConfig, GameUserInfoResponse, UserData, UserInfoType } from '../dto/games.dto';
 
-interface TenantData {
-  success: boolean;
-  message: string;
-  data: {
-    activeGames: string;
-    tanantName: string;
-    tenantAppKey: string;
-    tenantProductionDomain: string;
-    tenantTestingDomain: string;
-    tenantPassword: string;
-  };
-}
-interface UserInfoType {
-  appKey: string;
-  token: string;
-  gameId: string;
-}
-
-interface UserData {
-  id: string;
-  name: string;
-  balance: number;
-  profilePicture: string;
-}
-interface GameUserInfoResponse {
-  success: boolean;
-  message: string;
-  data: UserData;
-}
-interface GameConfig {
-  colors: string[];
-  gameId: number;
-  cardImages: string[][];
-  BettingTime: number;
-  nextBetWait: number;
-  bettingCoins: number[];
-  dealerAvatar: string;
-  timerUpSound: string;
-  cardBackImages: string[][];
-  cardsShuffleSound: string;
-  tableBackgroundImage: string;
-  winningCalculationTime: number;
-  betButtonAndCardClickSound: string;
-  returnWinngingPotPercentage: number[];
-}
 const phaseLabels: Record<string, string> = {
   bettingTimer: 'Betting',
   winningCalculationTimer: 'Calculating',
@@ -302,9 +255,6 @@ useEffect(() => {
       });
     }
   }, [currentPhase]);
-  // const onCardClick = () => SoundManager.getInstance().play('betButtonAndCardClickSound');
-  // const onShuffleCards = () => SoundManager.getInstance().play('cardsShuffleSound');
-
   // Initialize PixiJS engine AFTER canvas and config are ready
   useEffect(() => {
     if (!canvasRef.current || !gameConfig) return;
@@ -412,7 +362,7 @@ const getCardsForPot = (idx: number): string[] => {
                 {pot.potIndex === 0 && (
                   <>
                   {/*  */}
-                   <span className="absolute -top-9 left-[16%] -translate-x-1/2 z-40">
+                   <span className="absolute -top-10 left-[16%] -translate-x-1/2 z-40">
                    <Image
                       src="/APOT.png"
                       alt="Guardian"

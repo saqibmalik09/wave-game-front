@@ -195,14 +195,20 @@ export default function PotCard({
   useEffect(() => {
     if (currentPhase === 'resultAnnounceTimer') {
       setDisplayCards(cardBackImages);
+      
+      // Calculate delay based on pot index
+      // Each pot waits 300ms * its index before revealing
+      const revealDelay = potIndex * 500;
+      
       const timer = setTimeout(() => {
         setDisplayCards(cardImages);
-      }, 500);
+      }, revealDelay);
+      
       return () => clearTimeout(timer);
     } else {
       setDisplayCards(cardBackImages);
     }
-  }, [currentPhase, cardBackImages, cardImages]);
+  }, [currentPhase, cardBackImages, cardImages, potIndex]);
 
   const handlePotClick = () => {
     if (!selectedCoin) {
@@ -297,6 +303,7 @@ export default function PotCard({
           POT  {totalBet.toLocaleString()}
         </div>
       </div>
+
 
       {/* Cards Section - Larger & More Visible, Minimal Spacing */}
       <div className="relative flex justify-center items-start mt-0.5" style={{ height: '70px' }}>

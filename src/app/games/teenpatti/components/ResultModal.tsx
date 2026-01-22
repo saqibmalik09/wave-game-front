@@ -6,6 +6,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '@/lib/redux/store';
 import { clearWinningPot, setWinningPotIndex } from '@/lib/redux/slices/teenpatti/winningPotSlice';
 import { gameTeenPattiResultAnnounce } from '@/lib/socket/game/teenpatti/teenpattiSocketEventHandler';
+import Image from 'next/image';
 
 interface ResultData {
   winners: any[]; // you can make a proper type if you know the structure
@@ -65,6 +66,7 @@ export default function ResultModal() {
   //   };
   // }, [manualClosed, dispatch]);
   gameTeenPattiResultAnnounce((response: ResultResponse) => {
+    console.log('Received teenpattiAnnounceGameResultResponse33:', response);
   if (!response?.success || !response.data) return;
   if (manualClosed) return;
 
@@ -142,13 +144,20 @@ export default function ResultModal() {
           {isWinner ? '🎉 You Won!' : 'Round Complete'}
         </h5>
 
-        <p
+      <div className="d-flex flex-column align-items-center justify-content-center my-1">
+        <span
           className="text-warning fw-semibold m-0"
           style={{ fontSize: 'clamp(12px, 3vw, 18px)' }}
         >
-          Winning Pot: {result.winningPot.toUpperCase()}
-        </p>
-
+          Winning Pot
+        </span>
+      <Image src={result.winningPotIndex === 0 ? '/APOT.png' : result.winningPotIndex === 1 ? '/BPOT.png' : '/CPOT.png'}
+                      alt="Guardian"
+                      width={45}
+                      height={45}
+                      // className="drop-shadow-[0_0_6px_rgba(0,255,255,0.6)]"
+                    />
+      </div>
         <p
           className="text-white-50 m-0"
           style={{ fontSize: 'clamp(12px, 1vw, 12px)' }}
