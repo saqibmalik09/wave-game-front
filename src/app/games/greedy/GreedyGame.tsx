@@ -8,6 +8,9 @@ import LeftPanel from "./components/LeftPanel";
 import RightPanel from "./components/RightPanel";
 import TopBar from "./components/TopBar";
 import Wheel from "./components/Wheel";
+import MessageModal from "@/app/components/messageModel";
+import GameLoading from "@/app/components/GameLoading";
+
 
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useRef, useState } from "react";
@@ -19,8 +22,14 @@ export default function GreedyGameUI() {
   const dispatch = useDispatch();
   const tenant = useSelector((s: RootState) => s.tenantDetails.data);
   const user = useSelector((s: RootState) => s.userPlayerData?.data);
-
   const [ready, setReady] = useState(false);
+
+  const [showModal, setShowModal] = useState(false);
+  const [modalMessage, setModalMessage] = useState({
+    title: "",
+    message: "",
+  });
+  const [isValid, setIsValid] = useState(true);
 
   useEffect(() => {
     const runInit = async () => {
@@ -44,9 +53,15 @@ export default function GreedyGameUI() {
 
       if (!response.success) {
         console.error(response.error);
-        return;
+            setModalMessage({
+            title: "Invalid Parameters",
+            message: "Missing appKey, token, or gameId in URL parameters.",
+          });
+          setShowModal(true);
+          setIsValid(false);
+            return;
       }
-
+      
       setReady(true);
     };
 
@@ -55,7 +70,12 @@ export default function GreedyGameUI() {
   const handleHelpClick = () => {
     console.log("Help button clicked");
   }
+  if (!ready && isValid) {
+    return <GameLoading message="Initializing game..." />;
+  }
+
   return (
+    <>
     <div className="min-h-screen w-full flex items-center justify-center bg-gradient-to-b from-sky-300 to-blue-600 overflow-hidden">
 
       {/* Stars overlay - full screen */}
@@ -94,5 +114,12 @@ export default function GreedyGameUI() {
 
       </div>
     </div>
+     <MessageModal
+        show={showModal}
+        header={modalMessage.title}
+        message={modalMessage.message}
+        onClose={() => setShowModal(false)}
+      />
+    </>
   );
 }
