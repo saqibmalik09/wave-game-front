@@ -68,7 +68,8 @@ const [loserCards, setLoserCards] = useState<{
 } | null>(null);
 
 const [winningPotIndex, setWinningPotIndex] = useState<number | null>(null);
-  const [gameLoadedFully, setGameLoadedFully] = useState<boolean>(false);
+const [gameLoadedFully, setGameLoadedFully] = useState<boolean>(false);
+const [mybettingLocked, setMybettingLocked] = useState<boolean>(false);
 
   const user = useSelector((state: RootState) => state.userPlayerData);
   const gameId = React.useMemo(() => ({ gameId: 16 }), []);
@@ -178,6 +179,10 @@ const [winningPotIndex, setWinningPotIndex] = useState<number | null>(null);
     ) {
       fetchUserInfo(); // <-- call here
     }
+    if ( currentPhase === "newGameStartTimer") {
+      setMybettingLocked(false);
+      fetchUserInfo(); // <-- call here
+    }
   }, [currentPhase]);
   myMessagesFromServer((message)=>{
     if(message.betType==2 && message.winningAmount>0){
@@ -201,7 +206,6 @@ const [winningPotIndex, setWinningPotIndex] = useState<number | null>(null);
     }
   })
   useTeenpattiBetResponseListener((data) => {
-    console.log("Teenpatti Bet useTeenpattiBetResponseListener:", data);
     if (data.success) {
       // showToast(data.message ?? `Bet placed: ₹${data.amount}`, "success");
       dispatch(setPendingCoin({ potIndex: Number(data.data.potIndex), value: data.data.amount }));
@@ -211,6 +215,12 @@ const [winningPotIndex, setWinningPotIndex] = useState<number | null>(null);
         data: data.data,
       }));
     } else {
+      if(data.betLimit==1 && data.success==false){
+         setMybettingLocked(true);
+         setMyPotBetSum(data.winningAmount);
+
+      }
+      
       showToast(data.message ?? "Bet failed!", "error");
     }
   });
@@ -218,8 +228,8 @@ const [winningPotIndex, setWinningPotIndex] = useState<number | null>(null);
     setCoinAnimation(prev => ({ ...prev, isActive: false }));
   };
   useEffect(() => {
-    if (!latestBet || !userInfo || !tenant) return;
-   
+    console.log("mybettingLocked:",mybettingLocked)
+    if (!latestBet || !userInfo || !tenant || mybettingLocked) return;
     const potIndex = Number(latestBet.potIndex);
     const betAmount = Number(latestBet.amount);
       setMyPotBetSum((prev) => {
