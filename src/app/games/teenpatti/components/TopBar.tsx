@@ -160,7 +160,7 @@ export default function TopBar() {
                 fill="#FFC17B"
                 style={{ letterSpacing: '0.5px' }}
               >
-                100000k
+                500k
               </text>
             </svg>
           </div>

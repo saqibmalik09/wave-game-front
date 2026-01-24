@@ -62,7 +62,6 @@ export default function PotCard({
   const currentUserId = userPlayerData.data?.id;
   const bettingCoins: number[] = gameConfig?.bettingCoins || [];
   const colors: string[] = gameConfig?.colors || [];
-  const tableBackgroundImage = gameConfig?.tableBackgroundImage;
   const [announcedWinner, setAnnouncedWinner] = useState<string | null>(null);
   const [winner, setWinner] = useState<string | null>(null);
 
