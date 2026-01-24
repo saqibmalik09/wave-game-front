@@ -32,8 +32,8 @@ interface PlayersUpdateResponse {
 }
 
 // Configuration constants
-const MIN_VISIBLE_PLAYERS = 3;
-const MAX_VISIBLE_PLAYERS = 7;
+const MIN_VISIBLE_PLAYERS = 5;
+const MAX_VISIBLE_PLAYERS = 6;
 
 // 10 beautiful gradient colors for crown borders
 const CROWN_GRADIENTS = [
@@ -91,7 +91,7 @@ export default function LeftPanel() {
   return (
     <aside
       className="absolute left-1 top-1/2 -translate-y-1/2
-        w-14 rounded-xl
+        w-12 rounded-xl
         flex flex-col items-center
         shadow-lg z-20"
       style={{
@@ -101,14 +101,14 @@ export default function LeftPanel() {
       }}
     >
       {/* Header */}
-      <div className="w-full text-center font-black text-white text-[10px] tracking-wider py-2 border-b border-white/20">
+      <div className="w-full text-center font-black text-white text-[10px] tracking-wider py-1 border-b border-white/20">
         Players
       </div>
 
       {/* Players List */}
       {hasPlayers ? (
         <div
-          className="flex flex-col gap-2 p-2 w-full flex-1 overflow-hidden"
+          className="flex flex-col gap-1 p-1 w-full flex-1 overflow-hidden"
           style={{
             maxHeight: isExpanded ? `${MAX_VISIBLE_PLAYERS * 44}px` : 'auto',
             overflowY: isExpanded ? 'auto' : 'visible',
@@ -142,7 +142,7 @@ export default function LeftPanel() {
                         tabIndex={0}
                         role="button"
                         aria-label={player.name}
-                        className="rounded-lg p-[2px] cursor-pointer focus:outline-none focus:ring-2 focus:ring-white/50 transition-all hover:scale-105"
+                        className="rounded-lg p-[1px] cursor-pointer focus:outline-none focus:ring-2 focus:ring-white/50 transition-all hover:scale-105"
                         style={{
                           background: crownGradient,
                           width: '40px',
