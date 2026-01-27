@@ -3,7 +3,7 @@ import { useRef } from 'react';
 import PlayerTopBar from './PlayerTopBar';
 
 interface TopBarProps {
-  playerRef: React.RefObject<HTMLButtonElement>;
+    playerRef: React.RefObject<HTMLButtonElement | null>;
 }
 
 export default function TopBar({ playerRef }: TopBarProps) {

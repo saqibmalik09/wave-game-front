@@ -10,11 +10,14 @@ import { useGreedyBetResponseListener } from "@/lib/socket/game/greedy/greedySoc
 import { incrementUserBalance, setUserPlayerInfo } from '@/lib/redux/slices/userSlice';
 
 import { setPendingCoin } from "@/lib/redux/slices/teenpatti/coinDropAnimation";
+import { useToast } from "../../teenpatti/components/Toast";
 const COINS = [100, 1000, 5000, 10000, 50000];
 const COLORS = ['#34d399', '#22c55e', '#16a34a', '#15803d', '#166534'];
 
 export default function BottomBar() {
   const dispatch = useDispatch();
+  const { ToastContainer, showToast } = useToast();
+  
   const userPlayerData = useSelector((state: RootState) => state.userPlayerData);
 
   const [selectedCoin, setSelectedCoin] = useState<number | null>(null);
@@ -49,6 +52,7 @@ export default function BottomBar() {
   };
 
   return (
+    <>
     <div className="absolute bottom-5 left-0 right-0
       flex justify-between items-center
       px-2 pb-2 pt-2 z-30 flex-wrap gap-2">
@@ -89,5 +93,7 @@ export default function BottomBar() {
         })}
       </div>
     </div>
+    <ToastContainer />
+    </>
   );
 }

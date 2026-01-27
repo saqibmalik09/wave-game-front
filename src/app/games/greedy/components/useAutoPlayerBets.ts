@@ -10,7 +10,7 @@ export function useAutoPlayerBets(
     wheelRef: React.RefObject<WheelRef>,
     animateCoin: (amount: number, color: string, target: HTMLElement, startX?: number, startY?: number) => void,
     playersBettingStatus: 'on' | 'off',
-    playerRef: React.RefObject<HTMLButtonElement>
+    playerRef: React.RefObject<HTMLButtonElement | null>
 ) {
     const intervalRef = useRef<NodeJS.Timeout | null>(null);
     const timeoutRef = useRef<NodeJS.Timeout | null>(null);
