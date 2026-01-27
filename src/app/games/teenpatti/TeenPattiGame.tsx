@@ -220,7 +220,6 @@ const [mybettingLocked, setMybettingLocked] = useState<boolean>(false);
          setMyPotBetSum(data.winningAmount);
 
       }
-      
       showToast(data.message ?? "Bet failed!", "error");
     }
   });

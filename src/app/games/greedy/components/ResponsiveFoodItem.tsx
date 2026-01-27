@@ -1,4 +1,3 @@
-// ResponsiveFoodItem.tsx file
 import React, { useEffect, useRef, useState } from 'react';
 import * as PIXI from 'pixi.js';
 
@@ -16,16 +15,30 @@ const ResponsiveFoodItem: React.FC<FoodItemProps> = ({
   const containerRef = useRef<HTMLDivElement>(null);
   const appRef = useRef<PIXI.Application | null>(null);
   const isInitializing = useRef(false);
+  const isMounted = useRef(true);
   const [isReady, setIsReady] = useState(false);
+
+  useEffect(() => {
+    isMounted.current = true;
+    
+    return () => {
+      isMounted.current = false;
+    };
+  }, []);
 
   useEffect(() => {
     if (!containerRef.current || isInitializing.current) return;
 
-    let destroyed = false;
     isInitializing.current = true;
 
     const initApp = async () => {
       try {
+        // Cleanup any existing app first
+        if (appRef.current) {
+          appRef.current.destroy(true, { children: true, texture: true });
+          appRef.current = null;
+        }
+
         // Calculate responsive size
         const getOptimalSize = () => {
           const screenWidth = window.innerWidth;
@@ -41,6 +54,13 @@ const ResponsiveFoodItem: React.FC<FoodItemProps> = ({
         };
 
         const canvasSize = getOptimalSize();
+        
+        // Check if component is still mounted
+        if (!isMounted.current) {
+          isInitializing.current = false;
+          return;
+        }
+
         const app = new PIXI.Application();
         
         await app.init({
@@ -52,13 +72,20 @@ const ResponsiveFoodItem: React.FC<FoodItemProps> = ({
           autoDensity: true,
         });
 
-        if (destroyed) {
+        // Check again after async init
+        if (!isMounted.current) {
           app.destroy(true, { children: true, texture: true });
+          isInitializing.current = false;
           return;
         }
 
         appRef.current = app;
-        containerRef.current?.appendChild(app.canvas);
+        
+        // Clear container before appending
+        if (containerRef.current) {
+          containerRef.current.innerHTML = '';
+          containerRef.current.appendChild(app.canvas);
+        }
 
         const root = new PIXI.Container();
         app.stage.addChild(root);
@@ -100,7 +127,9 @@ const ResponsiveFoodItem: React.FC<FoodItemProps> = ({
         // 4. FOOD ITEM
         const foodTexture = await PIXI.Assets.load(imageUrl);
         
-        if (destroyed) return;
+        if (!isMounted.current) {
+          return;
+        }
 
         const foodSprite = new PIXI.Sprite(foodTexture);
         foodSprite.anchor.set(0.5);
@@ -140,7 +169,9 @@ const ResponsiveFoodItem: React.FC<FoodItemProps> = ({
         badge.addChild(badgeText);
 
         // Mark as ready
-        setIsReady(true);
+        if (isMounted.current) {
+          setIsReady(true);
+        }
 
         // 6. ANIMATION
         let elapsed = 0;
@@ -172,8 +203,10 @@ const ResponsiveFoodItem: React.FC<FoodItemProps> = ({
 
         // Handle window resize
         const handleResize = () => {
+          if (!appRef.current || !isMounted.current) return;
+          
           const newSize = getOptimalSize();
-          app.renderer.resize(newSize, newSize);
+          appRef.current.renderer.resize(newSize, newSize);
           const newScale = newSize / 1250;
           root.x = newSize / 2;
           root.y = newSize / 2;
@@ -182,27 +215,44 @@ const ResponsiveFoodItem: React.FC<FoodItemProps> = ({
 
         window.addEventListener('resize', handleResize);
 
-        // Cleanup resize listener
+        // Store cleanup function
         return () => {
           window.removeEventListener('resize', handleResize);
         };
 
       } catch (err) {
         console.error("PixiJS Init Error:", err);
-        setIsReady(true); // Show even on error to prevent infinite loading
+        if (isMounted.current) {
+          setIsReady(true); // Show even on error to prevent infinite loading
+        }
       } finally {
         isInitializing.current = false;
       }
     };
 
-    initApp();
+    const cleanup = initApp();
 
     return () => {
-      destroyed = true;
+      // Cleanup resize listener if it exists
+      if (cleanup instanceof Promise) {
+        cleanup.then(cleanupFn => {
+          if (typeof cleanupFn === 'function') {
+            cleanupFn();
+          }
+        });
+      }
+      
+      // Destroy PixiJS app
       if (appRef.current) {
         appRef.current.destroy(true, { children: true, texture: true });
         appRef.current = null;
       }
+      
+      // Clear container
+      if (containerRef.current) {
+        containerRef.current.innerHTML = '';
+      }
+      
       isInitializing.current = false;
     };
   }, [imageUrl, multiplier, imageScale]);
