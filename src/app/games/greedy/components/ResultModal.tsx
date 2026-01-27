@@ -7,6 +7,7 @@ import { RootState } from '@/lib/redux/store';
 import { clearWinningPot, setWinningPotIndex } from '@/lib/redux/slices/teenpatti/winningPotSlice';
 import { gameTeenPattiResultAnnounce } from '@/lib/socket/game/teenpatti/teenpattiSocketEventHandler';
 import Image from 'next/image';
+import { gameGreedyResultAnnounce } from '@/lib/socket/game/greedy/greedySocketEventHandler';
 
 interface ResultData {
   winners: any[]; // you can make a proper type if you know the structure
@@ -34,8 +35,8 @@ export default function ResultModal() {
 
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  gameTeenPattiResultAnnounce((response: ResultResponse) => {
-    console.log('Received teenpattiAnnounceGameResultResponse33:', response);
+  gameGreedyResultAnnounce((response: ResultResponse) => {
+    console.log('Received greedyAnnounceGameResultResponse33:', response);
   if (!response?.success || !response.data) return;
   if (manualClosed) return;
 
@@ -85,7 +86,7 @@ export default function ResultModal() {
       style={{
         background: 'rgba(0,0,0,0.8)',
         backdropFilter: 'blur(8px)',
-        zIndex: 100,
+        zIndex: 999,
         animation: 'fadeIn 0.25s ease',
       }}
       onClick={handleClose}
@@ -98,7 +99,7 @@ export default function ResultModal() {
         width: '80%',
         height: '80%',
         maxWidth: '250px',
-        background: 'linear-gradient(180deg, #6b1f2b 0%, #4a1520 100%)',
+        background: 'linear-gradient(180deg, #FF8904 0%, #FF8904 100%)',
         boxShadow: '0 20px 60px rgba(0,0,0,0.7)',
         zIndex: 101,
         animation: 'scaleIn 0.25s ease',
@@ -113,43 +114,6 @@ export default function ResultModal() {
           {isWinner ? '🎉 You Won!' : 'Round Complete'}
         </h5>
 
-      <div className="d-flex flex-column align-items-center justify-content-center my-1">
-        <span
-          className="text-warning fw-semibold m-0"
-          style={{ fontSize: 'clamp(12px, 3vw, 18px)' }}
-        >
-          Winning Pot
-        </span>
-      <Image src={result.winningPotIndex === 0 ? '/APOT.png' : result.winningPotIndex === 1 ? '/BPOT.png' : '/CPOT.png'}
-                      alt="Guardian"
-                      width={45}
-                      height={45}
-                      // className="drop-shadow-[0_0_6px_rgba(0,255,255,0.6)]"
-                    />
-      </div>
-        <p
-          className="text-white-50 m-0"
-          style={{ fontSize: 'clamp(12px, 1vw, 12px)' }}
-        >
-          {result.winningPotRankText}
-        </p>
-      </div>
-
-      {/* Winning Cards */}
-      <div className="d-flex justify-content-center gap-1 p-1 flex-shrink-0">
-        {result.winningCards.map((cardUrl, idx) => (
-          <img
-            key={idx}
-            src={`${process.env.NEXT_PUBLIC_BACKEND_ASSET_URL}/${cardUrl}`}
-            alt={`Card ${idx + 1}`}
-            className="rounded-3"
-            style={{
-              width: 'clamp(50px, 16vw, 100px)',
-              height: 'clamp(70px, 12vw, 80px)',
-              boxShadow: '0 4px 12px rgba(0,0,0,0.5)',
-            }}
-          />
-        ))}
       </div>
 
       {/* Winners Section - Scrollable */}
@@ -195,7 +159,7 @@ export default function ResultModal() {
                       width: '25px',
                       height: '25px',
                       objectFit: 'cover',
-                      border: '2px solid #ffd700',
+                      border: '2px solid #852F3C',
                     }}
                   />
                   <span className="text-white" style={{ fontSize: '12px' }}>
@@ -204,12 +168,12 @@ export default function ResultModal() {
                 </div>
                 <div className="d-flex align-items-center gap-1">
                   <span
-                    className="d-flex align-items-center justify-content-center fw-bold"
+                    className="d-flex align-items-center justify-content-center fw-bold text-white"
                     style={{
                       width: '18px',
                       height: '18px',
                       borderRadius: '50%',
-                      background: 'linear-gradient(135deg, #ffd700, #ffed4e)',
+                      background: 'linear-gradient(135deg, #852F3C, #852F3C)',
                       color: '#000',
                       fontSize: '11px',
                       flexShrink: 0,
