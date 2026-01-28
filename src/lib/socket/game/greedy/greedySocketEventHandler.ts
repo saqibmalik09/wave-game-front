@@ -57,20 +57,18 @@ import { getSocket } from '@/lib/socket/socketClient';
 
 export function useGreedyBetResponseListener( onResponse: (data: any) => void) {
   const socket = getSocket();
-  console.log("useGreedyBetResponseListener socket:", socket);
   if (!socket) {
     console.log('Socket not initialized',socket);
   return ;
   }
   useEffect(() => {
     const handleBetResponse = (data: any) => {
-      console.log('Received greedyBetResponse data:', data);
       onResponse(data); // send data back to component
     };
-    socket.on("teenpattiBetResponse", handleBetResponse);
+    socket.on("greedyBetResponse", handleBetResponse);
 
     return () => {
-      socket.off("teenpattiBetResponse", handleBetResponse);
+      socket.off("greedyBetResponse", handleBetResponse);
     };
   }, [onResponse]);
 
@@ -91,10 +89,66 @@ export function gameGreedyResultAnnounce(
       onResponse(data);
     };
 
-    socket.on('teenpattiAnnounceGameResultResponse', handleWinningResponse);
+    socket.on('greedyAnnounceGameResultResponse', handleWinningResponse);
 
     return () => {
-      socket.off('teenpattiAnnounceGameResultResponse', handleWinningResponse);
+      socket.off('greedyAnnounceGameResultResponse', handleWinningResponse);
     };
   }, [onResponse]);
+}
+
+
+export function useCurrentRoundID(
+  onResponse: (data: any) => void
+) {
+  useEffect(() => {
+    const socket = getSocket();
+    if (!socket) {
+      console.log('Socket not initialized');
+      return;
+    }
+
+    const handler = (payload: any) => {
+      console.log('Received CurrentRoundIDResponse:', payload);
+      onResponse(payload);
+    };
+
+    socket.on('CurrentRoundIDResponse', handler);
+
+    return () => {
+      socket.off('CurrentRoundIDResponse', handler);
+    };
+  }, [onResponse]);
+}
+
+
+
+export function greedyGameTableJoin({
+  userId,
+  name,
+  imageProfile,
+  appKey,
+  token,
+}: {
+  userId: string;
+  name: string;
+  imageProfile: string;
+  appKey:string;
+  token:string
+}) {
+ const socket = getSocket();
+  console.log("greedyGameTableJoin socket:", socket);
+  if (!socket) {
+    console.log('Socket not initialized',socket);
+  return ;
+  }
+  const payload = {
+    userId,
+    name,
+    imageProfile,
+    appKey,
+    token
+  };
+  console.log("greedyGameTableJoin payload:", payload);
+  socket.emit("greedyGameTableJoin", payload);
 }

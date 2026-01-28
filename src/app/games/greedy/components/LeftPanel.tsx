@@ -65,10 +65,10 @@ export default function LeftPanel() {
       }
     };
 
-    socket.on('teenpattiGameTableUpdate', handlePotDataResponse);
+    socket.on('greedyGameTableUpdate', handlePotDataResponse);
 
     return () => {
-      socket.off('teenpattiGameTableUpdate', handlePotDataResponse);
+      socket.off('greedyGameTableUpdate', handlePotDataResponse);
     };
   }, []);
 
