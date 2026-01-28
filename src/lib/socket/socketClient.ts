@@ -78,7 +78,7 @@ export const initSocket = ({ userId, appKey,gameId, name, profilePicture, token 
     reconnectionDelayMax: 5000,  
     randomizationFactor: 0.5,
     timeout: 15000,
-    query: { userId, appKey, name, profilePicture, token },
+    query: { userId, appKey, name, profilePicture, token,gameId },
   });
 
   // Add event listeners only once
