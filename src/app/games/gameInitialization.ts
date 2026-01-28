@@ -1,6 +1,5 @@
 import ApiService from "@/lib/api/api";
 import initSocket from "@/lib/socket/socketClient";
-import { teenpattiGameTableJoin } from "@/lib/socket/game/teenpatti/teenpattiSocketEventHandler";
 import { setTenantDetails } from "@/lib/redux/slices/tenantDetails";
 import { setUserPlayerInfo } from "@/lib/redux/slices/userSlice";
 import { gameInitOnce } from "@/lib/gameInitSingleton";
@@ -9,6 +8,7 @@ import {
   TenantDataResponse,
 } from "@/app/games/dto/games.dto";
 import { AppDispatch } from "@/lib/redux/store";
+import { greedyGameTableJoin } from "@/lib/socket/game/greedy/greedySocketEventHandler";
 
 interface GameInitResponse {
   success: boolean;
@@ -82,15 +82,17 @@ export async function gameInitialization({
         name: userData.name,
         profilePicture: userData.profilePicture,
         token,
+        
       });
 
       setTimeout(() => {
-        teenpattiGameTableJoin({
+        greedyGameTableJoin({
           userId: userData.id,
           name: userData.name,
           imageProfile: userData.profilePicture,
           appKey,
           token,
+          
         });
       }, 3000);
     });

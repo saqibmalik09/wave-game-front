@@ -46,10 +46,10 @@ export default function GreedyTimer() {
       }
     };
 
-    socket.on('teenpattiTimer', handleTimer);
+    socket.on('greedyTimer', handleTimer);
 
     return () => {
-      socket.off('teenpattiTimer', handleTimer);
+      socket.off('greedyTimer', handleTimer);
     };
   }, [dispatch]);
 
