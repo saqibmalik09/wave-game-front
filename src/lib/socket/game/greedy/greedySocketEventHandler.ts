@@ -3,7 +3,6 @@
 import { useEffect } from 'react';
 import { getSocket } from '@/lib/socket/socketClient';
 
-
 /**
  *  Place Greedy Bet
  */
@@ -48,29 +47,24 @@ import { getSocket } from '@/lib/socket/socketClient';
 
   };
   console.log(`Placeing bet gredy:`,payload);
-  socket.emit("placeTeenpattiBet", payload);
+  socket.emit("placeGreedyBet", payload);
 }
-
-
-   
-
 
 export function useGreedyBetResponseListener( onResponse: (data: any) => void) {
   const socket = getSocket();
-  console.log("useGreedyBetResponseListener socket:", socket);
   if (!socket) {
     console.log('Socket not initialized',socket);
   return ;
   }
   useEffect(() => {
     const handleBetResponse = (data: any) => {
-      console.log('Received greedyBetResponse data:', data);
-      onResponse(data); // send data back to component
+      console.log("Received greedyBetResponse:", data);
+      onResponse(data);
     };
-    socket.on("teenpattiBetResponse", handleBetResponse);
+    socket.on("greedyBetResponse", handleBetResponse);
 
     return () => {
-      socket.off("teenpattiBetResponse", handleBetResponse);
+      socket.off("greedyBetResponse", handleBetResponse);
     };
   }, [onResponse]);
 
