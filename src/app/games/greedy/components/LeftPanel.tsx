@@ -96,8 +96,8 @@ export default function LeftPanel() {
         shadow-lg z-20"
       style={{
         background: 'linear-gradient(180deg, #fb923c 0%, #f97316 100%)',
-        height: isExpanded ? 'auto' : '40%',
-        maxHeight: '80%',
+        maxHeight: isExpanded ? `${MIN_VISIBLE_PLAYERS * 32}px` : 'auto',
+         overflowY: isExpanded ? 'auto' : 'visible',
       }}
     >
       {/* Header */}
@@ -222,7 +222,7 @@ export default function LeftPanel() {
       ) : (
         <div className="flex-1 flex items-center justify-center px-2">
           <p className="text-white/60 text-[9px] text-center font-medium">
-            No players yet
+            Loading players...
           </p>
         </div>
       )}
