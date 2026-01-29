@@ -96,7 +96,7 @@ export default function LeftPanel() {
         shadow-lg z-20"
       style={{
         background: 'linear-gradient(180deg, #fb923c 0%, #f97316 100%)',
-        height: isExpanded ? 'auto' : '40%',
+        height: isExpanded ? 'auto' : '60%',
         maxHeight: '80%',
       }}
     >
