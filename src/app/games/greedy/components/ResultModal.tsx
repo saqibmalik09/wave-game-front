@@ -5,7 +5,6 @@ import { useAppSelector } from '@/lib/redux/hooks';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '@/lib/redux/store';
 import { clearWinningPot, setWinningPotIndex } from '@/lib/redux/slices/teenpatti/winningPotSlice';
-import { gameTeenPattiResultAnnounce } from '@/lib/socket/game/teenpatti/teenpattiSocketEventHandler';
 import Image from 'next/image';
 import { gameGreedyResultAnnounce } from '@/lib/socket/game/greedy/greedySocketEventHandler';
 
@@ -47,7 +46,7 @@ export default function ResultModal() {
 
   timeoutRef.current = setTimeout(() => {
     setShow(true);
-  }, 2000);
+  }, 3500);
 });
 
 

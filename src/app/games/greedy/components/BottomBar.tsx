@@ -6,11 +6,12 @@ import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useState, useRef } from "react";
 import { setCoin } from "@/lib/redux/slices/teenpatti/selectedCoinSlice";
 import { SoundManager } from "../../teenpatti/game/SoundManager";
-import { useGreedyBetResponseListener } from "@/lib/socket/game/greedy/greedySocketEventHandler";
+import { myGreedyMessagesFromServer, useGreedyBetResponseListener } from "@/lib/socket/game/greedy/greedySocketEventHandler";
 import { incrementUserBalance, setUserPlayerInfo } from '@/lib/redux/slices/userSlice';
 
 import { setPendingCoin } from "@/lib/redux/slices/teenpatti/coinDropAnimation";
 import { useToast } from "../../teenpatti/components/Toast";
+
 const COINS = [100, 1000, 5000, 10000, 50000];
 const COLORS = ['#044b31', '#795300', '#560c97', '#8a0669', '#134705'];
 
@@ -32,6 +33,7 @@ export default function BottomBar() {
   }, [dispatch]);
 
   useGreedyBetResponseListener((data) => {
+    console.log("Greedy Bet Response:", data);
     if (data.success) {
       dispatch(setPendingCoin({ potIndex: Number(data.data.potIndex), value: data.data.amount }));
       dispatch(setUserPlayerInfo({
@@ -43,6 +45,7 @@ export default function BottomBar() {
       showToast(data.message ?? "Bet failed!", "error");
     }
   });
+
 
   const selectCoin = (amount: number, color: string) => {
     setSelectedCoin(amount);
@@ -57,7 +60,7 @@ export default function BottomBar() {
 
         {/* Balance - Flexible width */}
         <div className="flex items-center gap-1 sm:gap-2 bg-white/95
-          px-2 sm:px-3 py-1.5 sm:py-2 rounded-full shadow flex-shrink-0">
+          px-2 sm:px-3 py-1.5 sm:py-2 rounded-full shadow flex-shrink-0" data-balance-area>
           <span className="text-green-600 font-extrabold text-sm sm:text-lg">G</span>
           <span className="font-extrabold text-green-800 text-xs sm:text-base whitespace-nowrap">
             {userPlayerData?.data?.balance?.toLocaleString() || '0'}

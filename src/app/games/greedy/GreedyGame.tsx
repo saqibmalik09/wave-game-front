@@ -16,6 +16,7 @@ import MessageModal from "@/app/components/messageModel";
 import GameLoading from "@/app/components/GameLoading";
 import { useAutoPlayerBets } from "./components/useAutoPlayerBets";
 import ResultModal from "./components/ResultModal";
+import { useUserInfo } from "../UserInfoAPI";
 
 export default function GreedyGameUI() {
   const dispatch = useDispatch();
@@ -31,8 +32,9 @@ export default function GreedyGameUI() {
   const playerRef = useRef<HTMLButtonElement>(null);
 
   const phase = useSelector((s: RootState) => s.teenpattiTimer.phase);
-
   const playersBettingStatus: 'on' | 'off' = 'on';
+  const { loadUser } = useUserInfo();
+
 
   // Hook to auto-drop coins for first 5 seconds of betting
   useAutoPlayerBets(phase, wheelRef, animateCoin, playersBettingStatus, playerRef);
@@ -40,6 +42,16 @@ export default function GreedyGameUI() {
   useEffect(() => {
     if (phase === 'newGameStartTimer') {
       clearAllAnimations();
+    }
+    if( phase === 'bettingTimer'|| phase ==='resultAnnounceTimer') {
+      // get user info
+     const params = new URLSearchParams(window.location.search);
+     const token = params.get("token");
+     if (!token) {
+       console.error("Missing token in URL params");
+       return;
+     }
+       loadUser(token).catch(console.error);
     }
   }, [phase, clearAllAnimations]);
 
@@ -65,6 +77,7 @@ export default function GreedyGameUI() {
     };
     runInit();
   }, []);
+  
 
   if (!ready && isValid) return <GameLoading message="Initializing game..." />;
 
