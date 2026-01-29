@@ -24,7 +24,7 @@ export default function RightPanel() {
     }
   });
 
-  /** 🖱️ click outside → collapse */
+  /**  click outside → collapse */
   useEffect(() => {
     if (!isExpanded) return;
 
@@ -50,19 +50,33 @@ export default function RightPanel() {
     if (patterns.length === 0) return;
     setIsExpanded((prev) => !prev);
   };
+const isLoading = patterns.length === 0;
 
-  return (
-    <aside
-      ref={panelRef}
-      onClick={handleToggle}
-      className="absolute right-1 top-1/2 -translate-y-1/2
-        w-14 bg-blue-500 rounded-xl px-1 py-2
-        flex flex-col items-center gap-2 shadow-lg z-20 cursor-pointer"
-    >
-      <div className="text-white text-[10px] font-extrabold">
-        Result
+return (
+  <aside
+    ref={panelRef}
+    onClick={!isLoading ? handleToggle : undefined}
+    className="absolute right-1 top-1/2 -translate-y-1/2
+      w-14 bg-blue-500 rounded-xl px-1 py-2
+      flex flex-col items-center gap-2 shadow-lg z-20 cursor-pointer"
+  >
+    <div className="text-white text-[10px] font-extrabold">
+      Result
+    </div>
+
+    {isLoading ? (
+      <div className="flex justify-center items-center h-[120px]">
+        <span
+          className="text-white text-[9px] font-semibold tracking-widest"
+          style={{
+            writingMode: 'vertical-rl',
+            transform: 'rotate(180deg)',
+          }}
+        >
+          Loading Data...
+        </span>
       </div>
-
+    ) : (
       <div
         className="flex flex-col gap-1"
         style={{
@@ -87,6 +101,8 @@ export default function RightPanel() {
           </div>
         ))}
       </div>
-    </aside>
-  );
+    )}
+  </aside>
+);
+
 }
