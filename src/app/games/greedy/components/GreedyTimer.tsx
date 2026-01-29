@@ -3,12 +3,10 @@
 
 import React, { useEffect, useState } from 'react';
 import { getSocket } from '@/lib/socket/socketClient';
-import { useTeenpattiTimerListener } from '@/lib/socket/game/teenpatti/teenpattiSocketEventHandler';
 import { useDispatch } from 'react-redux';
 import { updateTimer } from '@/lib/redux/slices/teenpatti/teenpattiTimerSlice';
 
 import { SoundManager } from '../../teenpatti/game/SoundManager';
-
 interface TimerData {
   phase: string;
   remaining: number;
@@ -19,7 +17,6 @@ interface TimerData {
 export default function GreedyTimer() {
   const dispatch = useDispatch();
   const [timerData, setTimerData] = useState<TimerData>();
-  useTeenpattiTimerListener();
 
   useEffect(() => {
     const socket = getSocket();

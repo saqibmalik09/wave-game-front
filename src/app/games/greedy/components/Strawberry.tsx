@@ -4,10 +4,10 @@ import ResponsiveFoodItem from './ResponsiveFoodItem';
 
 const Strawberry: React.FC = () => (
   <ResponsiveFoodItem
-    imageUrl="https://cdn-icons-png.flaticon.com/512/590/590772.png"
+    imageUrl=""
     multiplier="x5"
     imageScale={0.34}
   />
 );
-
+// https://cdn-icons-png.flaticon.com/512/590/590772.png
 export default Strawberry;

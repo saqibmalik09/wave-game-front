@@ -3,7 +3,6 @@
 import { useEffect } from 'react';
 import { getSocket } from '@/lib/socket/socketClient';
 
-
 /**
  *  Place Greedy Bet
  */
@@ -48,12 +47,8 @@ import { getSocket } from '@/lib/socket/socketClient';
 
   };
   console.log(`Placeing bet gredy:`,payload);
-  socket.emit("placeTeenpattiBet", payload);
+  socket.emit("placeGreedyBet", payload);
 }
-
-
-   
-
 
 export function useGreedyBetResponseListener( onResponse: (data: any) => void) {
   const socket = getSocket();
@@ -63,6 +58,7 @@ export function useGreedyBetResponseListener( onResponse: (data: any) => void) {
   }
   useEffect(() => {
     const handleBetResponse = (data: any) => {
+      console.log("Received greedyBetResponse:", data);
       onResponse(data); // send data back to component
     };
     socket.on("greedyBetResponse", handleBetResponse);
@@ -129,12 +125,14 @@ export function greedyGameTableJoin({
   imageProfile,
   appKey,
   token,
+  gameId
 }: {
   userId: string;
   name: string;
   imageProfile: string;
   appKey:string;
-  token:string
+  token:string;
+   gameId:number;
 }) {
  const socket = getSocket();
   console.log("greedyGameTableJoin socket:", socket);
@@ -147,8 +145,55 @@ export function greedyGameTableJoin({
     name,
     imageProfile,
     appKey,
-    token
+    token,
+    gameId
   };
   console.log("greedyGameTableJoin payload:", payload);
   socket.emit("greedyGameTableJoin", payload);
+}
+
+export function myGreedyMessagesFromServer(
+  onResponse: (data: any) => void
+) {
+   const socket = getSocket();
+
+  if (!socket) {
+    console.log('Socket not initialized',socket);
+  return ;
+  }
+  useEffect(() => {
+    
+    const handleBetResponse = (data: any) => {
+      onResponse(data); 
+    };
+    socket.on("toGreedyWinnerMessage", handleBetResponse);
+
+    return () => {
+      socket.off("toGreedyWinnerMessage", handleBetResponse);
+    };
+  }, [onResponse]); 
+}
+
+
+export function useGreedyPatternResponse(
+  onResponse: (data: any) => void
+) {
+  useEffect(() => {
+    const socket = getSocket();
+    if (!socket) {
+      console.log('Socket not initialized in TeenpattiPatternResponse');
+      return;
+    }
+
+    const handlePatternResponse = (data: any) => {
+      console.log('in socket TeenpattiPatternResponse:', data);
+      onResponse(data);
+    };
+
+    socket.on('greedyWinningCombinationResponse', handlePatternResponse);
+
+    return () => {
+      socket.off('greedyWinningCombinationResponse', handlePatternResponse);
+    };
+  }, [onResponse]);
 }

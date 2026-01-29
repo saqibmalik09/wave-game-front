@@ -92,6 +92,8 @@ export async function gameInitialization({
           imageProfile: userData.profilePicture,
           appKey,
           token,
+          gameId: Number(gameId),
+
           
         });
       }, 3000);

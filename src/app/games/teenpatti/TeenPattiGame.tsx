@@ -227,7 +227,6 @@ const [mybettingLocked, setMybettingLocked] = useState<boolean>(false);
     setCoinAnimation(prev => ({ ...prev, isActive: false }));
   };
   useEffect(() => {
-    console.log("mybettingLocked:",mybettingLocked)
     if (!latestBet || !userInfo || !tenant || mybettingLocked) return;
     const potIndex = Number(latestBet.potIndex);
     const betAmount = Number(latestBet.amount);

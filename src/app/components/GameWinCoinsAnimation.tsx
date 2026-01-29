@@ -11,14 +11,14 @@ interface FlyingCoin {
   delay: number;
 }
 
-interface CoinsAnimationProps {
+interface GameWinCoinsAnimationProps {
   isActive: boolean;
   amount: number;
   potIndex: number;
   onComplete: () => void;
 }
 
-export const CoinsAnimation: React.FC<CoinsAnimationProps> = ({
+export const GameWinCoinsAnimation: React.FC<GameWinCoinsAnimationProps> = ({
   isActive,
   amount,
   potIndex,
@@ -73,7 +73,6 @@ export const CoinsAnimation: React.FC<CoinsAnimationProps> = ({
 
     setCoins(newCoins);
 
-    // ✅ Show amount text slightly after coins start flying
     setTimeout(() => {
       setShowAmountText(true);
     }, 300);

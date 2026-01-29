@@ -41,7 +41,7 @@ export const useCabinSpinEffect = (
 
     // Start spinning during calculation phase
     if (phase === 'winningCalculationTimer') {
-      console.log('🎰 Starting cabin spin...');
+      console.log(' Starting cabin spin...');
       isStoppingRef.current = false;
       currentIndexRef.current = 1;
 
@@ -80,7 +80,7 @@ export const useCabinSpinEffect = (
           clearInterval(slowSpinInterval);
           
           // Show winner with green border
-          console.log(`✅ Stopped at winning cabin: ${winningIndex}`);
+          console.log(`Stopped at winning cabin: ${winningIndex}`);
           setSpinState({
             currentHighlight: winningIndex,
             isWinnerHighlighted: true,
@@ -90,7 +90,7 @@ export const useCabinSpinEffect = (
 
         // Move to next cabin
         currentIndexRef.current = currentIndexRef.current >= 8 ? 1 : currentIndexRef.current + 1;
-      }, 150); // Slower spin (150ms) for smooth stop
+      }, 50); // Slower spin (150ms) for smooth stop
     }
 
     // Keep winner highlighted during entire result phase

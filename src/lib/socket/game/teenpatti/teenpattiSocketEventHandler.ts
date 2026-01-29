@@ -232,10 +232,10 @@ export function useTeenpattiPatternResponse(
       onResponse(data);
     };
 
-    socket.on('teenpattiWinningCombinationResponse', handlePatternResponse);
+    socket.on('greedyWinningCombinationResponse', handlePatternResponse);
 
     return () => {
-      socket.off('teenpattiWinningCombinationResponse', handlePatternResponse);
+      socket.off('greedyWinningCombinationResponse', handlePatternResponse);
     };
   }, [onResponse]);
 }
