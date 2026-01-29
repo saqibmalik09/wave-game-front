@@ -230,7 +230,7 @@ export default function LeftPanel() {
       {/* Toggle Button */}
       {showExpandButton && (
         <div
-          className="w-full flex justify-center items-center p-2 cursor-pointer hover:bg-white/10 transition-all border-t border-white/20"
+          className="w-full flex justify-center items-center p-1 cursor-pointer hover:bg-white/10 transition-all border-t border-white/20"
           onClick={handleToggle}
           title={
             isExpanded
@@ -241,7 +241,7 @@ export default function LeftPanel() {
           <div
             className="rounded-lg flex items-center justify-center font-extrabold text-white shadow-lg transition-all hover:scale-105"
             style={{
-              width: '40px',
+              width: '50px',
               height: '40px',
               background: isExpanded
                 ? 'linear-gradient(135deg, #dc2626, #ef4444)'

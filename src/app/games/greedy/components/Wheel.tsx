@@ -44,7 +44,7 @@ const Wheel = forwardRef<WheelRef, WheelProps>(({ onCabinClick, animateCoin }, r
     const selectedCoin = useSelector((s: RootState) => s.selectedCoin.coin);
     const userPlayerData = useSelector((state: RootState) => state.userPlayerData);
     const tenant = useSelector((state: RootState) => state.tenantDetails.data);
-    const [coinAnimation, setCoinAnimation] = useState({isActive: false, amount: 0, potIndex: 0});
+    const [coinAnimation, setCoinAnimation] = useState({ isActive: false, amount: 0, potIndex: 0 });
 
     const { ToastContainer, showToast } = useToast();
     const dispatch = useDispatch();
@@ -55,7 +55,7 @@ const Wheel = forwardRef<WheelRef, WheelProps>(({ onCabinClick, animateCoin }, r
     useImperativeHandle(ref, () => ({
         getCabinElement: (index: number) => cabinRefs.current.get(index) || null,
     }));
-    
+
     myGreedyMessagesFromServer((message) => {
         console.log("Received toGreedyWinnerMessage:", message);
         if (message.betType == 2 && message.winningAmount > 0) {
@@ -69,11 +69,11 @@ const Wheel = forwardRef<WheelRef, WheelProps>(({ onCabinClick, animateCoin }, r
             }, 3000);
         }
     });
-    
+
     const handleCoinAnimationComplete = () => {
         setCoinAnimation(prev => ({ ...prev, isActive: false }));
     };
-    
+
     const handleCabinClicked = (cabinIndex: number) => {
         if (!selectedCoin) {
             showToast(`Please select a coin to bet!`);
@@ -86,7 +86,7 @@ const Wheel = forwardRef<WheelRef, WheelProps>(({ onCabinClick, animateCoin }, r
         const balance = Number(userPlayerData.data?.balance || 0);
         const betAmount = Number(selectedCoin.amount);
         const currentUserId = userPlayerData.data?.id;
-        
+
         if (!selectedCoin) {
             showToast(`Please select a coin to bet!`);
             return;
@@ -101,27 +101,27 @@ const Wheel = forwardRef<WheelRef, WheelProps>(({ onCabinClick, animateCoin }, r
             showToast(`Insufficient balance.`);
             return;
         }
-        
+
         const params = new URLSearchParams(window.location.search);
         const appKey = params.get("appKey");
         const gameId = params.get("gameId");
         const token = params.get("token");
-        
+
         if (currentPhase !== 'bettingTimer') {
             showToast(`Betting closed. Wait`);
             return;
         }
-        
+
         if (!currentUserId) {
             showToast(`User not found. Cannot place bet.`);
             return;
         }
-        
+
         const tenantBaseURL =
             tenant.environemnt === "production"
                 ? tenant.tenantProductionDomain
                 : tenant.tenantTestingDomain;
-        
+
         let betData = {
             userId: currentUserId.toString(),
             amount: betAmount,
@@ -134,7 +134,7 @@ const Wheel = forwardRef<WheelRef, WheelProps>(({ onCabinClick, animateCoin }, r
             gameId: gameId!,
             tenantBaseURL,
         }
-        
+
         dispatch(placeBet({
             userId: currentUserId.toString(),
             amount: betAmount,
@@ -142,7 +142,7 @@ const Wheel = forwardRef<WheelRef, WheelProps>(({ onCabinClick, animateCoin }, r
             betType: 1,
             potIndex: cabinIndex,
         }));
-        
+
         placeGreedyBet(betData);
 
         const targetCabin = cabinRefs.current.get(cabinIndex);
@@ -154,11 +154,15 @@ const Wheel = forwardRef<WheelRef, WheelProps>(({ onCabinClick, animateCoin }, r
 
     return (
         <>
-            <div className="relative w-full max-w-[280px] aspect-square">
+            {/* Responsive container that scales based on screen size */}
+            <div className="relative w-full aspect-square 
+                max-w-[180px] xs:max-w-[200px] sm:max-w-[240px] md:max-w-[280px] lg:max-w-[320px]">
+
                 {/* ===== SPOKES ===== */}
                 <svg
                     viewBox="0 0 320 320"
-                    className="absolute inset-0 w-full h-full z-0">
+                    className="absolute inset-0 w-full h-full z-0"
+                    preserveAspectRatio="xMidYMid meet">
                     {[
                         [160, 160, 160, 40],
                         [160, 160, 255, 65],
@@ -195,14 +199,16 @@ const Wheel = forwardRef<WheelRef, WheelProps>(({ onCabinClick, animateCoin }, r
                             onClick={() => handleCabinClicked(cabin.index)}
                             data-pot-index={cabin.index}
                             className={`absolute ${cabin.pos} -translate-x-1/2 -translate-y-1/2
-                                w-[80px] h-[80px] rounded-full
+                                rounded-full
                                 flex flex-col items-center justify-center
                                 shadow-lg z-10 cursor-pointer hover:scale-110 active:scale-95
                                 transition-all duration-200 select-none overflow-visible
-                                ${isWinner 
-                                    ? 'bg-gradient-to-b from-green-600 to-green-700 border-4 border-white shadow-[0_0_30px_rgba(74,222,128,0.9)]' 
-                                    : 'bg-white border-[3px] border-orange-600'
-                                }`}
+                                ${isWinner
+                                    ? 'bg-gradient-to-b from-green-600 to-green-700 border-white shadow-[0_0_30px_rgba(74,222,128,0.9)]'
+                                    : 'bg-white border-orange-600'
+                                }
+                                w-[50px] h-[50px] xs:w-[55px] xs:h-[55px] sm:w-[65px] sm:h-[65px] md:w-[75px] md:h-[75px] lg:w-[80px] lg:h-[80px]
+                                border-[2px] xs:border-[2px] sm:border-[3px]`}
                             style={{
                                 opacity: shouldFade ? 0.3 : 1,
                             }}
@@ -214,19 +220,23 @@ const Wheel = forwardRef<WheelRef, WheelProps>(({ onCabinClick, animateCoin }, r
                                     alt={`Cabin ${cabin.index}`}
                                     width={50}
                                     height={50}
-                                    className="object-contain pointer-events-none"
+                                    className="object-contain pointer-events-none 
+                                        w-[30px] h-[30px] xs:w-[35px] xs:h-[35px] sm:w-[40px] sm:h-[40px] md:w-[45px] md:h-[45px] lg:w-[50px] lg:h-[50px]"
                                     loading="eager"
                                     priority={cabin.index <= 4}
                                 />
                             </div>
-                            
+
                             {/* Multiplier Badge */}
-                            <div className={`absolute -top-2 -right-2 min-w-[30px] h-[30px] rounded-full 
+                            <div className={`absolute -top-1 -right-1 sm:-top-2 sm:-right-2 
+                                min-w-[22px] h-[22px] xs:min-w-[24px] xs:h-[24px] sm:min-w-[28px] sm:h-[28px] md:min-w-[30px] md:h-[30px]
+                                rounded-full 
                                 flex items-center justify-center px-1
-                                font-black text-white text-sm
-                                border-[3px] border-white shadow-lg
-                                ${isWinner 
-                                    ? 'bg-gradient-to-br from-yellow-400 to-yellow-600 animate-pulse' 
+                                font-black text-white 
+                                text-[9px] xs:text-[10px] sm:text-xs md:text-sm
+                                border-[2px] sm:border-[3px] border-white shadow-lg
+                                ${isWinner
+                                    ? 'bg-gradient-to-br from-yellow-400 to-yellow-600 animate-pulse'
                                     : 'bg-gradient-to-br from-red-500 to-red-700'
                                 }`}
                                 style={{
@@ -240,25 +250,40 @@ const Wheel = forwardRef<WheelRef, WheelProps>(({ onCabinClick, animateCoin }, r
                 })}
 
                 {/* ===== CENTER HUB ===== */}
+
                 <div
                     className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2
-                        w-[100px] h-[100px] bg-orange-400 rounded-full shadow-xl
-                        flex flex-col items-center justify-center z-20 overflow-visible"
-                >
-                    <Image
-                        src="/DealarAvatarGreedy-removebg-preview.png"
-                        width={150}
-                        height={150}
-                        alt="Dealer"
-                        className="absolute -top-10 pointer-events-none"
-                        loading="eager"
-                        priority
-                    />
-                    <div className="text-white text-center font-bold text-sm leading-tight z-10">
-                        <div className="text-[13px] font-semibold relative z-10 top-1">
+                                bg-orange-400 rounded-full shadow-xl
+                                flex flex-col items-center justify-center z-20 overflow-visible
+                                w-[70px] h-[70px] xs:w-[80px] xs:h-[80px] sm:w-[95px] sm:h-[95px] md:w-[100px] md:h-[100px] lg:w-[110px] lg:h-[110px]"
+                                        >
+                    {/* Dealer Avatar Container - with transform scaling for better control */}
+                    <div className="absolute left-1/2 -translate-x-1/2 pointer-events-none z-30
+                                    -top-[40px] xs:-top-[43px] sm:-top-[50px] md:-top-[54px] lg:-top-[60px]">
+                        <div className="relative
+                                w-[80px] xs:w-[100px] sm:w-[100px] md:w-[100px] lg:w-[80px]
+                                h-[80px] xs:h-[100px] sm:h-[100px] md:h-[100px] lg:h-[80px]">
+                            <Image
+                                src="/DealarAvatarGreedy-removebg-preview.png"
+                                fill
+                                alt="Dealer"
+                                className="object-contain"
+                                loading="eager"
+                                priority
+                                sizes="(max-width: 400px) 110px, (max-width: 640px) 125px, (max-width: 768px) 145px, (max-width: 1024px) 155px, 170px"
+                            />
+                        </div>
+                    </div>
+
+                    {/* Timer and Phase Text - with proper spacing */}
+                    <div className="text-white text-center font-bold leading-tight z-10 mt-1">
+                        <div className="font-semibold
+            text-[10px] xs:text-[11px] sm:text-[13px] md:text-[13px] lg:text-[14px]
+            whitespace-nowrap">
                             {currentPhase && phaseLabels[currentPhase]}
                         </div>
-                        <div className="text-lg font-extrabold relative z-10 top-1">
+                        <div className="font-extrabold mt-0.5
+            text-base xs:text-lg sm:text-xl md:text-[22px] lg:text-2xl">
                             <GreedyTimer />
                         </div>
                     </div>
