@@ -54,7 +54,7 @@ export default function BottomBar() {
 
   return (
     <>
-      <div className="absolute bottom-5 left-0 right-0
+      <div className="absolute bottom-6 left-0 right-0
         flex flex-row justify-between items-center
         px-2 sm:px-4 pb-2 pt-2 z-30 gap-2 rounded-full">
 
@@ -83,20 +83,22 @@ export default function BottomBar() {
                   w-8 h-8 text-[9px]
                   xs:w-9 xs:h-9 xs:text-[10px]
                   sm:w-11 sm:h-11 sm:text-xs
-                  transition-all
+                  transition-all mx-1
                 "
               >
-                {/* SELECTION BORDER (YELLOW BOX) */}
-                {isSelected && (
-                  <div
-                    className="absolute -inset-[4px] rounded-[10px] border-2"
-                    style={{
-                      background: "linear-gradient(135deg, #50420a, #ec4899, #10b981, #021430)",
-                      // Yellow -> Pink -> Green -> Blue, readable over blue coin
-                    }}
-                  />
-                )}
-
+                {/* BORDER (GRADIENT FOR SELECTED, WHITE SHADOW FOR NON-SELECTED) */}
+                <div
+                  className="absolute -inset-[4px] rounded-[10px] border-2"
+                  style={{
+                    background: isSelected 
+                      ? "linear-gradient(135deg, #50420a, #ec4899, #10b981, #021430)"
+                      : "transparent",
+                    // borderColor: isSelected ? "transparent" : "rgba(255, 255, 255, 0.4)",
+                    boxShadow: isSelected 
+                      ? "none" 
+                      : "0 0 8px rgba(255, 255, 255, 0.3), inset 0 0 4px rgba(255, 255, 255, 0.2)",
+                  }}
+                />
 
                 {/* WHITE OUTER RING */}
                 <div className="absolute inset-0 rounded-full bg-white p-[2px]">

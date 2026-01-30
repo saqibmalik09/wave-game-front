@@ -259,10 +259,10 @@ const Wheel = forwardRef<WheelRef, WheelProps>(({ onCabinClick, animateCoin }, r
                                         >
                     {/* Dealer Avatar Container - with transform scaling for better control */}
                     <div className="absolute left-1/2 -translate-x-1/2 pointer-events-none z-30
-                                    -top-[40px] xs:-top-[43px] sm:-top-[50px] md:-top-[54px] lg:-top-[60px]">
+                                    -top-[40px] xs:-top-[43px] sm:-top-[50px] md:-top-[54px] lg:-top-[40px]">
                         <div className="relative
-                                w-[80px] xs:w-[100px] sm:w-[100px] md:w-[100px] lg:w-[80px]
-                                h-[80px] xs:h-[100px] sm:h-[100px] md:h-[100px] lg:h-[80px]">
+                                w-[80px] xs:w-[100px] sm:w-[100px] md:w-[100px] lg:w-[110px]
+                                h-[80px] xs:h-[100px] sm:h-[100px] md:h-[100px] lg:h-[110px]">
                             <Image
                                 src="/DealarAvatarGreedy-removebg-preview.png"
                                 fill
