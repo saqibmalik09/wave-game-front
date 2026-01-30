@@ -266,3 +266,5 @@ export default function Page() {
       <p>This is a server component page.</p>
     </div>
   );
+}
+
