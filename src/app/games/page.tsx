@@ -257,3 +257,12 @@
 //     </div>
 //   );
 // }
+
+
+export default function Page() {
+  return (
+    <div>
+      <h1>Welcome to Next.js!</h1>
+      <p>This is a server component page.</p>
+    </div>
+  );
