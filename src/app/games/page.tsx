@@ -197,33 +197,31 @@ export default function Home() {
           </h2>
           <p className="text-gray-400 mb-6">Test game integrations with live tokens</p>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {testGames.map((testGame, index) => (
-              <div key={index} className="bg-white/5 rounded-lg p-4 border border-white/10 hover:border-purple-500/50 transition-all">
-                <div className="flex items-center justify-between mb-3">
-                  <h3 className="text-white font-semibold flex items-center">
-                    <span className="bg-purple-500 text-white text-xs rounded-full w-6 h-6 flex items-center justify-center mr-2">
-                      {index + 1}
-                    </span>
-                    {testGame.name}
-                  </h3>
-                </div>
-                
-                  href={testGame.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white text-sm font-medium rounded-lg transition-all shadow-lg hover:shadow-purple-500/50"
-                >
-                  <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                  </svg>
-                  Launch Test
-                </a>
-              </div>
-            ))}
-          </div>
-        </div>
+<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+  {testGames.map((testGame, index) => (
+    <div key={index} className="bg-white/5 rounded-lg p-4 border border-white/10 hover:border-purple-500/50 transition-all">
+      <div className="flex items-center justify-between mb-3">
+        <h3 className="text-white font-semibold flex items-center">
+          <span className="bg-purple-500 text-white text-xs rounded-full w-6 h-6 flex items-center justify-center mr-2">
+            {index + 1}
+          </span>
+          {testGame.name}
+        </h3>
       </div>
+      
+        href={testGame.url}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white text-sm font-medium rounded-lg transition-all shadow-lg hover:shadow-purple-500/50"
+      >
+        <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+        </svg>
+        Launch Test
+      </a>
+    </div>
+  ))}
+</div>
 
       {/* Locked Game Modal */}
       {selectedGame && !selectedGame.available && (
