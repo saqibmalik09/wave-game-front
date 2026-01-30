@@ -197,7 +197,7 @@ export default function Home() {
           </h2>
           <p className="text-gray-400 mb-6">Test game integrations with live tokens</p>
           
-<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+{/* <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
   {testGames.map((testGame, index) => (
     <div key={index} className="bg-white/5 rounded-lg p-4 border border-white/10 hover:border-purple-500/50 transition-all">
       <div className="flex items-center justify-between mb-3">
@@ -220,7 +220,7 @@ export default function Home() {
       </a>
     </div>
   ))}
-</div>
+</div> */}
 
       {/* Locked Game Modal */}
       {selectedGame && !selectedGame.available && (
