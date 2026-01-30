@@ -702,7 +702,7 @@ const Contact = () => {
             Get In Touch
           </Badge>
           <h2 className="text-4xl md:text-5xl font-bold mb-6">
-            Let's Build Something 
+            Let-s Build Something 
             <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
               Amazing
             </span>
