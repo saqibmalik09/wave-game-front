@@ -722,7 +722,7 @@ const Contact = () => {
             <Card className="border-2 border-gray-200 shadow-xl">
               <CardHeader>
                 <CardTitle className="text-2xl">Send us a message</CardTitle>
-                <CardDescription>We'll get back to you within 24 hours</CardDescription>
+                <CardDescription>We-ll get back to you within 24 hours</CardDescription>
               </CardHeader>
               <CardContent>
                 <form onSubmit={handleSubmit} className="space-y-6">
