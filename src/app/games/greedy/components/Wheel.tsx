@@ -2,7 +2,7 @@
 import Image from "next/image";
 import GreedyTimer from "./GreedyTimer";
 import { RootState } from "@/lib/redux/store";
-import { useRef, useImperativeHandle, forwardRef, useState } from "react";
+import { useRef, useImperativeHandle, forwardRef, useState, useEffect } from "react";
 import { useToast } from "../../teenpatti/components/Toast";
 import { myGreedyMessagesFromServer, placeGreedyBet } from "@/lib/socket/game/greedy/greedySocketEventHandler";
 import { useSelector, useDispatch } from 'react-redux';
@@ -45,6 +45,16 @@ const Wheel = forwardRef<WheelRef, WheelProps>(({ onCabinClick, animateCoin }, r
     const userPlayerData = useSelector((state: RootState) => state.userPlayerData);
     const tenant = useSelector((state: RootState) => state.tenantDetails.data);
     const [coinAnimation, setCoinAnimation] = useState({ isActive: false, amount: 0, potIndex: 0 });
+    const [myBet, setMyBet] = useState<Record<number, number>>({
+        1: 50,
+        2: 100,
+        3: 500,
+        4: 700,
+        5: 900,
+        6: 456,
+        7: 200,
+        8: 600,
+    });
 
     const { ToastContainer, showToast } = useToast();
     const dispatch = useDispatch();
@@ -52,6 +62,20 @@ const Wheel = forwardRef<WheelRef, WheelProps>(({ onCabinClick, animateCoin }, r
     // Use spin effect
     const spinState = useCabinSpinEffect(currentPhase, winningPotIndex);
 
+    useEffect(() => {
+    if (currentPhase === 'newGameStartTimer') {
+        setMyBet({
+            1: 0,
+            2: 0,
+            3: 0,
+            4: 0,
+            5: 0,
+            6: 0,
+            7: 0,
+            8: 0,
+        });
+    }
+}, [currentPhase]);
     useImperativeHandle(ref, () => ({
         getCabinElement: (index: number) => cabinRefs.current.get(index) || null,
     }));
@@ -149,6 +173,10 @@ const Wheel = forwardRef<WheelRef, WheelProps>(({ onCabinClick, animateCoin }, r
         if (!targetCabin) return;
 
         animateCoin(selectedCoin.amount, selectedCoin.color, targetCabin);
+        setMyBet(prev => ({
+            ...prev,
+            [cabinIndex]: prev[cabinIndex] + betAmount
+        }));
         onCabinClick?.(cabinIndex);
     };
 
@@ -226,7 +254,21 @@ const Wheel = forwardRef<WheelRef, WheelProps>(({ onCabinClick, animateCoin }, r
                                     priority={cabin.index <= 4}
                                 />
                             </div>
-
+                            {/* my  bet */}
+                            {/* my bet - ALWAYS SHOW, even when 0 */}
+                            <div className={`absolute -bottom-3 xs:-bottom-4 sm:-bottom-5 
+                                            min-w-[24px] h-[16px] xs:min-w-[26px] xs:h-[18px] sm:min-w-[30px] sm:h-[20px] md:min-w-[32px] md:h-[22px]
+                                            rounded-full
+                                            flex items-center justify-center px-1
+                                            font-black text-white
+                                            text-[8px] xs:text-[9px] sm:text-[10px] md:text-[11px]
+                                            border-[2px] sm:border-[3px] border-white shadow-lg
+                                            bg-gradient-to-br from-blue-500 to-blue-700`}
+                                style={{
+                                    textShadow: '0 1px 3px rgba(0,0,0,0.5)'
+                                }}>
+                                {myBet[cabin.index] >= 1000 ? `${(myBet[cabin.index] / 1000).toFixed(1)}k` : myBet[cabin.index]}
+                            </div>
                             {/* Multiplier Badge */}
                             <div className={`absolute -top-1 -right-1 sm:-top-2 sm:-right-2 
                                 min-w-[22px] h-[22px] xs:min-w-[24px] xs:h-[24px] sm:min-w-[28px] sm:h-[28px] md:min-w-[30px] md:h-[30px]
@@ -241,10 +283,10 @@ const Wheel = forwardRef<WheelRef, WheelProps>(({ onCabinClick, animateCoin }, r
                                 }`}
                                 style={{
                                     textShadow: '0 1px 3px rgba(0,0,0,0.5)'
-                                }}
-                            >
+                                }}>
                                 {cabin.mult}
                             </div>
+
                         </div>
                     );
                 })}
@@ -256,7 +298,7 @@ const Wheel = forwardRef<WheelRef, WheelProps>(({ onCabinClick, animateCoin }, r
                                 bg-orange-400 rounded-full shadow-xl
                                 flex flex-col items-center justify-center z-20 overflow-visible
                                 w-[70px] h-[70px] xs:w-[80px] xs:h-[80px] sm:w-[95px] sm:h-[95px] md:w-[100px] md:h-[100px] lg:w-[110px] lg:h-[110px]"
-                                        >
+                >
                     {/* Dealer Avatar Container - with transform scaling for better control */}
                     <div className="absolute left-1/2 -translate-x-1/2 pointer-events-none z-30
                                     -top-[40px] xs:-top-[43px] sm:-top-[50px] md:-top-[54px] lg:-top-[40px]">
