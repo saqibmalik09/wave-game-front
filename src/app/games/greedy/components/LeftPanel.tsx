@@ -97,8 +97,8 @@ export default function LeftPanel() {
       style={{
         background: 'linear-gradient(180deg, #fb923c 0%, #f97316 100%)',
         height: isExpanded ? 'auto' : 'auto',
-        maxHeight: '80%',
-        minHeight:'50%'
+        maxHeight: '70%',
+        minHeight:'40%'
       }}
     >
       {/* Header */}
