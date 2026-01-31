@@ -46,14 +46,14 @@ const Wheel = forwardRef<WheelRef, WheelProps>(({ onCabinClick, animateCoin }, r
     const tenant = useSelector((state: RootState) => state.tenantDetails.data);
     const [coinAnimation, setCoinAnimation] = useState({ isActive: false, amount: 0, potIndex: 0 });
     const [myBet, setMyBet] = useState<Record<number, number>>({
-        1: 50,
-        2: 100,
-        3: 500,
-        4: 700,
-        5: 900,
-        6: 456,
-        7: 200,
-        8: 600,
+        1: 0,
+        2: 0,
+        3: 0,
+        4: 0,
+        5: 0,
+        6: 0,
+        7: 0,
+        8: 0,
     });
 
     const { ToastContainer, showToast } = useToast();
