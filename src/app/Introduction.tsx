@@ -36,6 +36,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { useRouter } from "next/navigation";
 
 // ==================== CONFIGURATION ====================
 const CONFIG = {
@@ -185,7 +186,7 @@ const CONFIG = {
 const Navigation = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-
+  
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 50);
@@ -195,7 +196,6 @@ const Navigation = () => {
   }, []);
 
   const navLinks = ["Features", "Games", "Pricing", "Contact"];
-
   return (
     <motion.nav
       initial={{ y: -100 }}
@@ -498,6 +498,7 @@ await wave.startGame();
 
 // Games Showcase
 const Games = () => {
+  const router = useRouter();
   return (
     <section id="games" className="py-24 bg-gradient-to-br from-gray-50 to-purple-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -581,10 +582,12 @@ const Games = () => {
             size="lg"
             variant="outline"
             className="border-2 border-purple-600 text-purple-600 hover:bg-purple-50"
+            onClick={() => router.push("/games")}
           >
             View All 12+ Games
             <ArrowRight className="ml-2 w-4 h-4" />
           </Button>
+
         </motion.div>
       </div>
     </section>
@@ -702,7 +705,7 @@ const Contact = () => {
             Get In Touch
           </Badge>
           <h2 className="text-4xl md:text-5xl font-bold mb-6">
-            Let-s Build Something 
+            Let-s Build Something
             <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
               Amazing
             </span>
