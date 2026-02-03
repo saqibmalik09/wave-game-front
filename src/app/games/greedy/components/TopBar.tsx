@@ -28,7 +28,7 @@ export default function TopBar({ playerRef }: TopBarProps) {
         <PlayerTopBar ref={playerRef} />
       </div>
 
-      <div className="flex flex-col items-end gap-1 mt-14">
+      <div className="flex flex-col items-end gap-1 mt-auto">
         <div className="bg-blue-500 text-white text-[11px] px-3 py-1 rounded-lg font-bold shadow">
           Round {roundCount}
         </div>

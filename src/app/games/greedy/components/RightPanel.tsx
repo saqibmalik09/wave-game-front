@@ -57,7 +57,7 @@ return (
     ref={panelRef}
     onClick={!isLoading ? handleToggle : undefined}
     className="absolute right-1 top-1/2 -translate-y-1/2
-      w-14 bg-blue-500 rounded-xl px-1 py-2
+      sm:w-12 lg:w-12 bg-blue-500 rounded-xl px-1 py-2
       flex flex-col items-center gap-2 shadow-lg z-20 cursor-pointer"
   >
     <div className="text-white text-[10px] font-extrabold">
@@ -78,7 +78,7 @@ return (
       </div>
     ) : (
       <div
-        className="flex flex-col gap-1"
+        className="flex flex-col gap-1 no-scrollbar"
         style={{
           maxHeight: isExpanded ? `${MAX_VISIBLE_ITEMS * 32}px` : 'auto',
           overflowY: isExpanded ? 'auto' : 'visible',
@@ -106,3 +106,4 @@ return (
 );
 
 }
+

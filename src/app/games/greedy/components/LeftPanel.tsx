@@ -88,16 +88,17 @@ export default function LeftPanel() {
     setIsExpanded(!isExpanded);
   };
 
-  return (
+ return (
     <aside
-      className="absolute left-1 top-1/2 -translate-y-1/2
-        w-12 rounded-xl
+      className={`absolute left-1 top-1/2 -translate-y-1/2
+        w-11 rounded-sm
         flex flex-col items-center
-        shadow-lg z-20"
+        shadow-lg ${isExpanded ? 'z-220' : 'z-20'}`}
       style={{
         background: 'linear-gradient(180deg, #fb923c 0%, #f97316 100%)',
-        height: isExpanded ? 'auto' : '40%',
-        maxHeight: '80%',
+        height: isExpanded ? 'auto' : 'auto',
+        maxHeight: '70%',
+        minHeight:'40%'
       }}
     >
       {/* Header */}
@@ -108,10 +109,9 @@ export default function LeftPanel() {
       {/* Players List */}
       {hasPlayers ? (
         <div
-          className="flex flex-col gap-1 p-1 w-full flex-1 overflow-hidden"
+          className={`flex flex-col gap-1 p-1 w-full flex-1 overflow-hidden ${isExpanded ? 'overflow-y-auto cursor-pointer' : ''}`}
           style={{
-            maxHeight: isExpanded ? `${MAX_VISIBLE_PLAYERS * 44}px` : 'auto',
-            overflowY: isExpanded ? 'auto' : 'visible',
+            maxHeight: isExpanded ? `${MAX_VISIBLE_PLAYERS * 40}px` : 'none',
             scrollbarWidth: 'none',
             msOverflowStyle: 'none',
           }}
@@ -220,17 +220,23 @@ export default function LeftPanel() {
           })}
         </div>
       ) : (
-        <div className="flex-1 flex items-center justify-center px-2">
-          <p className="text-white/60 text-[9px] text-center font-medium">
-            No players yet
-          </p>
+         <div className="flex-1 flex items-center justify-center">
+          <span
+            className="text-white/80 text-[9px] font-semibold tracking-widest"
+            style={{
+              writingMode: 'vertical-rl',
+              transform: 'rotate(180deg)',
+            }}
+          >
+            Loading Players...
+          </span>
         </div>
       )}
 
       {/* Toggle Button */}
       {showExpandButton && (
         <div
-          className="w-full flex justify-center items-center p-2 cursor-pointer hover:bg-white/10 transition-all border-t border-white/20"
+          className="w-full flex justify-center items-center p-1 cursor-pointer hover:bg-white/10 transition-all border-t border-white/20"
           onClick={handleToggle}
           title={
             isExpanded
@@ -241,7 +247,7 @@ export default function LeftPanel() {
           <div
             className="rounded-lg flex items-center justify-center font-extrabold text-white shadow-lg transition-all hover:scale-105"
             style={{
-              width: '40px',
+              width: '50px',
               height: '40px',
               background: isExpanded
                 ? 'linear-gradient(135deg, #dc2626, #ef4444)'

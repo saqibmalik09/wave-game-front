@@ -12,7 +12,7 @@ interface CoinAnimationProps {
   stayDuration?: number;
 }
 
-export const CoinAnimation: React.FC<CoinAnimationProps> = ({
+export const CoinAnimation: React.FC<CoinAnimationProps> = ({  
   id,
   amount,
   color,
@@ -21,7 +21,7 @@ export const CoinAnimation: React.FC<CoinAnimationProps> = ({
   endX,
   endY,
   onComplete,
-  stayDuration = 15000,
+  stayDuration = 0
 }) => {
   const [isAnimating, setIsAnimating] = useState(true);
   const [finalPosition] = useState(() => {
@@ -33,7 +33,8 @@ export const CoinAnimation: React.FC<CoinAnimationProps> = ({
   useEffect(() => {
     const animTimer = setTimeout(() => {
       setIsAnimating(false);
-    }, 600);
+      onComplete();
+    }, 500);
 
     const removeTimer = setTimeout(() => {
       onComplete();
