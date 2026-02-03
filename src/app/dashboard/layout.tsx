@@ -2,7 +2,18 @@
 
 import { useState } from 'react'
 import { DashboardSidebar } from '@/components/dashboard/sidebar'
-import { Menu, Search, Bell } from 'lucide-react'
+import { Menu, Search, Bell, CheckCircle2, User } from 'lucide-react'
+import { ThemeToggle } from '@/components/theme-toggle'
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 
 export default function DashboardLayout({
     children,
@@ -10,44 +21,97 @@ export default function DashboardLayout({
     children: React.ReactNode
 }) {
     const [mobileOpen, setMobileOpen] = useState(false)
+    const router = useRouter()
 
     return (
-        <div className="min-h-screen bg-zinc-950 text-white flex">
+        <div className="min-h-screen bg-background text-foreground flex transition-colors duration-300">
             <DashboardSidebar mobileOpen={mobileOpen} setMobileOpen={setMobileOpen} />
 
             <div className="flex-1 flex flex-col min-h-0 overflow-hidden lg:pl-0">
                 {/* Top Header */}
-                <header className="h-20 border-b border-white/5 flex items-center justify-between px-6 lg:px-10 bg-zinc-950/50 backdrop-blur-sm sticky top-0 z-30">
+                <header className="h-16 border-b border-border flex items-center justify-between px-4 lg:px-8 bg-background/80 backdrop-blur-md sticky top-0 z-30 transition-colors duration-300">
                     <div className="flex items-center gap-4">
                         <button
                             onClick={() => setMobileOpen(true)}
-                            className="lg:hidden p-2 text-zinc-400 hover:text-white rounded-lg hover:bg-white/5"
+                            className="lg:hidden p-2 text-muted-foreground hover:text-foreground rounded-lg hover:bg-accent"
                         >
-                            <Menu className="w-6 h-6" />
+                            <Menu className="w-5 h-5" />
                         </button>
-                        <h2 className="text-xl font-semibold hidden md:block text-zinc-100">
+                        <h2 className="text-lg font-semibold hidden md:block text-foreground">
                             Dashboard
                         </h2>
                     </div>
 
-                    <div className="flex items-center gap-4">
-                        <div className="relative hidden md:block">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
+                    <div className="flex items-center gap-3">
+                        <div className="relative hidden md:block group">
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
                             <input
                                 type="text"
                                 placeholder="Search..."
-                                className="bg-zinc-900 border border-white/10 rounded-full pl-10 pr-4 py-2 text-sm focus:outline-none focus:border-purple-500/50 focus:ring-1 focus:ring-purple-500/20 placeholder:text-zinc-600 w-64 text-zinc-200"
+                                className="bg-accent/50 border border-input rounded-full pl-9 pr-4 py-1.5 text-sm focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/20 placeholder:text-muted-foreground w-64 text-foreground transition-all"
                             />
                         </div>
-                        <button className="relative p-2 text-zinc-400 hover:text-white rounded-full hover:bg-white/5 transition-colors">
-                            <Bell className="w-5 h-5" />
-                            <span className="absolute top-2 right-2 w-2 h-2 bg-purple-500 rounded-full ring-2 ring-zinc-950 animate-pulse" />
-                        </button>
+
+                        <ThemeToggle />
+
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <button className="relative p-2 text-muted-foreground hover:text-foreground rounded-lg hover:bg-accent transition-colors outline-none">
+                                    <Bell className="w-5 h-5" />
+                                    <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full ring-2 ring-background animate-pulse" />
+                                </button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end" className="w-80">
+                                <DropdownMenuLabel>Notifications</DropdownMenuLabel>
+                                <DropdownMenuSeparator />
+                                <div className="max-h-[300px] overflow-y-auto">
+                                    <DropdownMenuItem className="cursor-pointer gap-4 p-3 items-start">
+                                        <div className="h-2 w-2 mt-1.5 rounded-full bg-blue-500 shrink-0" />
+                                        <div className="flex-1 space-y-1">
+                                            <p className="text-sm font-medium leading-none">New Game Added</p>
+                                            <p className="text-xs text-muted-foreground">Cyber Racer 2077 was added to the catalog.</p>
+                                            <p className="text-[10px] text-muted-foreground/60">2 mins ago</p>
+                                        </div>
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem className="cursor-pointer gap-4 p-3 items-start">
+                                        <div className="h-2 w-2 mt-1.5 rounded-full bg-green-500 shrink-0" />
+                                        <div className="flex-1 space-y-1">
+                                            <p className="text-sm font-medium leading-none">System Update</p>
+                                            <p className="text-xs text-muted-foreground">Platform version 2.4.0 is now live.</p>
+                                            <p className="text-[10px] text-muted-foreground/60">1 hour ago</p>
+                                        </div>
+                                    </DropdownMenuItem>
+                                </div>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem className="p-2 justify-center text-primary text-xs font-medium cursor-pointer">
+                                    View all properties
+                                </DropdownMenuItem>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <button className="h-8 w-8 rounded-full bg-gradient-to-br from-primary to-blue-600 flex items-center justify-center text-white font-medium text-xs hover:ring-2 ring-primary/20 transition-all outline-none">
+                                    AD
+                                </button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                                <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem onClick={() => router.push('/dashboard/profile')}>
+                                    <User className="mr-2 h-4 w-4" />
+                                    <span>Profile</span>
+                                </DropdownMenuItem>
+                                <DropdownMenuItem className="text-red-500 focus:text-red-500" onClick={() => router.push('/login')}>
+                                    Log out
+                                </DropdownMenuItem>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
                     </div>
                 </header>
 
                 {/* Main Content Scrollable Area */}
-                <main className="flex-1 overflow-y-auto p-4 lg:p-10 scrollbar-thin scrollbar-thumb-zinc-800 scrollbar-track-transparent">
+                <main className="flex-1 overflow-y-auto p-4 lg:p-8 scrollbar-thin scrollbar-thumb-zinc-800 scrollbar-track-transparent">
                     <div className="max-w-7xl mx-auto w-full animate-in fade-in slide-in-from-bottom-4 duration-500">
                         {children}
                     </div>
