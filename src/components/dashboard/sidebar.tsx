@@ -14,21 +14,48 @@ import {
     X,
     ChevronRight,
     Users,
-    Megaphone
+    Megaphone,
+    ChevronDown,
+    Sliders
 } from 'lucide-react'
 
-const navItems = [
+type NavItem = {
+    name: string
+    href?: string
+    icon: any
+    subItems?: NavItem[]
+}
+
+const navItems: NavItem[] = [
     { name: 'Overview', href: '/dashboard', icon: LayoutDashboard },
     { name: 'Analytics', href: '/dashboard/analytics', icon: BarChart3 },
     { name: 'User Management', href: '/dashboard/users', icon: Users },
     { name: 'Games Management', href: '/dashboard/games', icon: Gamepad2 },
     { name: 'Broadcast Messages', href: '/dashboard/broadcast', icon: Megaphone },
+    {
+        name: 'Game Settings',
+        icon: Sliders,
+        subItems: [
+            { name: 'Greedy Teen Patti', href: '/dashboard/game-settings/greedy-teenpatti', icon: Gamepad2 },
+            { name: 'Fruit Game', href: '/dashboard/game-settings/fruit-game', icon: Gamepad2 },
+            { name: 'Teen Patti 3', href: '/dashboard/game-settings/teenpatti-3', icon: Gamepad2 },
+        ]
+    },
     { name: 'Profile', href: '/dashboard/profile', icon: User },
     { name: 'Settings', href: '/dashboard/settings', icon: Settings },
 ]
 
 export function DashboardSidebar({ mobileOpen, setMobileOpen, collapsed }: { mobileOpen: boolean, setMobileOpen: (open: boolean) => void, collapsed: boolean }) {
     const pathname = usePathname()
+    const [expandedMenus, setExpandedMenus] = useState<string[]>([])
+
+    const toggleMenu = (menuName: string) => {
+        setExpandedMenus(prev =>
+            prev.includes(menuName)
+                ? prev.filter(name => name !== menuName)
+                : [...prev, menuName]
+        )
+    }
 
     return (
         <>
@@ -77,29 +104,79 @@ export function DashboardSidebar({ mobileOpen, setMobileOpen, collapsed }: { mob
                     )}
                     {navItems.map((item) => {
                         const isActive = pathname === item.href
+                        const hasSubItems = item.subItems && item.subItems.length > 0
+                        const isExpanded = expandedMenus.includes(item.name)
                         const Icon = item.icon
 
                         return (
-                            <Link
-                                key={item.href}
-                                href={item.href}
-                                onClick={() => setMobileOpen(false)}
-                                className={cn(
-                                    "group flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 relative overflow-hidden",
-                                    isActive
-                                        ? "text-primary bg-primary/10"
-                                        : "text-muted-foreground hover:text-foreground hover:bg-accent",
-                                    collapsed && "justify-center px-2"
+                            <div key={item.name}>
+                                {/* Main Menu Item */}
+                                {hasSubItems ? (
+                                    <button
+                                        onClick={() => toggleMenu(item.name)}
+                                        className={cn(
+                                            "w-full group flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 relative overflow-hidden",
+                                            "text-muted-foreground hover:text-foreground hover:bg-accent",
+                                            collapsed && "justify-center px-2"
+                                        )}
+                                        title={collapsed ? item.name : undefined}
+                                    >
+                                        <Icon className={cn("w-5 h-5 transition-colors shrink-0", "text-muted-foreground group-hover:text-foreground")} />
+                                        {!collapsed && <span>{item.name}</span>}
+                                        {!collapsed && (
+                                            <ChevronDown className={cn("w-4 h-4 ml-auto transition-transform", isExpanded && "rotate-180")} />
+                                        )}
+                                    </button>
+                                ) : (
+                                    <Link
+                                        href={item.href!}
+                                        onClick={() => setMobileOpen(false)}
+                                        className={cn(
+                                            "group flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 relative overflow-hidden",
+                                            isActive
+                                                ? "text-primary bg-primary/10"
+                                                : "text-muted-foreground hover:text-foreground hover:bg-accent",
+                                            collapsed && "justify-center px-2"
+                                        )}
+                                        title={collapsed ? item.name : undefined}
+                                    >
+                                        {isActive && (
+                                            <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-primary rounded-r-full" />
+                                        )}
+                                        <Icon className={cn("w-5 h-5 transition-colors shrink-0", isActive ? "text-primary" : "text-muted-foreground group-hover:text-foreground")} />
+                                        {!collapsed && <span>{item.name}</span>}
+                                        {!collapsed && isActive && <ChevronRight className="w-4 h-4 ml-auto text-primary/50" />}
+                                    </Link>
                                 )}
-                                title={collapsed ? item.name : undefined}
-                            >
-                                {isActive && (
-                                    <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-primary rounded-r-full" />
+
+                                {/* Sub Menu Items */}
+                                {hasSubItems && isExpanded && !collapsed && (
+                                    <div className="mt-1 ml-4 space-y-1 border-l-2 border-border/50 pl-3">
+                                        {item.subItems!.map((subItem) => {
+                                            const isSubActive = pathname === subItem.href
+                                            const SubIcon = subItem.icon
+
+                                            return (
+                                                <Link
+                                                    key={subItem.href}
+                                                    href={subItem.href!}
+                                                    onClick={() => setMobileOpen(false)}
+                                                    className={cn(
+                                                        "group flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200",
+                                                        isSubActive
+                                                            ? "text-primary bg-primary/10"
+                                                            : "text-muted-foreground hover:text-foreground hover:bg-accent"
+                                                    )}
+                                                >
+                                                    <SubIcon className={cn("w-4 h-4 transition-colors shrink-0", isSubActive ? "text-primary" : "text-muted-foreground group-hover:text-foreground")} />
+                                                    <span className="text-xs">{subItem.name}</span>
+                                                    {isSubActive && <ChevronRight className="w-3 h-3 ml-auto text-primary/50" />}
+                                                </Link>
+                                            )
+                                        })}
+                                    </div>
                                 )}
-                                <Icon className={cn("w-5 h-5 transition-colors shrink-0", isActive ? "text-primary" : "text-muted-foreground group-hover:text-foreground")} />
-                                {!collapsed && <span>{item.name}</span>}
-                                {!collapsed && isActive && <ChevronRight className="w-4 h-4 ml-auto text-primary/50" />}
-                            </Link>
+                            </div>
                         )
                     })}
                 </div>
