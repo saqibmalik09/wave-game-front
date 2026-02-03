@@ -13,7 +13,8 @@ import {
     LogOut,
     X,
     ChevronRight,
-    Users
+    Users,
+    Megaphone
 } from 'lucide-react'
 
 const navItems = [
@@ -21,6 +22,7 @@ const navItems = [
     { name: 'Analytics', href: '/dashboard/analytics', icon: BarChart3 },
     { name: 'User Management', href: '/dashboard/users', icon: Users },
     { name: 'Games Management', href: '/dashboard/games', icon: Gamepad2 },
+    { name: 'Broadcast Messages', href: '/dashboard/broadcast', icon: Megaphone },
     { name: 'Profile', href: '/dashboard/profile', icon: User },
     { name: 'Settings', href: '/dashboard/settings', icon: Settings },
 ]
