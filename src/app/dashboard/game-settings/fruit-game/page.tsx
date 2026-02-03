@@ -53,15 +53,24 @@ export default function FruitGameSettings() {
     }
 
     return (
-        <div className="space-y-8">
-            <div>
-                <h1 className="text-3xl font-bold text-foreground mb-2">Fruit Game Settings</h1>
-                <p className="text-muted-foreground">Configure game parameters and probabilities</p>
+        <div className="space-y-6">
+            <div className="flex items-start justify-between gap-4">
+                <div>
+                    <h1 className="text-2xl font-bold text-foreground mb-1">Fruit Game Settings</h1>
+                    <p className="text-sm text-muted-foreground">Configure game parameters and probabilities</p>
+                </div>
+                <button
+                    onClick={handleClearRecords}
+                    className="flex items-center gap-2 px-4 py-2 bg-destructive/10 text-destructive rounded-lg text-sm font-medium transition-all hover:bg-destructive/20 border border-destructive/20 shrink-0"
+                >
+                    <Trash2 className="w-4 h-4" />
+                    Reset Records
+                </button>
             </div>
 
             {/* Max Bet Configuration */}
-            <div className="bg-card border border-border rounded-2xl p-6 shadow-sm">
-                <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
+            <div className="bg-card border border-border rounded-2xl p-5 shadow-sm">
+                <h3 className="text-base font-semibold text-foreground mb-3 flex items-center gap-2">
                     <div className="w-2 h-2 rounded-full bg-primary"></div>
                     Max Bet Configuration
                 </h3>
@@ -78,8 +87,8 @@ export default function FruitGameSettings() {
             </div>
 
             {/* Winning Multiplier Editor */}
-            <div className="bg-card border border-border rounded-2xl p-6 shadow-sm">
-                <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
+            <div className="bg-card border border-border rounded-2xl p-5 shadow-sm">
+                <h3 className="text-base font-semibold text-foreground mb-3 flex items-center gap-2">
                     <div className="w-2 h-2 rounded-full bg-blue-500"></div>
                     Winning Multiplier
                 </h3>
@@ -99,8 +108,8 @@ export default function FruitGameSettings() {
             </div>
 
             {/* Winning Percentage Editor */}
-            <div className="bg-card border border-border rounded-2xl p-6 shadow-sm">
-                <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
+            <div className="bg-card border border-border rounded-2xl p-5 shadow-sm">
+                <h3 className="text-base font-semibold text-foreground mb-3 flex items-center gap-2">
                     <div className="w-2 h-2 rounded-full bg-emerald-500"></div>
                     Winning Percentage
                 </h3>
@@ -129,12 +138,12 @@ export default function FruitGameSettings() {
             </div>
 
             {/* Action Buttons */}
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-3">
                 <button
                     onClick={handleSaveSettings}
                     disabled={isSaving}
                     className={cn(
-                        "flex items-center gap-2 px-6 py-3 bg-primary text-primary-foreground rounded-lg font-medium transition-all hover:bg-primary/90 shadow-md hover:shadow-lg",
+                        "flex items-center gap-2 px-5 py-2.5 bg-primary text-primary-foreground rounded-lg text-sm font-medium transition-all hover:bg-primary/90 shadow-md hover:shadow-lg",
                         isSaving && "opacity-50 cursor-not-allowed"
                     )}
                 >
@@ -144,10 +153,10 @@ export default function FruitGameSettings() {
 
                 <button
                     onClick={() => setShowClearDialog(true)}
-                    className="flex items-center gap-2 px-6 py-3 bg-destructive/10 text-destructive rounded-lg font-medium transition-all hover:bg-destructive/20 border border-destructive/20"
+                    className="flex items-center gap-2 px-5 py-2.5 bg-muted text-foreground rounded-lg text-sm font-medium transition-all hover:bg-muted/80 border border-border"
                 >
                     <Trash2 className="w-4 h-4" />
-                    Clear Records
+                    Clear All Data
                 </button>
             </div>
 
@@ -155,8 +164,8 @@ export default function FruitGameSettings() {
             {showClearDialog && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm">
                     <div className="bg-card border border-border rounded-2xl p-6 max-w-md w-full mx-4 shadow-2xl">
-                        <h3 className="text-xl font-bold text-foreground mb-2">Clear All Records?</h3>
-                        <p className="text-muted-foreground mb-6">
+                        <h3 className="text-lg font-bold text-foreground mb-2">Clear All Records?</h3>
+                        <p className="text-sm text-muted-foreground mb-6">
                             This action cannot be undone. All game records for Fruit Game will be permanently deleted.
                         </p>
                         <div className="flex items-center gap-3">
