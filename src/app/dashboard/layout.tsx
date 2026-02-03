@@ -21,11 +21,12 @@ export default function DashboardLayout({
     children: React.ReactNode
 }) {
     const [mobileOpen, setMobileOpen] = useState(false)
+    const [collapsed, setCollapsed] = useState(false)
     const router = useRouter()
 
     return (
         <div className="min-h-screen bg-background text-foreground flex transition-colors duration-300">
-            <DashboardSidebar mobileOpen={mobileOpen} setMobileOpen={setMobileOpen} />
+            <DashboardSidebar mobileOpen={mobileOpen} setMobileOpen={setMobileOpen} collapsed={collapsed} />
 
             <div className="flex-1 flex flex-col min-h-0 overflow-hidden lg:pl-0">
                 {/* Top Header */}
@@ -34,6 +35,12 @@ export default function DashboardLayout({
                         <button
                             onClick={() => setMobileOpen(true)}
                             className="lg:hidden p-2 text-muted-foreground hover:text-foreground rounded-lg hover:bg-accent"
+                        >
+                            <Menu className="w-5 h-5" />
+                        </button>
+                        <button
+                            onClick={() => setCollapsed(!collapsed)}
+                            className="hidden lg:flex p-2 text-muted-foreground hover:text-foreground rounded-lg hover:bg-accent transition-colors"
                         >
                             <Menu className="w-5 h-5" />
                         </button>

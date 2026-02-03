@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Search, Filter, MoreHorizontal, Download, User as UserIcon, Coins, X, Save } from 'lucide-react'
+import { Search, Filter, MoreHorizontal, Download, User as UserIcon, Coins, X, Save, Check } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import {
     DropdownMenu,
@@ -10,31 +10,50 @@ import {
     DropdownMenuLabel,
     DropdownMenuSeparator,
     DropdownMenuTrigger,
+    DropdownMenuCheckboxItem,
 } from "@/components/ui/dropdown-menu"
 import { toast } from 'sonner'
 import { exportToExcel } from '@/lib/export'
+import { Pagination } from '@/components/ui/pagination'
 
-// Mock Data
-const usersData = Array.from({ length: 20 }).map((_, i) => ({
+// Mock Data - Increased for pagination demo
+const usersData = Array.from({ length: 64 }).map((_, i) => ({
     id: `USR-${1000 + i}`,
     username: `player_${1000 + i}`,
     email: `player${1000 + i}@example.com`,
     betAmount: Math.floor(Math.random() * 50000),
-    status: Math.random() > 0.2 ? 'active' : 'suspended',
+    status: Math.random() > 0.3 ? 'active' : 'suspended',
     joinDate: '2025-10-24'
 }))
+
+const ITEMS_PER_PAGE = 8
 
 export default function UsersPage() {
     const [users, setUsers] = useState(usersData)
     const [search, setSearch] = useState('')
+    const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'suspended'>('all')
+    const [currentPage, setCurrentPage] = useState(1)
     const [isModalOpen, setIsModalOpen] = useState(false)
     const [newUser, setNewUser] = useState({ username: '', email: '' })
 
-    const filteredUsers = users.filter(user =>
-        user.username.toLowerCase().includes(search.toLowerCase()) ||
-        user.id.toLowerCase().includes(search.toLowerCase()) ||
-        user.email.toLowerCase().includes(search.toLowerCase())
-    )
+    const filteredUsers = users.filter(user => {
+        const matchesSearch =
+            user.username.toLowerCase().includes(search.toLowerCase()) ||
+            user.id.toLowerCase().includes(search.toLowerCase()) ||
+            user.email.toLowerCase().includes(search.toLowerCase())
+
+        const matchesStatus = statusFilter === 'all' || user.status === statusFilter
+
+        return matchesSearch && matchesStatus
+    })
+
+    // Reset page when filters change
+    if (currentPage > Math.max(1, Math.ceil(filteredUsers.length / ITEMS_PER_PAGE))) {
+        setCurrentPage(1)
+    }
+
+    const totalPages = Math.ceil(filteredUsers.length / ITEMS_PER_PAGE)
+    const paginatedUsers = filteredUsers.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE)
 
     const handleAction = (action: string, userId: string) => {
         toast.success(`${action} action triggered for ${userId}`)
@@ -69,7 +88,7 @@ export default function UsersPage() {
     }
 
     return (
-        <div className="space-y-6 relative">
+        <div className="space-y-6 relative h-full flex flex-col">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
                     <h1 className="text-3xl font-bold text-foreground mb-2">User Management</h1>
@@ -78,14 +97,14 @@ export default function UsersPage() {
                 <div className="flex items-center gap-2">
                     <button
                         onClick={handleExport}
-                        className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-lg hover:from-green-500 hover:to-emerald-500 transition-colors text-sm font-medium shadow-sm"
+                        className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-lg hover:from-green-500 hover:to-emerald-500 transition-colors text-sm font-medium shadow-sm transition-all hover:shadow-emerald-500/20 shadow-md transform hover:-translate-y-0.5"
                     >
                         <Download className="w-4 h-4" />
                         Export Excel
                     </button>
                     <button
                         onClick={() => setIsModalOpen(true)}
-                        className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors text-sm font-medium shadow-sm"
+                        className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors text-sm font-medium shadow-sm transition-all hover:shadow-primary/20 shadow-md transform hover:-translate-y-0.5"
                     >
                         <UserIcon className="w-4 h-4" />
                         Add User
@@ -101,24 +120,54 @@ export default function UsersPage() {
                         type="text"
                         placeholder="Search users by ID, username or email..."
                         value={search}
-                        onChange={(e) => setSearch(e.target.value)}
+                        onChange={(e) => { setSearch(e.target.value); setCurrentPage(1); }}
                         className="w-full bg-background border border-input rounded-lg pl-9 pr-4 py-2 text-sm focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/20 placeholder:text-muted-foreground transition-all"
                     />
                 </div>
                 <div className="flex items-center gap-3 w-full sm:w-auto">
-                    <div className="text-sm text-muted-foreground">
+                    <div className="text-sm text-muted-foreground hidden sm:block">
                         Showing <span className="font-medium text-foreground">{filteredUsers.length}</span> users
                     </div>
                     <div className="h-4 w-px bg-border hidden sm:block"></div>
-                    <button className="flex items-center gap-2 px-3 py-2 bg-background border border-input rounded-lg text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-accent transition-colors">
-                        <Filter className="w-3.5 h-3.5" />
-                        Filters
-                    </button>
+
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <button className={cn(
+                                "flex items-center gap-2 px-3 py-2 bg-background border border-input rounded-lg text-xs font-medium transition-colors outline-none",
+                                statusFilter !== 'all' ? "text-primary border-primary/50 bg-primary/5" : "text-muted-foreground hover:text-foreground hover:bg-accent"
+                            )}>
+                                <Filter className="w-3.5 h-3.5" />
+                                Status: <span className="uppercase">{statusFilter}</span>
+                            </button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                            <DropdownMenuLabel>Filter by Status</DropdownMenuLabel>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuCheckboxItem
+                                checked={statusFilter === 'all'}
+                                onCheckedChange={() => setStatusFilter('all')}
+                            >
+                                All Users
+                            </DropdownMenuCheckboxItem>
+                            <DropdownMenuCheckboxItem
+                                checked={statusFilter === 'active'}
+                                onCheckedChange={() => setStatusFilter('active')}
+                            >
+                                Active Only
+                            </DropdownMenuCheckboxItem>
+                            <DropdownMenuCheckboxItem
+                                checked={statusFilter === 'suspended'}
+                                onCheckedChange={() => setStatusFilter('suspended')}
+                            >
+                                Suspended Only
+                            </DropdownMenuCheckboxItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
                 </div>
             </div>
 
             {/* Users Table */}
-            <div className="bg-card border border-border rounded-xl overflow-hidden shadow-sm">
+            <div className="bg-card border border-border rounded-xl shadow-sm flex-1 flex flex-col">
                 <div className="overflow-x-auto">
                     <table className="w-full text-left text-sm">
                         <thead className="bg-muted/50 border-b border-border uppercase tracking-wider font-medium text-xs text-muted-foreground">
@@ -131,7 +180,7 @@ export default function UsersPage() {
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-border">
-                            {filteredUsers.map((user) => (
+                            {paginatedUsers.map((user) => (
                                 <tr key={user.id} className="hover:bg-muted/30 transition-colors group">
                                     <td className="px-6 py-4">
                                         <div className="flex items-center gap-3">
@@ -194,9 +243,18 @@ export default function UsersPage() {
                     </table>
                     {filteredUsers.length === 0 && (
                         <div className="text-center py-10 text-muted-foreground">
-                            No users found matching "{search}"
+                            No users found matching filters
                         </div>
                     )}
+                </div>
+
+                {/* Pagination Footer */}
+                <div className="mt-auto">
+                    <Pagination
+                        currentPage={currentPage}
+                        totalPages={totalPages}
+                        onPageChange={setCurrentPage}
+                    />
                 </div>
             </div>
 
@@ -246,7 +304,7 @@ export default function UsersPage() {
                                 </button>
                                 <button
                                     type="submit"
-                                    className="px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium hover:bg-primary/90 transition-colors flex items-center gap-2"
+                                    className="px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium hover:bg-primary/90 transition-colors flex items-center gap-2 mb-2"
                                 >
                                     <Save className="w-4 h-4" />
                                     Save User

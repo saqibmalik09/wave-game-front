@@ -10,8 +10,10 @@ import {
     DropdownMenuLabel,
     DropdownMenuSeparator,
     DropdownMenuTrigger,
+    DropdownMenuCheckboxItem,
 } from "@/components/ui/dropdown-menu"
 import { toast } from 'sonner'
+import { Pagination } from '@/components/ui/pagination'
 
 interface Game {
     id: string
@@ -22,18 +24,24 @@ interface Game {
     lastUpdated: string
 }
 
-const initialGames: Game[] = [
-    { id: 'GM-001', name: 'Cyber Racer 2077', category: 'Racing', players: 1240, status: 'active', lastUpdated: '2h ago' },
-    { id: 'GM-002', name: 'Space Invaders Redux', category: 'Arcade', players: 850, status: 'active', lastUpdated: '5h ago' },
-    { id: 'GM-003', name: 'Mystic Puzzle', category: 'Puzzle', players: 320, status: 'inactive', lastUpdated: '1d ago' },
-    { id: 'GM-004', name: 'Battle Royale X', category: 'Action', players: 15400, status: 'active', lastUpdated: '10m ago' },
-    { id: 'GM-005', name: 'Chess Master', category: 'Strategy', players: 2100, status: 'active', lastUpdated: '3d ago' },
-]
+// Increased mock data for pagination
+const initialGames: Game[] = Array.from({ length: 42 }).map((_, i) => ({
+    id: `GM-${1000 + i}`,
+    name: `Game Title ${i + 1}`,
+    category: ['Action', 'Card', 'Strategy', 'Arcade', 'Racing'][Math.floor(Math.random() * 5)],
+    players: Math.floor(Math.random() * 10000),
+    status: Math.random() > 0.3 ? 'active' : 'inactive',
+    lastUpdated: `${Math.floor(Math.random() * 24)}h ago`
+}))
+
+const ITEMS_PER_PAGE = 7
 
 export default function GamesPage() {
     const [games, setGames] = useState<Game[]>(initialGames)
     const [isModalOpen, setIsModalOpen] = useState(false)
     const [search, setSearch] = useState('')
+    const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'inactive'>('all')
+    const [currentPage, setCurrentPage] = useState(1)
 
     // New Game Form State
     const [newGame, setNewGame] = useState({ name: '', category: 'Action' })
@@ -70,13 +78,26 @@ export default function GamesPage() {
         toast.error("Game deleted")
     }
 
-    const filteredGames = games.filter(g =>
-        g.name.toLowerCase().includes(search.toLowerCase()) ||
-        g.category.toLowerCase().includes(search.toLowerCase())
-    )
+    const filteredGames = games.filter(g => {
+        const matchesSearch =
+            g.name.toLowerCase().includes(search.toLowerCase()) ||
+            g.category.toLowerCase().includes(search.toLowerCase())
+
+        const matchesStatus = statusFilter === 'all' || g.status === statusFilter
+
+        return matchesSearch && matchesStatus
+    })
+
+    // Reset page
+    if (currentPage > Math.max(1, Math.ceil(filteredGames.length / ITEMS_PER_PAGE))) {
+        setCurrentPage(1)
+    }
+
+    const totalPages = Math.ceil(filteredGames.length / ITEMS_PER_PAGE)
+    const paginatedGames = filteredGames.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE)
 
     return (
-        <div className="space-y-6 relative">
+        <div className="space-y-6 relative h-full flex flex-col">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
                     <h1 className="text-3xl font-bold text-foreground mb-2">Games Management</h1>
@@ -98,19 +119,49 @@ export default function GamesPage() {
                     <input
                         type="text"
                         value={search}
-                        onChange={(e) => setSearch(e.target.value)}
+                        onChange={(e) => { setSearch(e.target.value); setCurrentPage(1); }}
                         placeholder="Search games..."
                         className="w-full bg-card border border-input rounded-xl pl-10 pr-4 py-2.5 text-sm focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/20 text-foreground"
                     />
                 </div>
-                <button className="flex items-center gap-2 px-4 py-2.5 bg-card border border-input rounded-xl text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-accent transition-colors">
-                    <Filter className="w-4 h-4" />
-                    Filters
-                </button>
+
+                <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                        <button className={cn(
+                            "flex items-center gap-2 px-4 py-2.5 bg-card border border-input rounded-xl text-sm font-medium transition-colors outline-none",
+                            statusFilter !== 'all' ? "text-primary border-primary/50 bg-primary/5" : "text-muted-foreground hover:text-foreground hover:bg-accent"
+                        )}>
+                            <Filter className="w-4 h-4" />
+                            Status: <span className="uppercase">{statusFilter}</span>
+                        </button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                        <DropdownMenuLabel>Filter by Status</DropdownMenuLabel>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuCheckboxItem
+                            checked={statusFilter === 'all'}
+                            onCheckedChange={() => setStatusFilter('all')}
+                        >
+                            All Games
+                        </DropdownMenuCheckboxItem>
+                        <DropdownMenuCheckboxItem
+                            checked={statusFilter === 'active'}
+                            onCheckedChange={() => setStatusFilter('active')}
+                        >
+                            Active Only
+                        </DropdownMenuCheckboxItem>
+                        <DropdownMenuCheckboxItem
+                            checked={statusFilter === 'inactive'}
+                            onCheckedChange={() => setStatusFilter('inactive')}
+                        >
+                            Inactive Only
+                        </DropdownMenuCheckboxItem>
+                    </DropdownMenuContent>
+                </DropdownMenu>
             </div>
 
             {/* Games List */}
-            <div className="bg-card border border-border rounded-2xl overflow-hidden shadow-sm">
+            <div className="bg-card border border-border rounded-2xl shadow-sm flex-1 flex flex-col">
                 <div className="overflow-x-auto">
                     <table className="w-full text-left text-sm text-muted-foreground">
                         <thead className="bg-muted/50 uppercase tracking-wider font-medium text-xs border-b border-border">
@@ -124,7 +175,7 @@ export default function GamesPage() {
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-border">
-                            {filteredGames.map((game) => (
+                            {paginatedGames.map((game) => (
                                 <tr key={game.id} className="hover:bg-muted/30 transition-colors group">
                                     <td className="px-6 py-4">
                                         <div className="flex items-center gap-3">
@@ -192,6 +243,20 @@ export default function GamesPage() {
                             ))}
                         </tbody>
                     </table>
+                    {filteredGames.length === 0 && (
+                        <div className="text-center py-10 text-muted-foreground">
+                            No games found matching filters
+                        </div>
+                    )}
+                </div>
+
+                {/* Pagination Footer */}
+                <div className="mt-auto">
+                    <Pagination
+                        currentPage={currentPage}
+                        totalPages={totalPages}
+                        onPageChange={setCurrentPage}
+                    />
                 </div>
             </div>
 
