@@ -23,6 +23,8 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { exportToExcel } from '@/lib/export'
+import { toast } from 'sonner'
 
 // Mock Data
 const data = [
@@ -43,6 +45,11 @@ const companies = [
 
 export default function AnalyticsPage() {
     const [selectedCompany, setSelectedCompany] = useState(companies[0])
+
+    const handleDownload = () => {
+        exportToExcel(data, `${selectedCompany.name}_Analytics_Export`)
+        toast.success("Analytics data exported successfully")
+    }
 
     return (
         <div className="space-y-8">
@@ -80,8 +87,12 @@ export default function AnalyticsPage() {
                         </DropdownMenuContent>
                     </DropdownMenu>
 
-                    <button className="p-2 bg-card border border-input rounded-xl hover:text-foreground text-muted-foreground hover:bg-accent transition-colors">
-                        <Download className="w-5 h-5" />
+                    <button
+                        onClick={handleDownload}
+                        className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-xl hover:from-green-500 hover:to-emerald-500 transition-colors shadow-sm text-sm font-medium"
+                    >
+                        <Download className="w-4 h-4" />
+                        Export Data
                     </button>
                 </div>
             </div>

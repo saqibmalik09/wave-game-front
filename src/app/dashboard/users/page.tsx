@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Search, Filter, MoreHorizontal, Download, User as UserIcon, Coins } from 'lucide-react'
+import { Search, Filter, MoreHorizontal, Download, User as UserIcon, Coins, X, Save } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import {
     DropdownMenu,
@@ -12,6 +12,7 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { toast } from 'sonner'
+import { exportToExcel } from '@/lib/export'
 
 // Mock Data
 const usersData = Array.from({ length: 20 }).map((_, i) => ({
@@ -26,6 +27,8 @@ const usersData = Array.from({ length: 20 }).map((_, i) => ({
 export default function UsersPage() {
     const [users, setUsers] = useState(usersData)
     const [search, setSearch] = useState('')
+    const [isModalOpen, setIsModalOpen] = useState(false)
+    const [newUser, setNewUser] = useState({ username: '', email: '' })
 
     const filteredUsers = users.filter(user =>
         user.username.toLowerCase().includes(search.toLowerCase()) ||
@@ -37,19 +40,53 @@ export default function UsersPage() {
         toast.success(`${action} action triggered for ${userId}`)
     }
 
+    const handleExport = () => {
+        exportToExcel(users, 'User_Data_Export')
+        toast.success("User data exported successfully")
+    }
+
+    const handleAddUser = (e: React.FormEvent) => {
+        e.preventDefault()
+        if (!newUser.username || !newUser.email) {
+            toast.error("Please fill all fields")
+            return
+        }
+
+        const userEntry = {
+            id: `USR-${Math.floor(Math.random() * 9000) + 1000}`,
+            username: newUser.username,
+            email: newUser.email,
+            betAmount: 0,
+            status: 'active',
+            joinDate: new Date().toISOString().split('T')[0]
+        }
+
+        // @ts-ignore
+        setUsers([userEntry, ...users])
+        setIsModalOpen(false)
+        setNewUser({ username: '', email: '' })
+        toast.success("User added successfully")
+    }
+
     return (
-        <div className="space-y-6">
+        <div className="space-y-6 relative">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
                     <h1 className="text-3xl font-bold text-foreground mb-2">User Management</h1>
                     <p className="text-muted-foreground">Manage registered players and view their betting history.</p>
                 </div>
                 <div className="flex items-center gap-2">
-                    <button className="flex items-center gap-2 px-4 py-2 bg-background border border-input rounded-lg hover:bg-accent hover:text-accent-foreground transition-colors text-sm font-medium">
+                    <button
+                        onClick={handleExport}
+                        className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-lg hover:from-green-500 hover:to-emerald-500 transition-colors text-sm font-medium shadow-sm"
+                    >
                         <Download className="w-4 h-4" />
-                        Export CSV
+                        Export Excel
                     </button>
-                    <button className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors text-sm font-medium shadow-sm">
+                    <button
+                        onClick={() => setIsModalOpen(true)}
+                        className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors text-sm font-medium shadow-sm"
+                    >
                         <UserIcon className="w-4 h-4" />
                         Add User
                     </button>
@@ -162,6 +199,63 @@ export default function UsersPage() {
                     )}
                 </div>
             </div>
+
+            {/* Add User Modal */}
+            {isModalOpen && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+                    <div className="absolute inset-0 bg-background/80 backdrop-blur-sm" onClick={() => setIsModalOpen(false)} />
+                    <div className="relative w-full max-w-lg bg-card border border-border rounded-xl shadow-2xl p-6 animate-in fade-in zoom-in-95 duration-200">
+                        <div className="flex items-center justify-between mb-6">
+                            <h2 className="text-xl font-bold text-foreground">Add New User</h2>
+                            <button onClick={() => setIsModalOpen(false)} className="text-muted-foreground hover:text-foreground">
+                                <X className="w-5 h-5" />
+                            </button>
+                        </div>
+
+                        <form onSubmit={handleAddUser} className="space-y-4">
+                            <div className="space-y-2">
+                                <label className="text-sm font-medium text-foreground">Username</label>
+                                <input
+                                    type="text"
+                                    required
+                                    value={newUser.username}
+                                    onChange={(e) => setNewUser({ ...newUser, username: e.target.value })}
+                                    className="w-full bg-background border border-input rounded-lg px-3 py-2 text-sm focus:border-primary/50 focus:ring-1 focus:ring-primary/20 outline-none transition-all"
+                                    placeholder="e.g. jondoe_99"
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <label className="text-sm font-medium text-foreground">Email Address</label>
+                                <input
+                                    type="email"
+                                    required
+                                    value={newUser.email}
+                                    onChange={(e) => setNewUser({ ...newUser, email: e.target.value })}
+                                    className="w-full bg-background border border-input rounded-lg px-3 py-2 text-sm focus:border-primary/50 focus:ring-1 focus:ring-primary/20 outline-none transition-all"
+                                    placeholder="e.g. jon@example.com"
+                                />
+                            </div>
+
+                            <div className="pt-4 flex justify-end gap-3">
+                                <button
+                                    type="button"
+                                    onClick={() => setIsModalOpen(false)}
+                                    className="px-4 py-2 border border-input rounded-lg text-sm font-medium hover:bg-accent transition-colors"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    type="submit"
+                                    className="px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium hover:bg-primary/90 transition-colors flex items-center gap-2"
+                                >
+                                    <Save className="w-4 h-4" />
+                                    Save User
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
         </div>
     )
 }
