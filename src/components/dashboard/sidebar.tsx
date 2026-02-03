@@ -16,7 +16,9 @@ import {
     Users,
     Megaphone,
     ChevronDown,
-    Sliders
+    Sliders,
+    FileText,
+    ScrollText
 } from 'lucide-react'
 
 type NavItem = {
@@ -39,6 +41,15 @@ const navItems: NavItem[] = [
             { name: 'Greedy Teen Patti', href: '/dashboard/game-settings/greedy-teenpatti', icon: Gamepad2 },
             { name: 'Fruit Game', href: '/dashboard/game-settings/fruit-game', icon: Gamepad2 },
             { name: 'Teen Patti 3', href: '/dashboard/game-settings/teenpatti-3', icon: Gamepad2 },
+        ]
+    },
+    {
+        name: 'Game Logs',
+        icon: FileText,
+        subItems: [
+            { name: 'Greedy Teen Patti', href: '/dashboard/game-logs/greedy-teenpatti', icon: ScrollText },
+            { name: 'Fruit Game', href: '/dashboard/game-logs/fruit-game', icon: ScrollText },
+            { name: 'Teen Patti 3', href: '/dashboard/game-logs/teenpatti-3', icon: ScrollText },
         ]
     },
     { name: 'Profile', href: '/dashboard/profile', icon: User },
