@@ -83,7 +83,7 @@ export function DashboardSidebar({ mobileOpen, setMobileOpen, collapsed }: { mob
                         </div>
                         {!collapsed && (
                             <span className="text-lg font-bold bg-gradient-to-r from-foreground to-muted-foreground bg-clip-text text-transparent fade-in animate-in duration-300">
-                                WaveLive
+                                WaveGame
                             </span>
                         )}
                     </div>
