@@ -17,6 +17,8 @@ import GameLoading from "@/app/components/GameLoading";
 import { useAutoPlayerBets } from "./components/useAutoPlayerBets";
 import ResultModal from "./components/ResultModal";
 import { useUserInfo } from "../UserInfoAPI";
+import { useRealtimeNetwork } from "@/app/components/useNetworkStatus";
+import NetworkStatus from "@/app/components/NetworkStatus";
 
 export default function GreedyGameUI() {
   const dispatch = useDispatch();
@@ -26,7 +28,7 @@ export default function GreedyGameUI() {
   const [showModal, setShowModal] = useState(false);
   const [modalMessage, setModalMessage] = useState({ title: "", message: "" });
   const [isValid, setIsValid] = useState(true);
-
+  const netState = useRealtimeNetwork(5000);
   const { animations, animateCoin, removeAnimation, clearAllAnimations } = useCoinAnimations();
   const wheelRef = useRef<WheelRef>({ getCabinElement: () => null });
   const playerRef = useRef<HTMLButtonElement>(null);
@@ -89,6 +91,8 @@ export default function GreedyGameUI() {
           radial-gradient(2px_2px_at_40px_70px,rgba(255,255,255,0.8),transparent),
           radial-gradient(2px_2px_at_50px_160px,white,transparent)]">
         </div>
+          <NetworkStatus state={netState} />
+        
 
         <div className="relative w-full max-w-lg h-screen flex items-center justify-center">
           <div className="relative w-full h-full isolate">

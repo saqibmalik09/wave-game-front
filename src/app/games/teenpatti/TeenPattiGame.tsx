@@ -27,6 +27,8 @@ import { useTeenpattiBetSumResponse } from '@/lib/socket/game/teenpatti/teenpatt
 import Image from 'next/image';
 import WinningPatternPanel from './components/WinningPattern';
 import { GameConfig, GameUserInfoResponse, UserData, UserInfoType } from '../dto/games.dto';
+import { useRealtimeNetwork } from '@/app/components/useNetworkStatus';
+import NetworkStatus from '@/app/components/NetworkStatus';
 
 const phaseLabels: Record<string, string> = {
   bettingTimer: 'Betting',
@@ -75,6 +77,12 @@ const [mybettingLocked, setMybettingLocked] = useState<boolean>(false);
   const gameId = React.useMemo(() => ({ gameId: 16 }), []);
   const idNumber = gameId.gameId;
   const cacheKey = `game_config_${idNumber}`;
+  const netState = useRealtimeNetwork(5000);
+  useEffect(() => {
+  if (netState === 'offline') {
+    setMybettingLocked(true);
+  }
+}, [netState]);
   // ------------------------
   // REUSABLE FUNCTION
   // ------------------------
@@ -342,6 +350,7 @@ const getCardsForPot = (idx: number): string[] => {
   return (
       <>
        <div className="relative w-full min-h-screen max-w-md mx-auto overflow-hidden " >
+            <NetworkStatus state={netState} />
 
           {/* Top Bar - Fixed at top */}
           <div className="absolute top-0 left-3 w-full ">

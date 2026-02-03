@@ -41,7 +41,7 @@ export const useCabinSpinEffect = (
     }, speed);
   };
 
-  // 🛑 Stop exactly at winner
+  //  Stop exactly at winner
   const stopAtWinner = (winner: number) => {
     clearSpinInterval();
 
