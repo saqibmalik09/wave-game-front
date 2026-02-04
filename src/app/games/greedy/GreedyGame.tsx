@@ -94,7 +94,10 @@ export default function GreedyGameUI() {
           <NetworkStatus state={netState} />
         
 
-        <div className="relative w-full max-w-lg h-screen flex items-center justify-center">
+        <div className="relative w-full max-w-lg h-screen flex items-center justify-center"
+        // background image
+        style={{ backgroundImage: 'url("/greedyBackgroundImage.jpeg")', backgroundSize: 'contain' }}
+        >
           <div className="relative w-full h-full isolate">
             <TopBar playerRef={playerRef} />
             <LeftPanel />

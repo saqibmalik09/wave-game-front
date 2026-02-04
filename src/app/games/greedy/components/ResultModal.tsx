@@ -1,15 +1,20 @@
 'use client';
 import React, { useEffect, useState, useRef } from 'react';
-import { getSocket } from '@/lib/socket/socketClient';
 import { useAppSelector } from '@/lib/redux/hooks';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '@/lib/redux/store';
 import { clearWinningPot, setWinningPotIndex } from '@/lib/redux/slices/teenpatti/winningPotSlice';
-import Image from 'next/image';
 import { gameGreedyResultAnnounce } from '@/lib/socket/game/greedy/greedySocketEventHandler';
+import { useWindowSize } from '@/app/components/useWindowSize';
+import { FiX } from 'react-icons/fi';
 
 interface ResultData {
-  winners: any[]; // you can make a proper type if you know the structure
+  winners: {
+    userId: string;
+    name: string;
+    imageProfile: string;
+    amountWon: number;
+  }[];
   winningPot: string;
   winningPotIndex: number;
   winningCards: string[];
@@ -24,192 +29,127 @@ interface ResultResponse {
 
 export default function ResultModal() {
   const [show, setShow] = useState(false);
+  const { width } = useWindowSize();
   const [result, setResult] = useState<ResultData | null>(null);
   const [manualClosed, setManualClosed] = useState(false);
+  const [timer, setTimer] = useState(3);
   const dispatch = useDispatch();
   const userPlayerData = useSelector((state: RootState) => state.userPlayerData);
   const currentUserId = userPlayerData.data?.id;
-
   const currentPhase = useAppSelector((state) => state.teenpattiTimer.phase);
-
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
+  // Listen for result event
   gameGreedyResultAnnounce((response: ResultResponse) => {
-    console.log('Received greedyAnnounceGameResultResponse33:', response);
-  if (!response?.success || !response.data) return;
-  if (manualClosed) return;
+    if (!response?.success || !response.data) return;
+    if (manualClosed) return;
 
-  setResult(response.data);
-  dispatch(setWinningPotIndex(response.data.winningPotIndex));
+    setResult(response.data);
+    dispatch(setWinningPotIndex(response.data.winningPotIndex));
 
-  if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    timeoutRef.current = setTimeout(() => setShow(true), 3500);
+  });
 
-  timeoutRef.current = setTimeout(() => {
-    setShow(true);
-  }, 3500);
-});
-
-
-  // Close modal on phase change or manual close
+  // Close modal on phase change
   useEffect(() => {
     if (!currentPhase) return;
-
-    // Close when new game starts or phase changes to any other
     if (currentPhase !== 'resultAnnounceTimer') {
       setShow(false);
-      setManualClosed(false); // reset manual close for next round
+      setManualClosed(false);
+      setTimer(3);
       dispatch(clearWinningPot());
-
       if (timeoutRef.current) clearTimeout(timeoutRef.current);
     }
   }, [currentPhase, dispatch]);
 
-  // Manual close
+  // Timer countdown
+  useEffect(() => {
+    if (!show) return;
+    if (timer <= 0) return handleClose();
+
+    const interval = setInterval(() => setTimer((t) => t - 1), 1000);
+    return () => clearInterval(interval);
+  }, [show, timer]);
+
   const handleClose = () => {
     setShow(false);
     setManualClosed(true);
+    setTimer(3);
     if (timeoutRef.current) clearTimeout(timeoutRef.current);
   };
 
-
   if (!show || !result) return null;
 
-  const currentUserWinner = result.winners.find((w) => w.userId === String(currentUserId));
-  const isWinner = !!currentUserWinner;
-
- return (
-  <>
-    {/* Backdrop */}
-    <div
-      className="position-fixed top-0 start-0 w-100 "
-      style={{
-        background: 'rgba(0,0,0,0.8)',
-        backdropFilter: 'blur(8px)',
-        zIndex: 999,
-        animation: 'fadeIn 0.25s ease',
-      }}
-      onClick={handleClose}
-    />
-
-    {/* Modal */}
-    <div
-      className="position-fixed top-50 start-50 translate-middle rounded-4 overflow-hidden d-flex flex-column"
-      style={{
-        width: '80%',
-        height: '80%',
-        maxWidth: '250px',
-        background: 'linear-gradient(180deg, #FF8904 0%, #FF8904 100%)',
-        boxShadow: '0 20px 60px rgba(0,0,0,0.7)',
-        zIndex: 101,
-        animation: 'scaleIn 0.25s ease',
-      }}
-    >
-      {/* Header */}
-      <div className="text-center flex-shrink-0 pt-2">
-        <h5
-          className="text-white fw-bold m-0"
-          style={{ fontSize: 'clamp(15px, 1vw, 10px)' }}
-        >
-          {isWinner ? '🎉 You Won!' : 'Round Complete'}
-        </h5>
-
-      </div>
-
-      {/* Winners Section - Scrollable */}
+  return (
+    <>
+      {/* Backdrop */}
       <div
-        className="flex-grow-1 d-flex flex-column"
-        style={{ 
-          background: 'rgba(0,0,0,0.3)',
-          minHeight: 0,
-        }}
-      >
-        <h5
-          className="text-white fw-semibold text-center flex-shrink-0 pt-2 mb-1"
-          style={{ fontSize: '10px' }}
-        >
-          {result.winners.length > 1 ? 'Winners' : 'Winner'}
-        </h5>
+        className="fixed inset-0 bg-black/70 backdrop-blur-sm z-[999]"
+        onClick={handleClose}
+      />
 
-        <div
-          className="flex-grow-1 px-2 pb-2"
-          style={{
-            overflowY: 'auto',
-            overflowX: 'hidden',
-          }}
-        >
-          <div className="d-flex flex-column gap-1">
-            {result.winners.map((winner) => (
-              <div
-                key={winner.userId}
-                className="d-flex align-items-center p-1 justify-content-between rounded-3"
-                style={{
-                  background:
-                    winner.userId === String(currentUserId)
-                      ? 'rgba(255,215,0,0.18)'
-                      : 'rgba(255,255,255,0.08)',
-                }}
-              >
-                <div className="d-flex align-items-center gap-1">
-                  <img
-                    src={winner.imageProfile}
-                    alt="Winner"
-                    className="rounded-circle"
-                    style={{
-                      width: '25px',
-                      height: '25px',
-                      objectFit: 'cover',
-                      border: '2px solid #852F3C',
-                    }}
-                  />
-                  <span className="text-white" style={{ fontSize: '12px' }}>
-                    {winner.name ?? "Ricolive"}
-                  </span>
-                </div>
-                <div className="d-flex align-items-center gap-1">
-                  <span
-                    className="d-flex align-items-center justify-content-center fw-bold text-white"
-                    style={{
-                      width: '18px',
-                      height: '18px',
-                      borderRadius: '50%',
-                      background: 'linear-gradient(135deg, #852F3C, #852F3C)',
-                      color: '#000',
-                      fontSize: '11px',
-                      flexShrink: 0,
-                    }}
-                  >
-                    G
-                  </span>
-                  <span
-                    className="text-warning fw-bold"
-                    style={{ fontSize: '13px' }}
-                  >
-                    +{winner.amountWon.toLocaleString()}
-                  </span>
-                </div>
-              </div>
-            ))}
+      {/* Bottom Sheet Modal */}
+      <div
+        className="fixed bottom-0 left-0 w-full max-w-md mx-auto rounded-t-3xl overflow-hidden bg-gradient-to-b from-purple-700 to-purple-900 text-white z-[1000] shadow-lg animate-slideUp"
+        style={{ maxHeight: '70%' }}
+      >
+        {/* Header */}
+        <div className="flex justify-between items-center py-3 px-4 border-b border-white/20 relative">
+          <h3 className="text-lg font-bold">Round Results</h3>
+          <div className="flex items-center gap-3">
+            <span className="bg-yellow-400 text-black rounded-full w-8 h-8 flex items-center justify-center font-bold">
+              {timer}s
+            </span>
+            <button
+              onClick={handleClose}
+              className="text-white text-xl hover:text-yellow-400 transition"
+            >
+              <FiX />
+            </button>
           </div>
+        </div>
+
+        {/* Winners List */}
+        <div className="flex flex-col gap-1 p-2 overflow-y-auto max-h-100">
+          {result.winners.map((winner) => (
+            <div
+              key={winner.userId}
+              className="flex items-center justify-between bg-white/10 rounded-xl p-1"
+            >
+              <div className="flex items-center gap-3">
+                <img
+                  src={winner.imageProfile}
+                  alt={winner.name}
+                  className="w-12 h-12 rounded-full border-2 border-yellow-400 object-cover"
+                />
+                <p className="font-semibold">{winner.name}</p>
+              </div>
+              <div className="flex items-center gap-1">
+                <span
+                  className="bg-yellow-400 text-black rounded-full w-8 h-8 flex items-center justify-center font-bold"
+                  style={{ fontSize: '14px' }}
+                >
+                  G
+                </span>
+                <span className="text-yellow-300 font-semibold">
+                  {winner.amountWon.toLocaleString()}
+                </span>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
 
-      {/* Footer - Fixed at Bottom */}
-      <div className="p-2 flex-shrink-0">
-        <button
-          onClick={handleClose}
-          className="btn w-100 fw-bold rounded-pill"
-          style={{
-            padding: '8px',
-            fontSize: '12px',
-            background: 'linear-gradient(135deg, #ffd700, #ffed4e)',
-            color: '#000',
-            border: 'none',
-          }}
-        >
-          Continue
-        </button>
-      </div>
-    </div>
-  </>
-);
+      <style jsx>{`
+        @keyframes slideUp {
+          0% { transform: translateY(100%); opacity: 0; }
+          100% { transform: translateY(0); opacity: 1; }
+        }
+        .animate-slideUp {
+          animation: slideUp 0.3s ease-out forwards;
+        }
+      `}</style>
+    </>
+  );
 }
