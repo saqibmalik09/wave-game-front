@@ -185,7 +185,7 @@ const Wheel = forwardRef<WheelRef, WheelProps>(({ onCabinClick, animateCoin }, r
     return (
         <>
             {/* Responsive container that scales based on screen size */}
-            <div className="relative w-full aspect-square  max-[638px]:max-w-[240px]
+            <div className="relative w-full aspect-square  max-[600px]:max-w-[200px]
                 max-w-[197px] xs:max-w-[210px] sm:max-w-[250px] md:max-w-[290px] lg:max-w-[330px] ">
 
                 {/* ===== SPOKES ===== */}
