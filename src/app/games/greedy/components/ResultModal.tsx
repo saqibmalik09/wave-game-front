@@ -6,7 +6,6 @@ import { RootState } from '@/lib/redux/store';
 import { clearWinningPot, setWinningPotIndex } from '@/lib/redux/slices/teenpatti/winningPotSlice';
 import { gameGreedyResultAnnounce } from '@/lib/socket/game/greedy/greedySocketEventHandler';
 import { useWindowSize } from '@/app/components/useWindowSize';
-import { FiX } from 'react-icons/fi';
 
 interface ResultData {
   winners: {
@@ -91,11 +90,11 @@ export default function ResultModal() {
 
       {/* Bottom Sheet Modal */}
       <div
-        className="fixed bottom-0 left-0 w-full max-w-md mx-auto rounded-t-3xl overflow-hidden bg-gradient-to-b from-purple-700 to-purple-900 text-white z-[1000] shadow-lg animate-slideUp"
-        style={{ maxHeight: '70%' }}
+        className="absolute bottom-0 left-1/2 -translate-x-1/2   w-full max-w-md mx-auto rounded-t-3xl overflow-hidden bg-gradient-to-b from-purple-700 to-purple-900 text-white z-[1000] shadow-lg animate-slideUp"
+        style={{ maxHeight: '80%' }}
       >
         {/* Header */}
-        <div className="flex justify-between items-center py-3 px-4 border-b border-white/20 relative">
+        <div className="flex justify-between items-center py-2 px-2 border-b border-white/20 absolute">
           <h3 className="text-lg font-bold">Round Results</h3>
           <div className="flex items-center gap-3">
             <span className="bg-yellow-400 text-black rounded-full w-8 h-8 flex items-center justify-center font-bold">
@@ -105,7 +104,7 @@ export default function ResultModal() {
               onClick={handleClose}
               className="text-white text-xl hover:text-yellow-400 transition"
             >
-              <FiX />
+              X
             </button>
           </div>
         </div>

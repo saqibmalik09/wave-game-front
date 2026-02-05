@@ -45,15 +45,15 @@ export default function GreedyGameUI() {
     if (phase === 'newGameStartTimer') {
       clearAllAnimations();
     }
-    if( phase === 'bettingTimer'|| phase ==='resultAnnounceTimer') {
+    if (phase === 'bettingTimer' || phase === 'resultAnnounceTimer') {
       // get user info
-     const params = new URLSearchParams(window.location.search);
-     const token = params.get("token");
-     if (!token) {
-       console.error("Missing token in URL params");
-       return;
-     }
-       loadUser(token).catch(console.error);
+      const params = new URLSearchParams(window.location.search);
+      const token = params.get("token");
+      if (!token) {
+        console.error("Missing token in URL params");
+        return;
+      }
+      loadUser(token).catch(console.error);
     }
   }, [phase, clearAllAnimations]);
 
@@ -79,7 +79,7 @@ export default function GreedyGameUI() {
     };
     runInit();
   }, []);
-  
+
 
   if (!ready && isValid) return <GameLoading message="Initializing game..." />;
 
@@ -91,12 +91,12 @@ export default function GreedyGameUI() {
           radial-gradient(2px_2px_at_40px_70px,rgba(255,255,255,0.8),transparent),
           radial-gradient(2px_2px_at_50px_160px,white,transparent)]">
         </div>
-          <NetworkStatus state={netState} />
-        
+        <NetworkStatus state={netState} />
+
 
         <div className="relative w-full max-w-lg h-screen flex items-center justify-center"
-        // background image
-        style={{ backgroundImage: 'url("/greedyBackgroundImage.jpeg")', backgroundSize: 'contain' }}
+          // background image
+          style={{ backgroundImage: 'url("/greedyBackgroundImage.jpeg")', backgroundSize: 'contain' }}
         >
           <div className="relative w-full h-full isolate">
             <TopBar playerRef={playerRef} />
@@ -120,7 +120,7 @@ export default function GreedyGameUI() {
           />
         ))}
       </div>
-    <span className="z-9999"><ResultModal  /></span>
+      <span className="z-9999"><ResultModal /></span>
       <MessageModal
         show={showModal}
         header={modalMessage.title}
