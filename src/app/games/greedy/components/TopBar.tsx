@@ -2,22 +2,33 @@
 import { useRef, useState } from 'react';
 import PlayerTopBar from './PlayerTopBar';
 import { useCurrentRoundID } from '@/lib/socket/game/greedy/greedySocketEventHandler';
-
+import { useRouter } from 'next/navigation'
 interface TopBarProps {
-    playerRef: React.RefObject<HTMLButtonElement | null>;
+  playerRef: React.RefObject<HTMLButtonElement | null>;
 }
 
 export default function TopBar({ playerRef }: TopBarProps) {
-  
-    const [roundCount, setRoundCount] = useState('Loading...');
+  const router = useRouter();
+  const [roundCount, setRoundCount] = useState('Loading...');
 
-    useCurrentRoundID((payload) => {
-      setRoundCount(payload.data.count);
-    });
+  useCurrentRoundID((payload) => {
+    setRoundCount(payload.data.count);
+  });
+  const handleBackButton = () => {
+    const params = new URLSearchParams(window.location.search);
+    const appKey = params.get("appKey");
+    const token = params.get("token");
+    if (!appKey || !token) {
+      console.error("Missing URL params");
+      return;
+    }
+    router.push(`/games?appKey=${appKey}&token=${token}`);
+  };
   return (
     <header className="absolute top-0 left-0 right-0 z-30 flex justify-between items-start px-1 pt-2">
       <div className="flex items-center gap-1">
-        <button className="w-9 h-9 bg-orange-400 rounded-full flex items-center justify-center shadow-md">
+        {/* BACK button */}
+        <button onClick={handleBackButton} className="w-9 h-9 bg-orange-400 rounded-full flex items-center justify-center shadow-md">
           <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-white" fill="none"
             viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />

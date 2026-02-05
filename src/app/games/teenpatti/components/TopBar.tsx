@@ -5,11 +5,11 @@ import { RootState } from '@/lib/redux/store';
 import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { SoundManager } from '../game/SoundManager';
-
+import { useRouter } from 'next/navigation'
 export default function TopBar() {
   const userPlayerData = useSelector((state: RootState) => state.userPlayerData);
   const [soundEnabled, setSoundEnabled] = useState(true);
-
+  const router = useRouter();
   // Initialize sound state from SoundManager
   useEffect(() => {
     const soundManager = SoundManager.getInstance();
@@ -26,7 +26,16 @@ export default function TopBar() {
       soundManager.play('betButtonAndCardClickSound', 0.3);
     }
   };
-
+  const handleBackButton = () => {
+    const params = new URLSearchParams(window.location.search);
+    const appKey = params.get("appKey");
+    const token = params.get("token");
+    if (!appKey || !token) {
+      console.error("Missing URL params");
+      return;
+    }
+    router.push(`/games?appKey=${appKey}&token=${token}`);
+  };
   return (
     <div className="sticky w-full p-1 " >
       <div className="container mx-auto p-0">
@@ -41,14 +50,14 @@ export default function TopBar() {
           {/* Left: Back & Menu */}
           <div className="d-flex align-items-center -left-5" style={{ gap: 'clamp(4px, 0.8vw, 6px)' }}>
             <button
-              className="rounded-circle p-0 d-flex align-items-center justify-content-center border-0 "
+              className="rounded-circle p-1 d-flex align-items-center justify-content-center border-0 "
               style={{
                 minWidth: '18px',
-                marginTop:"3px"
+                marginTop: "3px"
               }}
-              onClick={() => window.history.back()}
+              onClick={handleBackButton}
             >
-              <svg className='rounded-xl' xmlns="http://www.w3.org/2000/svg" viewBox="-2 -2 12 12" width="20" height="26" fill="#ffc109ff" style={{ opacity: 1, transform: 'rotate(90deg)',marginTop:"0px"}}><rect x="-2" y="-2" width="12" height="12" fill="#853426" /><path d="M4.5 1C2.57 1 1 2.57 1 4.5V5H0l2 2l2-2H3v-.5a2.5 2.5 0 0 1 5 0C8 2.57 6.43 1 4.5 1" /></svg>
+              <svg className='rounded-xl' xmlns="http://www.w3.org/2000/svg" viewBox="-2 -2 12 12" width="20" height="26" fill="#ffc109ff" style={{ opacity: 1, transform: 'rotate(90deg)', marginTop: "0px" }}><rect x="-2" y="-2" width="12" height="12" fill="#853426" /><path d="M4.5 1C2.57 1 1 2.57 1 4.5V5H0l2 2l2-2H3v-.5a2.5 2.5 0 0 1 5 0C8 2.57 6.43 1 4.5 1" /></svg>
             </button>
           </div>
           <div className="d-flex align-items-center" style={{ gap: 'clamp(4px, 0.5vw, 5px)' }}>
@@ -85,32 +94,32 @@ export default function TopBar() {
               </span>
             </div> */}
 
-          {/* Center: Maximum Bet */}
-          <div className="d-md-block p-0" style={{ maxWidth: '70%', marginTop:"5px" }}>
-            <svg
-              viewBox="0 0 260 70"
-              xmlns="http://www.w3.org/2000/svg"
-              style={{
-                display: 'block',
-                width: 'clamp(110px, 14vw, 130px)',
-                height: 'auto',
-                maxWidth: '80%',
-                pointerEvents: 'none',
-                userSelect: 'none',
-              }}
-              preserveAspectRatio="xMidYMid meet"
-            >
-              <defs>
-                <linearGradient id="goldBorder" x1="0%" y1="0%" x2="100%" y2="0%">
-                  <stop offset="0%" stopColor="#D4941E" />
-                  <stop offset="50%" stopColor="#F4C245" />
-                  <stop offset="100%" stopColor="#D4941E" />
-                </linearGradient>
-              </defs>
+            {/* Center: Maximum Bet */}
+            <div className="d-md-block p-0" style={{ maxWidth: '70%', marginTop: "5px" }}>
+              <svg
+                viewBox="0 0 260 70"
+                xmlns="http://www.w3.org/2000/svg"
+                style={{
+                  display: 'block',
+                  width: 'clamp(110px, 14vw, 130px)',
+                  height: 'auto',
+                  maxWidth: '80%',
+                  pointerEvents: 'none',
+                  userSelect: 'none',
+                }}
+                preserveAspectRatio="xMidYMid meet"
+              >
+                <defs>
+                  <linearGradient id="goldBorder" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" stopColor="#D4941E" />
+                    <stop offset="50%" stopColor="#F4C245" />
+                    <stop offset="100%" stopColor="#D4941E" />
+                  </linearGradient>
+                </defs>
 
-              {/* OUTER BORDER */}
-              <path
-                d="
+                {/* OUTER BORDER */}
+                <path
+                  d="
         M 10 4
         L 250 4
         L 220 58
@@ -119,12 +128,12 @@ export default function TopBar() {
         Q 50 66 40 58
         Z
       "
-                fill="url(#goldBorder)"
-              />
+                  fill="url(#goldBorder)"
+                />
 
-              {/* INNER BG */}
-              <path
-                d=" M 16 9
+                {/* INNER BG */}
+                <path
+                  d=" M 16 9
         L 244 9
         L 214 55
         Q 206 62 196 62
@@ -132,41 +141,41 @@ export default function TopBar() {
         Q 54 62 46 55
         Z
       "
-                fill="#4C141B"
-              />
+                  fill="#4C141B"
+                />
 
-              {/* TOP SHADOW */}
-              <rect x="16" y="9" width="140" height="10" fill="#000" opacity="0.25" />
+                {/* TOP SHADOW */}
+                <rect x="16" y="9" width="140" height="10" fill="#000" opacity="0.25" />
 
-              {/* TEXT - TWO ROWS */}
-              <text
-                x="130"
-                y="30"
-                textAnchor="middle"
-                fontSize="20"
-                fontWeight="600"
-                fill="#FFC17B"
-                style={{ letterSpacing: '0.5px' }}
-              >
-                Maximum bet
-              </text>
+                {/* TEXT - TWO ROWS */}
+                <text
+                  x="130"
+                  y="30"
+                  textAnchor="middle"
+                  fontSize="20"
+                  fontWeight="600"
+                  fill="#FFC17B"
+                  style={{ letterSpacing: '0.5px' }}
+                >
+                  Maximum bet
+                </text>
 
-              <text
-                x="130"
-                y="48"
-                textAnchor="middle"
-                fontSize="17"
-                fontWeight="700"
-                fill="#FFC17B"
-                style={{ letterSpacing: '0.5px' }}
-              >
-                500k
-              </text>
-            </svg>
-          </div>
+                <text
+                  x="130"
+                  y="48"
+                  textAnchor="middle"
+                  fontSize="17"
+                  fontWeight="700"
+                  fill="#FFC17B"
+                  style={{ letterSpacing: '0.5px' }}
+                >
+                  500k
+                </text>
+              </svg>
+            </div>
 
-          {/* Right: Balance, Sound, Settings */}
-         
+            {/* Right: Balance, Sound, Settings */}
+
 
             {/* Sound Toggle */}
             <button

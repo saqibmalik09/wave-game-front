@@ -9,6 +9,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { useWindowSize } from '@/app/components/useWindowSize';
 interface Player {
   id: number;
   userId: string;
@@ -31,8 +32,7 @@ interface PlayersUpdateResponse {
 }
 
 // Configuration constants
-const MIN_VISIBLE_PLAYERS = 3;
-const MAX_VISIBLE_PLAYERS = 7;
+
 
 // 10 beautiful gradient colors for crown borders (cycles through)
 const CROWN_GRADIENTS = [
@@ -51,13 +51,14 @@ const CROWN_GRADIENTS = [
 export default function PlayersList() {
   const [players, setPlayers] = useState<Player[]>([]);
   const [isExpanded, setIsExpanded] = useState(false);
-
+  const { height, width } = useWindowSize()
+  const MIN_VISIBLE_PLAYERS = height > 400 ? 5 : 3;
+  const MAX_VISIBLE_PLAYERS = height > 400 ? 7 : 5;
   useEffect(() => {
     const socket = getSocket();
     if (!socket) return;
 
     const handlePotDataResponse = (response: PlayersUpdateResponse) => {
-      console.log("table response:", response)
       if (response?.users) {
         console.log("players:", response.users)
         setPlayers(response.users);
