@@ -93,8 +93,8 @@ export default function ResultModal() {
         className="absolute bottom-0 left-1/2 -translate-x-1/2  w-full max-w-md mx-auto rounded-t-3xl overflow-hidden bg-gradient-to-b from-purple-700 to-purple-900 text-white z-[1000] shadow-lg animate-slideUp"
         style={{
           height: height < 400
-            ? Math.floor(height * 0.8)
-            : Math.floor(height * 0.6)
+            ? Math.floor(height * 0.7)
+            : Math.floor(height * 0.5)
         }}
       >
         {/* Header */}
