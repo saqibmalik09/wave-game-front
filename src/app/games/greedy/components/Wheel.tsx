@@ -10,6 +10,7 @@ import { placeBet } from "@/lib/redux/slices/teenpatti/teenPattiBettingSlice";
 import { useCabinSpinEffect } from "./useCabinSpinEffect";
 import { incrementUserBalance } from "@/lib/redux/slices/userSlice";
 import { GameWinCoinsAnimation } from "@/app/components/GameWinCoinsAnimation";
+import { useWindowSize } from "@/app/components/useWindowSize";
 
 const cabins = [
     { pos: 'top-[2%] left-1/2', mult: 'x10', index: 1, imageURL: '/BurgerGreedy.png' },
@@ -57,25 +58,26 @@ const Wheel = forwardRef<WheelRef, WheelProps>(({ onCabinClick, animateCoin }, r
     });
 
     const { ToastContainer, showToast } = useToast();
+    const { width, height } = useWindowSize();
     const dispatch = useDispatch();
     const winningPotIndex = useSelector((s: RootState) => s.winningPot.winningPotIndex);
     // Use spin effect
     const spinState = useCabinSpinEffect(currentPhase, winningPotIndex);
 
     useEffect(() => {
-    if (currentPhase === 'newGameStartTimer') {
-        setMyBet({
-            1: 0,
-            2: 0,
-            3: 0,
-            4: 0,
-            5: 0,
-            6: 0,
-            7: 0,
-            8: 0,
-        });
-    }
-}, [currentPhase]);
+        if (currentPhase === 'newGameStartTimer') {
+            setMyBet({
+                1: 0,
+                2: 0,
+                3: 0,
+                4: 0,
+                5: 0,
+                6: 0,
+                7: 0,
+                8: 0,
+            });
+        }
+    }, [currentPhase]);
     useImperativeHandle(ref, () => ({
         getCabinElement: (index: number) => cabinRefs.current.get(index) || null,
     }));
@@ -183,8 +185,8 @@ const Wheel = forwardRef<WheelRef, WheelProps>(({ onCabinClick, animateCoin }, r
     return (
         <>
             {/* Responsive container that scales based on screen size */}
-            <div className="relative w-full aspect-square  
-                max-w-[197px] xs:max-w-[210px] sm:max-w-[250px] md:max-w-[290px] lg:max-w-[330px] ">
+            <div className="relative w-full aspect-square  max-[638px]:max-w-[290px]
+                max-w-[197px] xs:max-w-[240px] sm:max-w-[270px] md:max-w-[290px] lg:max-w-[330px] ">
 
                 {/* ===== SPOKES ===== */}
                 <svg
@@ -296,13 +298,13 @@ const Wheel = forwardRef<WheelRef, WheelProps>(({ onCabinClick, animateCoin }, r
                 <div
                     className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2
                                 bg-orange-400 rounded-full shadow-xl
-                                flex flex-col items-center justify-center z-20 overflow-visible
+                                flex flex-col items-center justify-center z-20 overflow-visible 
                                 w-[70px] h-[70px] xs:w-[80px] xs:h-[80px] sm:w-[95px] sm:h-[95px] md:w-[100px] md:h-[100px] lg:w-[110px] lg:h-[110px]"
                 >
                     {/* Dealer Avatar Container - with transform scaling for better control */}
                     <div className="absolute left-1/2 -translate-x-1/2 pointer-events-none z-30
                                     -top-[40px] xs:-top-[43px] sm:-top-[50px] md:-top-[54px] lg:-top-[40px]">
-                        <div className="relative
+                        <div className="relative 
                                 w-[80px] xs:w-[100px] sm:w-[100px] md:w-[100px] lg:w-[110px]
                                 h-[80px] xs:h-[100px] sm:h-[100px] md:h-[100px] lg:h-[110px]">
                             <Image

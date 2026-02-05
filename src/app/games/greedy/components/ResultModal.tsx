@@ -28,7 +28,7 @@ interface ResultResponse {
 
 export default function ResultModal() {
   const [show, setShow] = useState(false);
-  const { width } = useWindowSize();
+  const { width, height } = useWindowSize();
   const [result, setResult] = useState<ResultData | null>(null);
   const [manualClosed, setManualClosed] = useState(false);
   const [timer, setTimer] = useState(3);
@@ -90,11 +90,15 @@ export default function ResultModal() {
 
       {/* Bottom Sheet Modal */}
       <div
-        className="absolute bottom-0 left-1/2 -translate-x-1/2   w-full max-w-md mx-auto rounded-t-3xl overflow-hidden bg-gradient-to-b from-purple-700 to-purple-900 text-white z-[1000] shadow-lg animate-slideUp"
-        style={{ maxHeight: '80%' }}
+        className="absolute bottom-0 left-1/2 -translate-x-1/2  w-full max-w-md mx-auto rounded-t-3xl overflow-hidden bg-gradient-to-b from-purple-700 to-purple-900 text-white z-[1000] shadow-lg animate-slideUp"
+        style={{
+          height: height < 400
+            ? Math.floor(height * 0.8)
+            : Math.floor(height * 0.6)
+        }}
       >
         {/* Header */}
-        <div className="flex justify-between items-center py-2 px-2 border-b border-white/20 absolute">
+        <div className="flex justify-between items-center py-3 px-4 border-b border-white/20 relative">
           <h3 className="text-lg font-bold">Round Results</h3>
           <div className="flex items-center gap-3">
             <span className="bg-yellow-400 text-black rounded-full w-8 h-8 flex items-center justify-center font-bold">
