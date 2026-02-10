@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { SoundManager } from "../../teenpatti/game/SoundManager";
 
 interface SpinState {
   currentHighlight: number | null;
@@ -29,7 +30,7 @@ export const useCabinSpinEffect = (
   // 🔄 Start spinning
   const startSpin = (speed: number) => {
     clearSpinInterval();
-
+    SoundManager.getInstance().play('GreedyWheelSpinSound');
     intervalRef.current = setInterval(() => {
       setSpinState({
         currentHighlight: currentIndexRef.current,
@@ -70,7 +71,7 @@ export const useCabinSpinEffect = (
   };
 
   useEffect(() => {
-    // ▶ Calculation phase → ALWAYS spin
+
     if (phase === "winningCalculationTimer" && !isSpinningRef.current) {
       isSpinningRef.current = true;
       isStoppingRef.current = false;

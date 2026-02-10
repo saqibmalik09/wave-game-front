@@ -1,6 +1,7 @@
 // components/CoinsAnimation.tsx
 'use client';
 import React, { useState, useEffect, useRef } from 'react';
+import { SoundManager } from '../games/teenpatti/game/SoundManager';
 
 interface FlyingCoin {
   id: number;
@@ -74,6 +75,7 @@ export const GameWinCoinsAnimation: React.FC<GameWinCoinsAnimationProps> = ({
     setCoins(newCoins);
 
     setTimeout(() => {
+      SoundManager.getInstance().play('GreedyCoinAnimationAddSound');
       setShowAmountText(true);
     }, 300);
 

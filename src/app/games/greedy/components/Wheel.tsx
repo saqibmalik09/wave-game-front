@@ -11,6 +11,7 @@ import { useCabinSpinEffect } from "./useCabinSpinEffect";
 import { incrementUserBalance } from "@/lib/redux/slices/userSlice";
 import { GameWinCoinsAnimation } from "@/app/components/GameWinCoinsAnimation";
 import { useWindowSize } from "@/app/components/useWindowSize";
+import { SoundManager } from "../../teenpatti/game/SoundManager";
 
 const cabins = [
     { pos: 'top-[2%] left-1/2', mult: 'x10', index: 1, imageURL: '/BurgerGreedy.png' },
@@ -101,6 +102,7 @@ const Wheel = forwardRef<WheelRef, WheelProps>(({ onCabinClick, animateCoin }, r
     };
 
     const handleCabinClicked = (cabinIndex: number) => {
+        SoundManager.getInstance().play('GreedyBetClickSound');
         if (!selectedCoin) {
             showToast(`Please select a coin to bet!`);
             return;

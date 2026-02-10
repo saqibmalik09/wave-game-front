@@ -19,6 +19,8 @@ import ResultModal from "./components/ResultModal";
 import { useUserInfo } from "../UserInfoAPI";
 import { useRealtimeNetwork } from "@/app/components/useNetworkStatus";
 import NetworkStatus from "@/app/components/NetworkStatus";
+import { SoundManagerLoadSounds } from "@/app/components/SoundManagerLoadSounds";
+import { SoundManager } from "../teenpatti/game/SoundManager";
 
 export default function GreedyGameUI() {
   const dispatch = useDispatch();
@@ -58,6 +60,8 @@ export default function GreedyGameUI() {
   }, [phase, clearAllAnimations]);
 
   useEffect(() => {
+
+
     const runInit = async () => {
       const params = new URLSearchParams(window.location.search);
       const appKey = params.get("appKey");
@@ -79,9 +83,17 @@ export default function GreedyGameUI() {
     };
     runInit();
   }, []);
-
+useEffect(() => {
+  setTimeout(() => {
+    const sound = SoundManager.getInstance();
+    
+    // Use playBackground with volume parameter
+    sound.playBackground('GreedyBackgroundMusic', 0.03); // Adjust volume here (0.01 to 0.1)
+  }, 3000);
+}, []);
 
   if (!ready && isValid) return <GameLoading message="Initializing game..." />;
+
 
   return (
     <>
@@ -92,11 +104,11 @@ export default function GreedyGameUI() {
           radial-gradient(2px_2px_at_50px_160px,white,transparent)]">
         </div>
         <NetworkStatus state={netState} />
-
+        <SoundManagerLoadSounds />
 
         <div className="relative w-full max-w-lg h-screen flex items-center justify-center"
           // background image
-          style={{ backgroundImage: 'url("/greedyBackgroundImage.jpeg")', backgroundSize: 'contain' }}
+          style={{ backgroundImage: 'url("/greedyBackgroundImage.jpeg")', backgroundSize: 'cover' }}
         >
           <div className="relative w-full h-full isolate">
             <TopBar playerRef={playerRef} />

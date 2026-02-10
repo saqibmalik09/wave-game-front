@@ -27,8 +27,8 @@ export default function GreedyTimer() {
     const handleTimer = (data: any) => {
       setTimerData(data);
 
-      if (data.remaining === 3 && data.phase === 'bettingTimer') {
-        SoundManager.getInstance().play('timerUpSound');
+      if (data.remaining === 3 && (data.phase === 'bettingTimer' || data.phase === 'resultAnnounceTimer')) {
+        SoundManager.getInstance().play('TimerUpSound');
       }
 
       if (data.phase && data.phase !== lastPhase) {
