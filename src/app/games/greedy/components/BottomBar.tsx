@@ -48,6 +48,7 @@ export default function BottomBar() {
 
 
   const selectCoin = (amount: number, color: string) => {
+    SoundManager.getInstance().play('GreedyCoinSelectionToggle', 0.5);
     setSelectedCoin(amount);
     dispatch(setCoin({ amount, color }));
   };

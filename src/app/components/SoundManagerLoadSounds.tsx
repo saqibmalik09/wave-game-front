@@ -8,6 +8,8 @@ const soundFiles = {
     GreedyWheelSpinSound: `/GreedyWheelSpinSound.mp3`,
     TimerUpSound: `${process.env.NEXT_PUBLIC_BACKEND_ASSET_URL}/timeUp.mp3`,
     GreedyBackgroundMusic: `/GreedyBackgroundMusic.mp3`,
+    GreedySoundButtonToggle: `/GreedySoundButtonToggle.mp3`,
+    GreedyCoinSelectionToggle: `/GreedyCoinSelectionToggle.mp3`,
 };
 
 export const SoundManagerLoadSounds = () => {
