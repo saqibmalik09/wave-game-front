@@ -1,36 +1,45 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { Mail, Lock, Info, Loader2 } from 'lucide-react'
+import { Mail, Lock, Loader2 } from 'lucide-react'
 import { motion } from 'framer-motion'
-import { toast } from 'sonner'
+import { useAppDispatch, useAppSelector } from '@/lib/redux/hooks'
+import { login, clearError } from '@/lib/redux/slices/authSlice'
+import Link from 'next/link'
 
 export default function LoginPage() {
     const router = useRouter()
+    const dispatch = useAppDispatch()
+    const { loading, error, isAuthenticated } = useAppSelector((state) => state.auth)
+
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
-    const [loading, setLoading] = useState(false)
+
+    useEffect(() => {
+        if (isAuthenticated) {
+            router.push('/dashboard')
+        }
+    }, [isAuthenticated, router])
+
+    useEffect(() => {
+        return () => {
+            dispatch(clearError())
+        }
+    }, [dispatch])
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault()
-        setLoading(true)
 
-        // Simulate network delay
-        setTimeout(() => {
-            if (email === 'admin@wavegames.com' && password === '1234567') {
-                toast.success("Welcome back, Admin!")
-                router.push('/dashboard')
-            } else {
-                toast.error("Invalid credentials. Please try again.")
-                setLoading(false)
-            }
-        }, 2000)
+        const result = await dispatch(login({ email, password }))
+
+        if (login.fulfilled.match(result)) {
+            router.push('/dashboard')
+        }
     }
 
     return (
         <div className="min-h-screen w-full flex items-center justify-center bg-background text-foreground relative overflow-hidden transition-colors duration-300">
-            {/* Dynamic Background */}
             <div className="absolute top-[-20%] left-[-10%] w-[500px] h-[500px] bg-primary/20 rounded-full blur-[120px] pointer-events-none animate-pulse" />
             <div className="absolute bottom-[-20%] right-[-10%] w-[500px] h-[500px] bg-blue-600/20 rounded-full blur-[120px] pointer-events-none animate-pulse delay-1000" />
 
@@ -64,7 +73,8 @@ export default function LoginPage() {
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
                                     placeholder="admin@wavegames.com"
-                                    className="w-full bg-background/50 border border-input focus:border-primary/50 rounded-lg pl-9 pr-3 py-2 text-sm text-foreground placeholder:text-muted-foreground/50 outline-none transition-all ring-0 focus:ring-2 focus:ring-primary/10 shadow-sm"
+                                    disabled={loading}
+                                    className="w-full bg-background/50 border border-input focus:border-primary/50 rounded-lg pl-9 pr-3 py-2 text-sm text-foreground placeholder:text-muted-foreground/50 outline-none transition-all ring-0 focus:ring-2 focus:ring-primary/10 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
                                 />
                             </div>
                         </div>
@@ -79,11 +89,18 @@ export default function LoginPage() {
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
                                     placeholder="••••••••"
-                                    className="w-full bg-background/50 border border-input focus:border-primary/50 rounded-lg pl-9 pr-3 py-2 text-sm text-foreground placeholder:text-muted-foreground/50 outline-none transition-all ring-0 focus:ring-2 focus:ring-primary/10 shadow-sm"
+                                    disabled={loading}
+                                    className="w-full bg-background/50 border border-input focus:border-primary/50 rounded-lg pl-9 pr-3 py-2 text-sm text-foreground placeholder:text-muted-foreground/50 outline-none transition-all ring-0 focus:ring-2 focus:ring-primary/10 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
                                 />
                             </div>
                         </div>
                     </div>
+
+                    {error && (
+                        <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-3 text-xs text-red-500">
+                            {error}
+                        </div>
+                    )}
 
                     <button
                         type="submit"
@@ -91,16 +108,25 @@ export default function LoginPage() {
                         className="w-full h-10 bg-gradient-to-r from-primary to-blue-600 hover:from-primary/90 hover:to-blue-600/90 text-primary-foreground text-sm font-medium rounded-lg transition-all shadow-md hover:shadow-lg disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2 mt-2"
                     >
                         {loading ? (
-                            <Loader2 className="w-4 h-4 animate-spin" />
+                            <>
+                                <Loader2 className="w-4 h-4 animate-spin" />
+                                <span>Signing in...</span>
+                            </>
                         ) : (
                             "Sign In"
                         )}
                     </button>
                 </form>
 
-                <div className="mt-6 text-center">
+                <div className="mt-6 text-center space-y-2">
                     <p className="text-xs text-muted-foreground">
-                        Don't have an account? <span className="text-primary cursor-pointer hover:underline">Contact Admin</span>
+                        Don't have an account?{' '}
+                        <Link href="/register" className="text-primary hover:underline font-medium">
+                            Register here
+                        </Link>
+                    </p>
+                    <p className="text-xs text-muted-foreground/70">
+                        Default: superadmin@wavegames.com / Admin@123
                     </p>
                 </div>
             </motion.div>

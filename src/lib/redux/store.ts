@@ -6,22 +6,24 @@ import teenPattiBettingReducer from "./slices/teenpatti/teenPattiBettingSlice";
 import selectedCoinReducer from "./slices/teenpatti/selectedCoinSlice";
 import gameConfigurationReducer from "./slices/teenpatti/gameConfiguration";
 import tenantDetailsReducer from "./slices/tenantDetails";
-import coinAnimationReducer from "./slices/teenpatti/coinDropAnimation"; 
+import coinAnimationReducer from "./slices/teenpatti/coinDropAnimation";
 import applicationInfoReducer from "./slices/applicationInfoSlice";
 import winningPotReducer from "./slices/teenpatti/winningPotSlice";
+import authReducer from "./slices/authSlice";
 
 export const store = configureStore({
   reducer: {
+    auth: authReducer,
     userPlayerData: userPlayerInfoReducer,
     gameConfig: gameConfigReducer,
     teenpattiTimer: teenpattiTimerReducer,
-    teenPattiBettingReducer:teenPattiBettingReducer,
+    teenPattiBettingReducer: teenPattiBettingReducer,
     selectedCoin: selectedCoinReducer,
     gameConfiguration: gameConfigurationReducer,
-    tenantDetails:tenantDetailsReducer,
-    coinAnimation:coinAnimationReducer,
+    tenantDetails: tenantDetailsReducer,
+    coinAnimation: coinAnimationReducer,
     applicationInfo: applicationInfoReducer,
-    winningPot:winningPotReducer,
+    winningPot: winningPotReducer,
 
 
 

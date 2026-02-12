@@ -18,47 +18,132 @@ import {
     ChevronDown,
     Sliders,
     FileText,
-    ScrollText
+    ScrollText,
+    Shield,
 } from 'lucide-react'
+import { useAppSelector, useAppDispatch } from '@/lib/redux/hooks'
+import { logout } from '@/lib/redux/slices/authSlice'
+import { useRouter } from 'next/navigation'
+import { PERMISSIONS, RoleId } from '@/lib/types/auth.types'
 
 type NavItem = {
     name: string
     href?: string
     icon: any
     subItems?: NavItem[]
+    permissions?: string[] // Required permissions (user needs ANY of these)
+    roles?: number[] // Required roles (user needs ANY of these)
 }
 
 const navItems: NavItem[] = [
-    { name: 'Overview', href: '/dashboard', icon: LayoutDashboard },
-    { name: 'Analytics', href: '/dashboard/analytics', icon: BarChart3 },
-    { name: 'User Management', href: '/dashboard/users', icon: Users },
-    { name: 'Games Management', href: '/dashboard/games', icon: Gamepad2 },
-    { name: 'Broadcast Messages', href: '/dashboard/broadcast', icon: Megaphone },
+    {
+        name: 'Overview',
+        href: '/dashboard',
+        icon: LayoutDashboard,
+        permissions: [], // No permission required - everyone can see
+    },
+    {
+        name: 'Analytics',
+        href: '/dashboard/analytics',
+        icon: BarChart3,
+        permissions: [PERMISSIONS.GAMES_READ, PERMISSIONS.USERS_READ],
+    },
+    {
+        name: 'User Management',
+        href: '/dashboard/users',
+        icon: Users,
+        permissions: [PERMISSIONS.USERS_READ, PERMISSIONS.USERS_MANAGE],
+    },
+    {
+        name: 'Games Management',
+        href: '/dashboard/games',
+        icon: Gamepad2,
+        permissions: [PERMISSIONS.GAMES_READ, PERMISSIONS.GAMES_MANAGE],
+    },
+    {
+        name: 'Broadcast Messages',
+        href: '/dashboard/broadcast',
+        icon: Megaphone,
+        permissions: [PERMISSIONS.BROADCASTS_CREATE, PERMISSIONS.BROADCASTS_MANAGE],
+    },
     {
         name: 'Game Settings',
         icon: Sliders,
+        permissions: [PERMISSIONS.SETTINGS_READ, PERMISSIONS.SETTINGS_MANAGE, PERMISSIONS.GAMES_MANAGE],
         subItems: [
-            { name: 'Greedy Teen Patti', href: '/dashboard/game-settings/greedy-teenpatti', icon: Gamepad2 },
-            { name: 'Fruit Game', href: '/dashboard/game-settings/fruit-game', icon: Gamepad2 },
-            { name: 'Teen Patti 3', href: '/dashboard/game-settings/teenpatti-3', icon: Gamepad2 },
+            {
+                name: 'Greedy Teen Patti',
+                href: '/dashboard/game-settings/greedy-teenpatti',
+                icon: Gamepad2,
+                permissions: [PERMISSIONS.SETTINGS_UPDATE, PERMISSIONS.GAMES_MANAGE],
+            },
+            {
+                name: 'Fruit Game',
+                href: '/dashboard/game-settings/fruit-game',
+                icon: Gamepad2,
+                permissions: [PERMISSIONS.SETTINGS_UPDATE, PERMISSIONS.GAMES_MANAGE],
+            },
+            {
+                name: 'Teen Patti 3',
+                href: '/dashboard/game-settings/teenpatti-3',
+                icon: Gamepad2,
+                permissions: [PERMISSIONS.SETTINGS_UPDATE, PERMISSIONS.GAMES_MANAGE],
+            },
         ]
     },
     {
         name: 'Game Logs',
         icon: FileText,
+        permissions: [PERMISSIONS.GAMES_READ],
         subItems: [
-            { name: 'Greedy Teen Patti', href: '/dashboard/game-logs/greedy-teenpatti', icon: ScrollText },
-            { name: 'Fruit Game', href: '/dashboard/game-logs/fruit-game', icon: ScrollText },
-            { name: 'Teen Patti 3', href: '/dashboard/game-logs/teenpatti-3', icon: ScrollText },
+            {
+                name: 'Greedy Teen Patti',
+                href: '/dashboard/game-logs/greedy-teenpatti',
+                icon: ScrollText,
+                permissions: [PERMISSIONS.GAMES_READ],
+            },
+            {
+                name: 'Fruit Game',
+                href: '/dashboard/game-logs/fruit-game',
+                icon: ScrollText,
+                permissions: [PERMISSIONS.GAMES_READ],
+            },
+            {
+                name: 'Teen Patti 3',
+                href: '/dashboard/game-logs/teenpatti-3',
+                icon: ScrollText,
+                permissions: [PERMISSIONS.GAMES_READ],
+            },
         ]
     },
-    { name: 'Profile', href: '/dashboard/profile', icon: User },
-    { name: 'Settings', href: '/dashboard/settings', icon: Settings },
+    {
+        name: 'Roles & Permissions',
+        href: '/dashboard/roles',
+        icon: Shield,
+        roles: [RoleId.SUPERADMIN], // Only superadmin
+        permissions: [PERMISSIONS.ROLES_MANAGE, PERMISSIONS.PERMISSIONS_MANAGE],
+    },
+    {
+        name: 'Profile',
+        href: '/dashboard/profile',
+        icon: User,
+        permissions: [], // Everyone can access their profile
+    },
+    {
+        name: 'Settings',
+        href: '/dashboard/settings',
+        icon: Settings,
+        permissions: [PERMISSIONS.SETTINGS_READ],
+    },
 ]
 
 export function DashboardSidebar({ mobileOpen, setMobileOpen, collapsed }: { mobileOpen: boolean, setMobileOpen: (open: boolean) => void, collapsed: boolean }) {
     const pathname = usePathname()
+    const router = useRouter()
+    const dispatch = useAppDispatch()
     const [expandedMenus, setExpandedMenus] = useState<string[]>([])
+
+    const { user, permissions: userPermissions, roleIds } = useAppSelector((state) => state.auth)
 
     const toggleMenu = (menuName: string) => {
         setExpandedMenus(prev =>
@@ -67,6 +152,57 @@ export function DashboardSidebar({ mobileOpen, setMobileOpen, collapsed }: { mob
                 : [...prev, menuName]
         )
     }
+
+    const handleLogout = () => {
+        dispatch(logout())
+        router.push('/login')
+    }
+
+    const getUserInitials = () => {
+        if (!user) return 'U'
+        return user.name
+            .split(' ')
+            .map((n: string) => n[0])
+            .join('')
+            .toUpperCase()
+            .slice(0, 2)
+    }
+
+    // Check if user has permission to view a menu item
+    const hasPermission = (item: NavItem): boolean => {
+        // Superadmin bypasses all checks
+        if (roleIds.includes(RoleId.SUPERADMIN)) {
+            return true
+        }
+
+        // Check role requirements
+        if (item.roles && item.roles.length > 0) {
+            const hasRole = item.roles.some(roleId => roleIds.includes(roleId))
+            if (!hasRole) return false
+        }
+
+        // No permissions required
+        if (!item.permissions || item.permissions.length === 0) {
+            return true
+        }
+
+        // Check if user has ANY of the required permissions
+        return item.permissions.some(perm => userPermissions.includes(perm))
+    }
+
+    // Filter nav items based on permissions
+    const visibleNavItems = navItems.filter(item => {
+        const hasAccess = hasPermission(item)
+
+        // If item has sub-items, filter them too
+        if (item.subItems) {
+            item.subItems = item.subItems.filter(subItem => hasPermission(subItem))
+            // Hide parent if no sub-items are visible
+            return hasAccess && item.subItems.length > 0
+        }
+
+        return hasAccess
+    })
 
     return (
         <>
@@ -113,7 +249,7 @@ export function DashboardSidebar({ mobileOpen, setMobileOpen, collapsed }: { mob
                             Main Menu
                         </div>
                     )}
-                    {navItems.map((item) => {
+                    {visibleNavItems.map((item) => {
                         const isActive = pathname === item.href
                         const hasSubItems = item.subItems && item.subItems.length > 0
                         const isExpanded = expandedMenus.includes(item.name)
@@ -195,19 +331,23 @@ export function DashboardSidebar({ mobileOpen, setMobileOpen, collapsed }: { mob
                 {/* User Profile Footer */}
                 <div className="p-4 border-t border-border mt-auto">
                     <div className={cn("flex items-center gap-3 p-2 rounded-xl bg-accent/30 border border-border/50 hover:bg-accent/50 transition-colors", collapsed && "justify-center p-0 bg-transparent border-none hover:bg-transparent")}>
-                        <div className="w-9 h-9 rounded-full bg-muted flex items-center justify-center border border-border shrink-0">
-                            <span className="text-muted-foreground text-xs font-bold">AD</span>
+                        <div className="w-9 h-9 rounded-full bg-gradient-to-br from-primary to-blue-600 flex items-center justify-center border border-border shrink-0">
+                            <span className="text-white text-xs font-bold">{getUserInitials()}</span>
                         </div>
                         {!collapsed && (
                             <div className="flex-1 min-w-0">
-                                <p className="text-sm font-medium text-foreground truncate">Admin User</p>
-                                <p className="text-[10px] text-muted-foreground truncate">admin@wavegames.com</p>
+                                <p className="text-sm font-medium text-foreground truncate">{user?.name || 'User'}</p>
+                                <p className="text-[10px] text-muted-foreground truncate">{user?.email || 'user@example.com'}</p>
                             </div>
                         )}
                         {!collapsed && (
-                            <Link href="/login" className="p-1.5 text-muted-foreground hover:text-destructive transition-colors" title="Logout">
+                            <button
+                                onClick={handleLogout}
+                                className="p-1.5 text-muted-foreground hover:text-destructive transition-colors"
+                                title="Logout"
+                            >
                                 <LogOut className="w-4 h-4" />
-                            </Link>
+                            </button>
                         )}
                     </div>
                 </div>
